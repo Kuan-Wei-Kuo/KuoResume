@@ -33,7 +33,7 @@ public class Experience {
 
     private ArrayList<Stamp> stamps = new ArrayList<>();
 
-    private String[] texts = {"急救小幫手", "藍球戰術版", "UrCoco", "MyBlog"};
+    private String[] texts = {"MyChartLib", "急救小幫手", "籃球戰術版", "UrCoco", "MyBlog"};
 
     public Experience(Context context, ObjectListener objectListener) {
 

@@ -32,8 +32,6 @@ public class GLSetting {
 
     public void addTexture(int index, Bitmap bitmap) {
 
-        Log.d("index", index + "");
-
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + index);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureNames[index]);

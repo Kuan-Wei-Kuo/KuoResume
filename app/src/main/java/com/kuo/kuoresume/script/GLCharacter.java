@@ -24,7 +24,7 @@ public class GLCharacter extends ComputeRect{
     private SpriteAnimation batAnimation;
     private SpriteController deadPoolIdleController, deadPoolRunController, deadPoolDownController, deadPoolUpController;
 
-    private int moveSpeed = 25;
+    private int moveSpeed = 40;
     private int direction = 1;
 
     private Image deadPoolRun;

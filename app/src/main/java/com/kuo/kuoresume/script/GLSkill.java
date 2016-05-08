@@ -2,9 +2,13 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
+import android.util.Log;
 
+import com.kuo.kuoresume.data.ChartData;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
+import com.kuo.kuoresume.object.GLChartRect;
+import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLText;
 import com.kuo.kuoresume.object.Image;
 import com.kuo.kuoresume.until.Until;
@@ -22,6 +26,10 @@ public class GLSkill extends ComputeRect{
 
     private GLText signText, skillText;
 
+    private GLChartRect glChartRect, languageChart;
+
+    public GLImageText glImageText1, glImageText2;
+
     public GLSkill(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
@@ -30,6 +38,7 @@ public class GLSkill extends ComputeRect{
         width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
+
 
         createPlants();
         createImage();
@@ -60,9 +69,39 @@ public class GLSkill extends ComputeRect{
 
         signText = new GLText("Level 2", 0, plantHeight - plantSize * 4);
 
-        signWood = new Image(new RectF(plantSize * 4, plantHeight - plantSize * 2, plantSize * 6, plantHeight));
+        signWood = new Image(new RectF(plantSize * 4,  plantHeight - plantSize *2, plantSize * 6, plantHeight));
 
         skillText = new GLText("SKILL", 0, 0);
+
+
+        String[] softwareAxisY = {"Android Studio", "Eclipse", "Git", "Unity"};
+        int[] values = {5, 3, 2, 2};
+
+        String[] languageAxisY = {"Java", "C", "C#", "JavaScript"};
+        int[] lvalues = {5, 3, 3, 2};
+
+        ArrayList<ChartData> softwareChartData = new ArrayList<>();
+        ArrayList<ChartData> languageChartData = new ArrayList<>();
+
+        for(int i = 0 ; i < softwareAxisY.length ; i++) {
+
+            ChartData chartData = new ChartData(softwareAxisY[i], values[i]);
+            softwareChartData.add(chartData);
+
+            ChartData chartData1 = new ChartData(languageAxisY[i], lvalues[i]);
+            languageChartData.add(chartData1);
+
+        }
+
+        glChartRect = new GLChartRect(0, 0, softwareChartData);
+        glChartRect.setPosition(plantSize * 8, plantHeight - glChartRect.getHeight());
+
+        glImageText1 = new GLImageText("SoftWare", plantSize * 8, plantHeight / 6);
+
+        languageChart = new GLChartRect(0, 0, languageChartData);
+        languageChart.setPosition(plantSize * 10 + glChartRect.getWidth(), plantHeight - languageChart.getHeight());
+
+        glImageText2= new GLImageText("Language", plantSize * 8, plantHeight / 6);
     }
 
     public void draw(float[] mvpMatrix) {
@@ -74,6 +113,13 @@ public class GLSkill extends ComputeRect{
 
         signWood.draw(mvpMatrix, 6);
         skillText.draw(mvpMatrix);
+
+        glChartRect.draw(mvpMatrix);
+        glImageText1.draw(mvpMatrix);
+
+        languageChart.draw(mvpMatrix);
+        glImageText2.draw(mvpMatrix);
+
     }
 
     private void drawPlants(float[] mvpMatrix) {
@@ -89,6 +135,8 @@ public class GLSkill extends ComputeRect{
     public void computeRect() {
         computeLevelSign();
         computeSkill();
+        computeSoftwareRect();
+        computeLanguageRect();
     }
 
     private void computeLevelSign() {
@@ -120,6 +168,35 @@ public class GLSkill extends ComputeRect{
         skillText.setLocation(signWood.getDstRect().centerX() - signText.getWidth() / 2,
                 signWood.getDstRect().top + skillText.getHeight() / 2);
 
+    }
+
+    private void computeSoftwareRect() {
+
+
+        float x = dstRect.left + glChartRect.getX();
+        float y = glChartRect.getY();
+
+        glChartRect.setRawPosition(x, y);
+
+
+        RectF textSrcRect = glImageText1.getSrcRect();
+
+        glImageText1.setLocation(glChartRect.getRawCenterX() - textSrcRect.width() / 2,
+                dstRect.top + textSrcRect.top);
+    }
+
+    private void computeLanguageRect() {
+
+
+        float x = dstRect.left + languageChart.getX();
+        float y = languageChart.getY();
+
+        languageChart.setRawPosition(x, y);
+
+        RectF textSrcRect = glImageText2.getSrcRect();
+
+        glImageText2.setLocation(languageChart.getRawCenterX() - textSrcRect.width() / 2,
+                dstRect.top + textSrcRect.top);
     }
 
     private void computePlants() {

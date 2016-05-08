@@ -13,6 +13,7 @@ import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.Square;
 import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLCharacter;
+import com.kuo.kuoresume.script.GLExperience;
 import com.kuo.kuoresume.script.GLSetting;
 import com.kuo.kuoresume.script.GLSkill;
 import com.kuo.kuoresume.until.Until;
@@ -47,6 +48,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLSetting glSetting;
     GLAbout glAbout;
     GLSkill glSkill;
+    GLExperience glExperience;
     GLCharacter glCharacter;
 
     public InterviewRenderer(Context context, ObjectListener objectListener) {
@@ -97,9 +99,10 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        glSetting = new GLSetting(10);
+        glSetting = new GLSetting(11);
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
+        glExperience = new GLExperience(mContext, this, objectListener);
         glCharacter = new GLCharacter(mContext, this, objectListener);
 
         createTexture();
@@ -117,6 +120,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             glCharacter.computeSprite();
             glAbout.computeRect();
             glSkill.computeRect();
+            glExperience.computeRect();
         }
 
         mSquare.draw(mMVPMatrix);
@@ -124,6 +128,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glAbout.draw(mMVPMatrix);
 
         glSkill.draw(mMVPMatrix);
+
+        glExperience.draw(mMVPMatrix);
 
         //glCharacter.draw(mMVPMatrix);
 
@@ -165,14 +171,15 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(7, objectListener.getHolderBitmap().pinkTag);
         glSetting.addTexture(8, objectListener.getHolderBitmap().build85);
         glSetting.addTexture(9, objectListener.getHolderBitmap().plantSea);
+        glSetting.addTexture(10, objectListener.getHolderBitmap().videoTape);
     }
 
     private void computeRect() {
 
         RectF currentRect = viewCompute.getCurRect();
 
-        float[] widths = {glAbout.getWidth(), glSkill.getWidth()};
-        float[] heights = {glAbout.getHeight(), glSkill.getHeight()};
+        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth()};
+        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight()};
 
         float left, top, right = 0, bottom;
 
@@ -187,6 +194,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 glAbout.setDstRect(left, top, right, bottom);
             else if(i == 1)
                 glSkill.setDstRect(left, top, right, bottom);
+            else if(i == 2)
+                glExperience.setDstRect(left, top, right, bottom);
         }
     }
 
