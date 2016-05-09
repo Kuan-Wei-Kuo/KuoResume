@@ -8,7 +8,6 @@ import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLText;
 import com.kuo.kuoresume.object.Image;
-import com.kuo.kuoresume.until.Until;
 
 import java.util.ArrayList;
 
@@ -64,15 +63,20 @@ public class GLAbout extends ComputeRect{
 
     public void drawPlants(float[] mvpMatrix) {
 
-        computePlants();
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
         int count = 0;
         for(Image image : plants) {
 
-            if (count >= SEA_MIN_SIZE && count <= SEA_MAX_SIZE)
-                image.draw(mvpMatrix, 9);
-            else
-                image.draw(mvpMatrix, 2);
+            RectF rectF = image.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
+                if (count >= SEA_MIN_SIZE && count <= SEA_MAX_SIZE)
+                    image.draw(mvpMatrix, 9);
+                else
+                    image.draw(mvpMatrix, 2);
+            }
             count++;
         }
     }
@@ -116,10 +120,19 @@ public class GLAbout extends ComputeRect{
     }
 
     public void computeRect() {
+
+        computePlants();
         computeAbout();
         computeLevelSign();
         computeTicketStation();
         computeBuild85();
+
+        GLCharacter glCharacter = viewComputeListener.getGLCharacter();
+        RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+        if(glCharacter.dstRect.right > dstRect.left && currentRect.top < contentRect.top){}
+
     }
 
     private void computeLevelSign() {
@@ -185,7 +198,7 @@ public class GLAbout extends ComputeRect{
 
     private void computePlants() {
 
-        float plantSize = Until.dp2px(context.getResources().getDisplayMetrics().density, 50);
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
 
         int count = 0;
         for(Image image : plants) {

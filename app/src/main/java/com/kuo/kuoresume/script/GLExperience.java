@@ -40,10 +40,10 @@ public class GLExperience extends ComputeRect {
         createPlants();
         createImage();
         createVideoTapes();
+        computeRect();
     }
 
     private void createImage() {
-
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
 
@@ -118,9 +118,17 @@ public class GLExperience extends ComputeRect {
 
     public void drawPlants(float[] mvpMatrix) {
 
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
         int count = 0;
         for(Image image : plants) {
-            image.draw(mvpMatrix, 2);
+
+            RectF rectF = image.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
+                image.draw(mvpMatrix, 2);
+
             count++;
         }
     }
@@ -167,8 +175,6 @@ public class GLExperience extends ComputeRect {
 
 
     private void computeVideoTapes() {
-
-        float plantSize = Until.dp2px(context.getResources().getDisplayMetrics().density, 50);
 
         int count = 0;
         for(Image image : videoTapes) {
