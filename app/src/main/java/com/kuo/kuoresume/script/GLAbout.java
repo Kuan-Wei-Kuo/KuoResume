@@ -128,10 +128,15 @@ public class GLAbout extends ComputeRect{
         computeBuild85();
 
         GLCharacter glCharacter = viewComputeListener.getGLCharacter();
+
         RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-        if(glCharacter.dstRect.right > dstRect.left && currentRect.top < contentRect.top){}
+        if(glCharacter.dstRect.right > dstRect.right) {
+            glCharacter.setCharacterStae(GLCharacter.CHARACTER_AIR);
+        } else if(glCharacter.dstRect.left > dstRect.right) {
+            glCharacter.setCharacterStae(GLCharacter.CHARACTER_DOWN);
+        }
 
     }
 

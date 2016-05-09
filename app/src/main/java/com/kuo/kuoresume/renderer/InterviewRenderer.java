@@ -144,10 +144,19 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     public void onTouchEvent(MotionEvent event) {
 
-        if(event.getAction() == MotionEvent.ACTION_DOWN)
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+            glCharacter.setCharacterStae(GLCharacter.CHARACTER_RUN);
+
             touch = true;
-        else if(event.getAction() == MotionEvent.ACTION_UP)
+
+        } else if(event.getAction() == MotionEvent.ACTION_UP) {
+
+            glCharacter.setCharacterStae(GLCharacter.CHARACTER_IDLE);
+
             touch = false;
+
+        }
 
         if(event.getX() <= mScreenWidth / 2)
             glCharacter.setDirection(-1);
@@ -166,6 +175,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     }
 
     private void createTexture() {
+
         glSetting.addTexture(0, objectListener.getHolderBitmap().deadPool_run);
         glSetting.addTexture(1, objectListener.getHolderBitmap().font);
         glSetting.addTexture(2, objectListener.getHolderBitmap().plantSand);
@@ -177,6 +187,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(8, objectListener.getHolderBitmap().build85);
         glSetting.addTexture(9, objectListener.getHolderBitmap().plantSea);
         glSetting.addTexture(10, objectListener.getHolderBitmap().videoTape);
+
     }
 
     private void computeRect() {

@@ -8,7 +8,7 @@ import android.graphics.RectF;
  */
 public class ViewCompute {
 
-    private RectF curRect, contentRect, plantRect;
+    private RectF currentRect, contentRect, plantRect;
 
     private float columnWidth, marginWidth, radius;
 
@@ -37,7 +37,7 @@ public class ViewCompute {
     }
 
     public void setCurRect(RectF curRect) {
-        this.curRect = curRect;
+        this.currentRect = curRect;
     }
 
     public void setPlantRect(RectF plantRect) {
@@ -61,7 +61,7 @@ public class ViewCompute {
     }
 
     public RectF getCurRect() {
-        return curRect;
+        return currentRect;
     }
 
     public RectF getPlantRect() {
