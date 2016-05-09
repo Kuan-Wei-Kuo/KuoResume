@@ -75,7 +75,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         viewCompute.setPlantSize(Until.dp2px(mContext .getResources().getDisplayMetrics().density, 50));
         viewCompute.setContentRect(new RectF(0, 0, width, height));
-        viewCompute.setCurRect(new RectF(0, 0, width, height));
+        viewCompute.setCurRect(new RectF(0, - height, width, height));
 
         GLES20.glViewport(0, 0, (int) mScreenWidth, (int) mScreenHeight);
 
@@ -106,7 +106,13 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glCharacter = new GLCharacter(mContext, this, objectListener);
 
         createTexture();
+
         computeRect();
+
+        glCharacter.computeSprite();
+        glAbout.computeRect();
+        glSkill.computeRect();
+        glExperience.computeRect();
     }
 
     @Override
@@ -114,9 +120,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        computeRect();
-
         if (touch) {
+            computeRect();
             glCharacter.computeSprite();
             glAbout.computeRect();
             glSkill.computeRect();
@@ -191,16 +196,21 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             bottom = top + heights[i];
 
             if (i == 0)
-                glAbout.setDstRect(left, top, right, bottom);
+                glAbout.setDstRect(left, top + heights[i], right, bottom + heights[i]);
             else if(i == 1)
                 glSkill.setDstRect(left, top, right, bottom);
             else if(i == 2)
-                glExperience.setDstRect(left, top, right, bottom);
+                glExperience.setDstRect(left, top + heights[i], right, bottom + heights[i]);
         }
     }
 
     @Override
     public ViewCompute getViewCompute() {
         return viewCompute;
+    }
+
+    @Override
+    public GLCharacter getGLCharacter() {
+        return glCharacter;
     }
 }

@@ -2,7 +2,6 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.kuo.kuoresume.data.ChartData;
 import com.kuo.kuoresume.listener.ObjectListener;
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 public class GLSkill extends ComputeRect{
 
     private ArrayList<Image> plants = new ArrayList<>();
+    private ArrayList<Image> grounds = new ArrayList<>();
 
     private Image levelSign, signWood;
 
@@ -39,9 +39,32 @@ public class GLSkill extends ComputeRect{
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
 
-
         createPlants();
+        createGrounds();
         createImage();
+        computeRect();
+    }
+
+    private void createGrounds() {
+
+        RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        int groundVerticalSize = ((int) currentRect.height() - height) / (int) plantSize + 1;
+
+        for(int j = 0 ; j < groundVerticalSize ; j++) {
+            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+                float left = dstRect.left + plantSize * i;
+                float top = dstRect.bottom + plantSize * j;
+                float right = left + plantSize;
+                float bottom = top + plantSize;
+
+                grounds.add(new Image(new RectF(left, top, right, bottom)));
+            }
+        }
+
     }
 
     private void createPlants() {
@@ -107,6 +130,7 @@ public class GLSkill extends ComputeRect{
     public void draw(float[] mvpMatrix) {
 
         drawPlants(mvpMatrix);
+        drawGrounds(mvpMatrix);
 
         levelSign.draw(mvpMatrix, 3);
         signText.draw(mvpMatrix);
@@ -122,17 +146,37 @@ public class GLSkill extends ComputeRect{
 
     }
 
+    private void drawGrounds(float[] mvpMatrix) {
+
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+        //int count = 0;
+        for(Image image : grounds) {
+
+            RectF rectF = image.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
+                image.draw(mvpMatrix, 2);
+        }
+    }
+
     private void drawPlants(float[] mvpMatrix) {
 
-        computePlants();
-
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
         //int count = 0;
         for(Image image : plants) {
-            image.draw(mvpMatrix, 2);
+
+            RectF rectF = image.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
+                image.draw(mvpMatrix, 2);
         }
     }
 
     public void computeRect() {
+        computeGrounds();
+        computePlants();
         computeLevelSign();
         computeSkill();
         computeSoftwareRect();
@@ -197,6 +241,29 @@ public class GLSkill extends ComputeRect{
 
         glImageText2.setLocation(languageChart.getRawCenterX() - textSrcRect.width() / 2,
                 dstRect.top + textSrcRect.top);
+    }
+
+    private void computeGrounds() {
+
+        RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        int groundVerticalSize = ((int) currentRect.height() - height) / (int) plantSize + 1;
+
+        int count = 0;
+        for(int j = 0 ; j < groundVerticalSize ; j++) {
+            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+                float left = dstRect.left + plantSize * i;
+                float top = dstRect.bottom + plantSize * j;
+                float right = left + plantSize;
+                float bottom = top + plantSize;
+
+                grounds.get(count).setDstRect(left, top, right, bottom);
+                count ++;
+            }
+        }
     }
 
     private void computePlants() {
