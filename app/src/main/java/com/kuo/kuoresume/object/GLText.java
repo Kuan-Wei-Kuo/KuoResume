@@ -117,40 +117,43 @@ public class GLText {
 
     private void setGLES() {
 
-        ByteBuffer bb = ByteBuffer.allocateDirect(totalCoords.length * 4); // (# of coordinate values * 4 bytes per float)
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(totalCoords);
-        vertexBuffer.position(0);
+        try {
+            ByteBuffer bb = ByteBuffer.allocateDirect(totalCoords.length * 4); // (# of coordinate values * 4 bytes per float)
+            bb.order(ByteOrder.nativeOrder());
+            vertexBuffer = bb.asFloatBuffer();
+            vertexBuffer.put(totalCoords);
+            vertexBuffer.position(0);
 
-        ByteBuffer dlb = ByteBuffer.allocateDirect(totalDrawOrder.length * 2); // (# of coordinate values * 2 bytes per short)
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(totalDrawOrder);
-        drawListBuffer.position(0);
+            ByteBuffer dlb = ByteBuffer.allocateDirect(totalDrawOrder.length * 2); // (# of coordinate values * 2 bytes per short)
+            dlb.order(ByteOrder.nativeOrder());
+            drawListBuffer = dlb.asShortBuffer();
+            drawListBuffer.put(totalDrawOrder);
+            drawListBuffer.position(0);
 
-        ByteBuffer bbr = ByteBuffer.allocateDirect(totalUvss.length * 4);
-        bbr.order(ByteOrder.nativeOrder());
-        uvBuffer = bbr.asFloatBuffer();
-        uvBuffer.put(totalUvss);
-        uvBuffer.position(0);
+            ByteBuffer bbr = ByteBuffer.allocateDirect(totalUvss.length * 4);
+            bbr.order(ByteOrder.nativeOrder());
+            uvBuffer = bbr.asFloatBuffer();
+            uvBuffer.put(totalUvss);
+            uvBuffer.position(0);
 
-        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
-                riGraphicTools.vertexShaderCode);
-        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER,
-                riGraphicTools.fragmentShaderCode);
+            int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
+                    riGraphicTools.vertexShaderCode);
+            int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER,
+                    riGraphicTools.fragmentShaderCode);
 
-        // create empty OpenGL ES Program
-        mProgram = GLES20.glCreateProgram();
+            // create empty OpenGL ES Program
+            mProgram = GLES20.glCreateProgram();
 
-        // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, vertexShader);
+            // add the vertex shader to program
+            GLES20.glAttachShader(mProgram, vertexShader);
 
-        // add the fragment shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader);
+            // add the fragment shader to program
+            GLES20.glAttachShader(mProgram, fragmentShader);
 
-        // creates OpenGL ES program executables
-        GLES20.glLinkProgram(mProgram);
+            // creates OpenGL ES program executables
+            GLES20.glLinkProgram(mProgram);
+        } catch (Exception e) {}
+
 
     }
 
@@ -217,27 +220,35 @@ public class GLText {
 
         computeCoords();
 
-        vertexBuffer.clear();
-        drawListBuffer.clear();
-        uvBuffer.clear();
+        if(vertexBuffer != null)
+            vertexBuffer.clear();
 
-        ByteBuffer bb = ByteBuffer.allocateDirect(totalCoords.length * 4); // (# of coordinate values * 4 bytes per float)
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(totalCoords);
-        vertexBuffer.position(0);
+        if(drawListBuffer != null)
+            drawListBuffer.clear();
 
-        ByteBuffer dlb = ByteBuffer.allocateDirect(totalDrawOrder.length * 2); // (# of coordinate values * 2 bytes per short)
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(totalDrawOrder);
-        drawListBuffer.position(0);
+        if(uvBuffer != null)
+            uvBuffer.clear();
 
-        ByteBuffer bbr = ByteBuffer.allocateDirect(totalUvss.length * 4);
-        bbr.order(ByteOrder.nativeOrder());
-        uvBuffer = bbr.asFloatBuffer();
-        uvBuffer.put(totalUvss);
-        uvBuffer.position(0);
+        try {
+            ByteBuffer bb = ByteBuffer.allocateDirect(totalCoords.length * 4); // (# of coordinate values * 4 bytes per float)
+            bb.order(ByteOrder.nativeOrder());
+            vertexBuffer = bb.asFloatBuffer();
+            vertexBuffer.put(totalCoords);
+            vertexBuffer.position(0);
+
+            ByteBuffer dlb = ByteBuffer.allocateDirect(totalDrawOrder.length * 2); // (# of coordinate values * 2 bytes per short)
+            dlb.order(ByteOrder.nativeOrder());
+            drawListBuffer = dlb.asShortBuffer();
+            drawListBuffer.put(totalDrawOrder);
+            drawListBuffer.position(0);
+
+            ByteBuffer bbr = ByteBuffer.allocateDirect(totalUvss.length * 4);
+            bbr.order(ByteOrder.nativeOrder());
+            uvBuffer = bbr.asFloatBuffer();
+            uvBuffer.put(totalUvss);
+            uvBuffer.position(0);
+        } catch (Exception e) {}
+
     }
 
     private int computeCharToIndex(char c) {

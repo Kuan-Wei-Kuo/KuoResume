@@ -134,7 +134,7 @@ public class GLAbout extends ComputeRect{
         RectF srcRect = levelSign.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top = dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 
@@ -149,7 +149,7 @@ public class GLAbout extends ComputeRect{
         RectF srcRect = signWood.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top =  dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 
@@ -165,7 +165,7 @@ public class GLAbout extends ComputeRect{
         RectF srcRect = ticketStation.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top = dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 
@@ -178,7 +178,7 @@ public class GLAbout extends ComputeRect{
         RectF srcRect = build85.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top = dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 

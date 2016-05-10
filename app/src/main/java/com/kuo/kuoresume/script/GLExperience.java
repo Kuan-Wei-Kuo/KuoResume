@@ -3,8 +3,10 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
+import com.kuo.kuoresume.data.ChartData;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
+import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLText;
 import com.kuo.kuoresume.object.Image;
 import com.kuo.kuoresume.until.Until;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
  */
 public class GLExperience extends ComputeRect {
 
-    private static final int VIDEO_TAPES_SIZE = 350;
+    private static final int VIDEO_TAPES_SIZE = 550;
 
     private ArrayList<Image> plants = new ArrayList<>();
 
@@ -25,6 +27,8 @@ public class GLExperience extends ComputeRect {
     private GLText signText, experience;
 
     private ArrayList<Image> videoTapes = new ArrayList<>();
+    private ArrayList<Image> images = new ArrayList<>();
+    private ArrayList<GLText> glImageTexts = new ArrayList<>();
 
     private String[] texts = {"MyChartLib", "急救小幫手", "籃球戰術版", "UrCoco", "MyBlog"};
 
@@ -40,6 +44,7 @@ public class GLExperience extends ComputeRect {
         createPlants();
         createImage();
         createVideoTapes();
+        createGLImageTexts();
         computeRect();
     }
 
@@ -58,6 +63,17 @@ public class GLExperience extends ComputeRect {
         experience = new GLText("EXPERIENCE", 0, 0);
     }
 
+    private void createGLImageTexts() {
+
+        for(int i = 0 ; i < texts.length ; i++) {
+
+            GLText glImageText = new GLText(texts[i], 0, 0);
+            glImageTexts.add(glImageText);
+
+        }
+
+    }
+
     private void createVideoTapes() {
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
@@ -71,9 +87,15 @@ public class GLExperience extends ComputeRect {
             float right = left + VIDEO_TAPES_SIZE;
             float bottom = top + VIDEO_TAPES_SIZE;
 
-            Image image = new Image(new RectF(left, top, right, bottom));
+            Image taps = new Image(new RectF(left, top, right, bottom));
 
-            videoTapes.add(image);
+            Image image = new Image(new RectF(taps.getSrcRect().centerX() - VIDEO_TAPES_SIZE * 0.8f / 2,
+                    taps.getSrcRect().centerY() - VIDEO_TAPES_SIZE * 0.8f / 2,
+                    taps.getSrcRect().centerX() + VIDEO_TAPES_SIZE * 0.8f / 2,
+                    taps.getSrcRect().centerY() + VIDEO_TAPES_SIZE * 0.8f / 2));
+
+            images.add(image);
+            videoTapes.add(taps);
 
         }
     }
@@ -102,12 +124,32 @@ public class GLExperience extends ComputeRect {
         experience.draw(mvpMatrix);
 
         drawVideoTapes(mvpMatrix);
+        drawImages(mvpMatrix);
+        drawGLImageTexts(mvpMatrix);
 
         drawPlants(mvpMatrix);
 
     }
 
-    public void drawVideoTapes(float[] mvpMatrix) {
+    private void drawGLImageTexts(float[] mvpMatrix) {
+
+        int count = 0;
+        for(GLText glImageText : glImageTexts) {
+            glImageText.draw(mvpMatrix);
+            count++;
+        }
+    }
+
+    private void drawImages(float[] mvpMatrix) {
+
+        int count = 0;
+        for(Image image : images) {
+            image.draw(mvpMatrix, 3);
+            count++;
+        }
+    }
+
+    private void drawVideoTapes(float[] mvpMatrix) {
 
         int count = 0;
         for(Image image : videoTapes) {
@@ -116,7 +158,7 @@ public class GLExperience extends ComputeRect {
         }
     }
 
-    public void drawPlants(float[] mvpMatrix) {
+    private void drawPlants(float[] mvpMatrix) {
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
@@ -139,7 +181,8 @@ public class GLExperience extends ComputeRect {
         computeLevelSign();
         computeExperience();
         computeVideoTapes();
-
+        computeImages();
+        computeGLImageTexts();
     }
 
     private void computeLevelSign() {
@@ -147,7 +190,7 @@ public class GLExperience extends ComputeRect {
         RectF srcRect = levelSign.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top = dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 
@@ -162,7 +205,7 @@ public class GLExperience extends ComputeRect {
         RectF srcRect = signWood.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top = dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 
@@ -180,9 +223,42 @@ public class GLExperience extends ComputeRect {
         for(Image image : videoTapes) {
 
             float left = dstRect.left + image.getSrcRect().left;
-            float top = image.getSrcRect().top;
+            float top = dstRect.top + image.getSrcRect().top;
             float right = left + VIDEO_TAPES_SIZE;
             float bottom = top + VIDEO_TAPES_SIZE;
+
+            image.setDstRect(left, top, right, bottom);
+
+            count++;
+        }
+    }
+
+    private void computeGLImageTexts() {
+
+        int count = 0;
+        for(GLText glImageText : glImageTexts) {
+
+            float left = dstRect.left + glImageText.x;
+            float top = dstRect.top + glImageText.y;
+            float right = left + VIDEO_TAPES_SIZE * 0.8f;
+            float bottom = top + VIDEO_TAPES_SIZE * 0.8f;
+
+            glImageText.setLocation(left, top);
+
+            count++;
+        }
+
+    }
+
+    private void computeImages() {
+
+        int count = 0;
+        for(Image image : images) {
+
+            float left = dstRect.left + image.getSrcRect().left;
+            float top = dstRect.top + image.getSrcRect().top;
+            float right = left + VIDEO_TAPES_SIZE * 0.8f;
+            float bottom = top + VIDEO_TAPES_SIZE * 0.8f;
 
             image.setDstRect(left, top, right, bottom);
 

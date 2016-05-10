@@ -34,6 +34,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
 
+    private boolean isTouch = false;
     // Our screenresolution
     float   mScreenWidth = 1280;
     float   mScreenHeight = 768;
@@ -53,8 +54,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLSkill glSkill;
     GLExperience glExperience;
     GLCharacter glCharacter;
-
-    ArrayList<RectF> levelRage = new ArrayList<>();
 
     public InterviewRenderer(Context context, ObjectListener objectListener) {
         mContext = context;
@@ -86,7 +85,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         Matrix.orthoM(mProjectionMatrix, 0, 0f, mScreenWidth, 0.0f, mScreenHeight, 0, 50);
 
-        float ratio = (float) width / height;
+        //float ratio = (float) width / height;
 
         // Screen to the drawing coordinates
         final float left = 0;
@@ -112,15 +111,11 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         glAbout.setSrcRect(0, glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight() * 2);
         glSkill.setSrcRect(0, 0, glAbout.getWidth(), glAbout.getHeight());
-        glExperience.setSrcRect(0, glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight() * 2);
+        glExperience.setSrcRect(0, glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight() * 2);
 
         createTexture();
-
+        computeCurrentRect();
         computeRect();
-
-        glAbout.computeRect();
-        glSkill.computeRect();
-        glExperience.computeRect();
     }
 
     @Override
@@ -128,8 +123,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        if (jumpAndDownToSkill() || touch) {
-            if(touch)
+        if (jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch) {
+            if(isTouch)
                 glCharacter.computeSprite(GLCharacter.CHARACTER_RUN);
             computeRect();
         }
@@ -153,10 +148,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         RectF currentRect = viewCompute.getCurRect();
         RectF contentRect = viewCompute.getContentRect();
 
-        Log.d("cRect", glCharacter.getDstRect() + "");
-        Log.d("aRect", glAbout.getDstRect() + "");
-
         if(glCharacter.getDstRect().right > glAbout.getDstRect().right
+                && glCharacter.getDirection() == 1
+                && glCharacter.getDstRect().right < glSkill.getDstRect().right
                 && currentRect.top < contentRect.top) {
 
             glCharacter.setAirDirection(1);
@@ -165,6 +159,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             needInvalidate = true;
 
         } else if(glCharacter.getDstRect().left < glAbout.getDstRect().right
+                && glCharacter.getDirection() == -1
+                && glCharacter.getDstRect().left < glSkill.getDstRect().right
                 && currentRect.bottom > contentRect.bottom) {
 
             glCharacter.setAirDirection(-1);
@@ -176,38 +172,35 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         return needInvalidate;
     }
 
-    boolean touch;
+    private boolean jumpAndDownToExperience() {
 
-    public void onTouchEvent(MotionEvent event) {
+        boolean needInvalidate = false;
 
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+        RectF currentRect = viewCompute.getCurRect();
+        RectF contentRect = viewCompute.getContentRect();
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
+        if(glCharacter.getDstRect().right > glSkill.getDstRect().right
+                && glCharacter.getDirection() == 1
+                && glCharacter.getDstRect().right > glAbout.getDstRect().right
+                && currentRect.bottom > contentRect.bottom) {
 
-            touch = true;
+            glCharacter.setAirDirection(-1);
+            glCharacter.computeSprite(GLCharacter.CHARACTER_DOWN);
 
-        } else if(event.getAction() == MotionEvent.ACTION_UP) {
+            needInvalidate = true;
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
+        } else if(glCharacter.getDstRect().left < glSkill.getDstRect().right
+                && glCharacter.getDirection() == -1
+                && glCharacter.getDstRect().left > glAbout.getDstRect().right
+                && currentRect.top < contentRect.top) {
 
-            touch = false;
+            glCharacter.setAirDirection(1);
+            glCharacter.computeSprite(GLCharacter.CHARACTER_UP);
 
+            needInvalidate = true;
         }
 
-        if(event.getX() <= mScreenWidth / 2)
-            glCharacter.setDirection(-1);
-        else
-            glCharacter.setDirection(1);
-
-    }
-
-    public void onPause() {
-        /* Do stuff to pause the renderer */
-    }
-
-    public void onResume() {
-        /* Do stuff to resume the renderer */
-        mLastTime = System.currentTimeMillis();
+        return needInvalidate;
     }
 
     private void createTexture() {
@@ -224,6 +217,18 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(9, objectListener.getHolderBitmap().plantSea);
         glSetting.addTexture(10, objectListener.getHolderBitmap().videoTape);
 
+    }
+
+    private void computeCurrentRect() {
+
+        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth()};
+
+        float totalWidth = 0;
+        for(float f : widths) {
+            totalWidth += f;
+        }
+
+        viewCompute.setCurRect(new RectF(0, - glAbout.getHeight(), totalWidth, glAbout.getHeight()));
     }
 
     private void computeRect() {
@@ -248,12 +253,35 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             else if(i == 1)
                 glSkill.setDstRect(left, top, right, bottom);
             else if(i == 2)
-                glExperience.setDstRect(left, top + heights[i], right, bottom + heights[i]);
+                glExperience.setDstRect(left, top, right, bottom);
         }
 
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();
+    }
+
+    public void onTouchEvent(MotionEvent event) {
+
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
+
+            isTouch = true;
+
+        } else if(event.getAction() == MotionEvent.ACTION_UP) {
+
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
+
+            isTouch = false;
+
+        }
+
+        if(event.getX() <= mScreenWidth / 2)
+            glCharacter.setDirection(-1);
+        else
+            glCharacter.setDirection(1);
+
     }
 
     @Override
@@ -264,5 +292,14 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     @Override
     public GLCharacter getGLCharacter() {
         return glCharacter;
+    }
+
+    public void onPause() {
+        /* Do stuff to pause the renderer */
+    }
+
+    public void onResume() {
+        /* Do stuff to resume the renderer */
+        mLastTime = System.currentTimeMillis();
     }
 }

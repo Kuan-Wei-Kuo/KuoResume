@@ -188,7 +188,7 @@ public class GLSkill extends ComputeRect{
         RectF srcRect = levelSign.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top = dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 
@@ -203,7 +203,7 @@ public class GLSkill extends ComputeRect{
         RectF srcRect = signWood.getSrcRect();
 
         float left = dstRect.left + srcRect.left;
-        float top = srcRect.top;
+        float top = dstRect.top + srcRect.top;
         float right = left + srcRect.width();
         float bottom = top + srcRect.height();
 
@@ -218,7 +218,7 @@ public class GLSkill extends ComputeRect{
 
 
         float x = dstRect.left + glChartRect.getX();
-        float y = glChartRect.getY();
+        float y = dstRect.top + glChartRect.getY();
 
         glChartRect.setRawPosition(x, y);
 
@@ -233,7 +233,7 @@ public class GLSkill extends ComputeRect{
 
 
         float x = dstRect.left + languageChart.getX();
-        float y = languageChart.getY();
+        float y = dstRect.top + languageChart.getY();
 
         languageChart.setRawPosition(x, y);
 

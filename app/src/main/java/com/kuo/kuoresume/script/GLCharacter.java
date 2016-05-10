@@ -51,7 +51,7 @@ public class GLCharacter extends ComputeRect{
                 objectListener.getHolderBitmap().deadPool_run.getHeight(), 2);
         deadPoolRunController.setOnUpdateListener(deadPoolRunListener);
 
-        deadPoolDownController = new SpriteController(50,
+        deadPoolDownController = new SpriteController(10,
                 objectListener.getHolderBitmap().deadPool_down.getWidth() / 2,
                 objectListener.getHolderBitmap().deadPool_down.getHeight(), 2);
         deadPoolDownController.setOnUpdateListener(deadPoolDownListener);
@@ -96,8 +96,6 @@ public class GLCharacter extends ComputeRect{
                 deadPoolDownController.start();
                 break;
         }
-
-        Log.d("CHARACTER_STATE", CHARACTER_STATE + "");
     }
 
     private SpriteController.OnUpdateListener deadPoolRunListener = new SpriteController.OnUpdateListener() {
@@ -105,10 +103,25 @@ public class GLCharacter extends ComputeRect{
         public void onUpdate(int currentHorizontalFrame) {
 
             RectF curRect = viewComputeListener.getViewCompute().getCurRect();
+            RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
             float width = curRect.width();
-            curRect.left -= moveSpeed * direction;
-            curRect.right = curRect.left + width;
+
+            float curLeft = curRect.left - moveSpeed * direction;
+            float curRight = curLeft + width;
+
+            Log.d("w", width + "");
+
+            if(curLeft > contentRect.left) {
+                curLeft = contentRect.left;
+                curRight = curLeft + width;
+            } else if(curRight < contentRect.right) {
+                curRight = contentRect.right;
+                curLeft = contentRect.right - width;
+            }
+
+            curRect.left = curLeft;
+            curRect.right = curRight;
 
             float left = (float) (currentHorizontalFrame * deadPoolRunController.getFrameWidth()) / deadPoolRunController.getWidth();
             float right = left + (float) deadPoolRunController.getFrameWidth() / deadPoolRunController.getWidth();

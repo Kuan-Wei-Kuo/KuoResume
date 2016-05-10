@@ -12,6 +12,13 @@ public class GLMessage extends ComputeRect {
 
     public GLMessage(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
+
+        PLANT_RANGE_SIZE = 20;
+
+        width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
+
+        height = (int) viewComputeListener.getViewCompute().getContentRect().height();
+
     }
 
 }
