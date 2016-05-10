@@ -260,6 +260,9 @@ public class GLSkill extends ComputeRect{
                 float right = left + plantSize;
                 float bottom = top + plantSize;
 
+                if(count == grounds.size())
+                    continue;
+
                 grounds.get(count).setDstRect(left, top, right, bottom);
                 count ++;
             }

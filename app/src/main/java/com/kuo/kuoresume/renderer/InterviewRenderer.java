@@ -5,6 +5,7 @@ import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.compute.ViewCompute;
@@ -17,6 +18,8 @@ import com.kuo.kuoresume.script.GLExperience;
 import com.kuo.kuoresume.script.GLSetting;
 import com.kuo.kuoresume.script.GLSkill;
 import com.kuo.kuoresume.until.Until;
+
+import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -50,6 +53,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLSkill glSkill;
     GLExperience glExperience;
     GLCharacter glCharacter;
+
+    ArrayList<RectF> levelRage = new ArrayList<>();
 
     public InterviewRenderer(Context context, ObjectListener objectListener) {
         mContext = context;
@@ -100,16 +105,19 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
         glSetting = new GLSetting(11);
+        glCharacter = new GLCharacter(mContext, this, objectListener);
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
         glExperience = new GLExperience(mContext, this, objectListener);
-        glCharacter = new GLCharacter(mContext, this, objectListener);
+
+        glAbout.setSrcRect(0, glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight() * 2);
+        glSkill.setSrcRect(0, 0, glAbout.getWidth(), glAbout.getHeight());
+        glExperience.setSrcRect(0, glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight() * 2);
 
         createTexture();
 
         computeRect();
 
-        glCharacter.computeSprite();
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();
@@ -120,13 +128,12 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        if (touch) {
+        if (jumpAndDownToSkill() || touch) {
+            if(touch)
+                glCharacter.computeSprite(GLCharacter.CHARACTER_RUN);
             computeRect();
-            glCharacter.computeSprite();
-            glAbout.computeRect();
-            glSkill.computeRect();
-            glExperience.computeRect();
         }
+
 
         mSquare.draw(mMVPMatrix);
 
@@ -137,7 +144,36 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glExperience.draw(mMVPMatrix);
 
         //glCharacter.draw(mMVPMatrix);
+    }
 
+    private boolean jumpAndDownToSkill() {
+
+        boolean needInvalidate = false;
+
+        RectF currentRect = viewCompute.getCurRect();
+        RectF contentRect = viewCompute.getContentRect();
+
+        Log.d("cRect", glCharacter.getDstRect() + "");
+        Log.d("aRect", glAbout.getDstRect() + "");
+
+        if(glCharacter.getDstRect().right > glAbout.getDstRect().right
+                && currentRect.top < contentRect.top) {
+
+            glCharacter.setAirDirection(1);
+            glCharacter.computeSprite(GLCharacter.CHARACTER_UP);
+
+            needInvalidate = true;
+
+        } else if(glCharacter.getDstRect().left < glAbout.getDstRect().right
+                && currentRect.bottom > contentRect.bottom) {
+
+            glCharacter.setAirDirection(-1);
+            glCharacter.computeSprite(GLCharacter.CHARACTER_DOWN);
+
+            needInvalidate = true;
+        }
+
+        return needInvalidate;
     }
 
     boolean touch;
@@ -146,13 +182,13 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
-            glCharacter.setCharacterStae(GLCharacter.CHARACTER_RUN);
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
             touch = true;
 
         } else if(event.getAction() == MotionEvent.ACTION_UP) {
 
-            glCharacter.setCharacterStae(GLCharacter.CHARACTER_IDLE);
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
 
             touch = false;
 
@@ -196,23 +232,28 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth()};
         float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight()};
+        float[] tops = {glAbout.getSrcRect().top, glSkill.getSrcRect().top, glExperience.getSrcRect().top};
 
         float left, top, right = 0, bottom;
 
         for(int i = 0 ; i < widths.length ; i++) {
 
             left = i > 0 ? right : currentRect.left;
-            top = currentRect.top;
+            top = currentRect.top + tops[i];
             right = left + widths[i];
             bottom = top + heights[i];
 
             if (i == 0)
-                glAbout.setDstRect(left, top + heights[i], right, bottom + heights[i]);
+                glAbout.setDstRect(left, top, right, bottom);
             else if(i == 1)
                 glSkill.setDstRect(left, top, right, bottom);
             else if(i == 2)
                 glExperience.setDstRect(left, top + heights[i], right, bottom + heights[i]);
         }
+
+        glAbout.computeRect();
+        glSkill.computeRect();
+        glExperience.computeRect();
     }
 
     @Override

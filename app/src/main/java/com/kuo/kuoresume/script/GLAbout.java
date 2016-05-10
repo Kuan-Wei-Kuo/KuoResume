@@ -41,6 +41,7 @@ public class GLAbout extends ComputeRect{
         createPlants();
         createImages();
 
+        setDstRect(0, 0, width, height);
     }
 
     public void draw(float[] mvpMatrix) {
@@ -101,7 +102,6 @@ public class GLAbout extends ComputeRect{
 
         glImageText1 = new GLImageText("Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
 
-        computeRect();
     }
 
     private void createPlants() {
@@ -126,17 +126,6 @@ public class GLAbout extends ComputeRect{
         computeLevelSign();
         computeTicketStation();
         computeBuild85();
-
-        GLCharacter glCharacter = viewComputeListener.getGLCharacter();
-
-        RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
-        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
-
-        if(glCharacter.dstRect.right > dstRect.right) {
-            glCharacter.setCharacterStae(GLCharacter.CHARACTER_AIR);
-        } else if(glCharacter.dstRect.left > dstRect.right) {
-            glCharacter.setCharacterStae(GLCharacter.CHARACTER_DOWN);
-        }
 
     }
 

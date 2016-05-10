@@ -2,6 +2,7 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.kuo.kuoresume.animation.SpriteAnimation;
 import com.kuo.kuoresume.animation.SpriteController;
@@ -23,11 +24,11 @@ public class GLCharacter extends ComputeRect{
 
     public int CHARACTER_STATE;
 
-    private SpriteAnimation batAnimation;
+    private SpriteAnimation ownAirAnimation;
     private SpriteController deadPoolIdleController, deadPoolRunController, deadPoolDownController, deadPoolUpController;
 
     private int moveSpeed = 40;
-    private int direction = 1;
+    private int direction = 1, airDirection = 1;
 
     private Image deadPoolRun;
 
@@ -77,9 +78,10 @@ public class GLCharacter extends ComputeRect{
             case CHARACTER_DOWN:
                 break;
         }
+
     }
 
-    public void computeSprite() {
+    public void computeSprite(int CHARACTER_STATE) {
 
         switch (CHARACTER_STATE) {
             case CHARACTER_IDLE:
@@ -91,8 +93,11 @@ public class GLCharacter extends ComputeRect{
                 deadPoolDownController.start();
                 break;
             case CHARACTER_DOWN:
+                deadPoolDownController.start();
                 break;
         }
+
+        Log.d("CHARACTER_STATE", CHARACTER_STATE + "");
     }
 
     private SpriteController.OnUpdateListener deadPoolRunListener = new SpriteController.OnUpdateListener() {
@@ -128,24 +133,19 @@ public class GLCharacter extends ComputeRect{
 
             float height = currentRect.height();
 
-            float curTop = currentRect.top - moveSpeed;
-            float curBottom = curTop + height;
+            float top = currentRect.top + moveSpeed * airDirection;
+            float bottom = top + height;
 
-            if(contentRect.top > curTop) {
-                curTop = contentRect.top;
-
-                curBottom = curTop + height;
-
-            } else if(contentRect.bottom > curBottom) {
-
-                curBottom = contentRect.bottom;
-
-                curTop = contentRect.top - height;
-
+            if(top > contentRect.top) {
+                top = contentRect.top;
+                bottom = top + height;
+            } else if(contentRect.bottom > bottom) {
+                bottom = contentRect.bottom;
+                top = contentRect.top - height;
             }
 
-            currentRect.top = curTop;
-            currentRect.bottom = curBottom;
+            currentRect.top = top;
+            currentRect.bottom = bottom;
 
             //int left = currentHorizontalFrame * deadPoolDownController.getFrameWidth();
             //int right = left + deadPoolDownController.getFrameWidth();
@@ -167,8 +167,19 @@ public class GLCharacter extends ComputeRect{
         this.direction = direction;
     }
 
-    public void setCharacterStae(int state) {
-            CHARACTER_STATE = state;
+    public void setAirDirection(int airDirection) {
+        this.airDirection = airDirection;
     }
 
+    public void setCharacterState(int state) {
+        CHARACTER_STATE = state;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public int getCharacterState() {
+        return CHARACTER_STATE;
+    }
 }

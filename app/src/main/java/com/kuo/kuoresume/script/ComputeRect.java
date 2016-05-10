@@ -11,6 +11,8 @@ import com.kuo.kuoresume.listener.ViewComputeListener;
  */
 public class ComputeRect {
 
+    protected RectF srcRect = new RectF(0, 0, 0, 0);
+
     protected RectF dstRect = new RectF(0, 0, 0, 0);
 
     protected int width, height, PLANT_RANGE_SIZE;
@@ -30,8 +32,20 @@ public class ComputeRect {
         this.objectListener = objectListener;
     }
 
+    public void setSrcRect(float left, float top, float right, float bottom) {
+        srcRect.set(left, top, right, bottom);
+    }
+
     public void setDstRect(float left, float top, float right, float bottom) {
         dstRect.set(left, top, right, bottom);
+    }
+
+    public RectF getSrcRect() {
+        return srcRect;
+    }
+
+    public RectF getDstRect() {
+        return dstRect;
     }
 
     public int getWidth() {
