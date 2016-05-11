@@ -5,7 +5,6 @@ import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.compute.ViewCompute;
@@ -18,8 +17,6 @@ import com.kuo.kuoresume.script.GLExperience;
 import com.kuo.kuoresume.script.GLSetting;
 import com.kuo.kuoresume.script.GLSkill;
 import com.kuo.kuoresume.until.Until;
-
-import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -103,7 +100,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        glSetting = new GLSetting(11);
+        glSetting = new GLSetting(16);
         glCharacter = new GLCharacter(mContext, this, objectListener);
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
@@ -216,6 +213,11 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(8, objectListener.getHolderBitmap().build85);
         glSetting.addTexture(9, objectListener.getHolderBitmap().plantSea);
         glSetting.addTexture(10, objectListener.getHolderBitmap().videoTape);
+        glSetting.addTexture(11, objectListener.getHolderBitmap().cloud);
+        glSetting.addTexture(12, objectListener.getHolderBitmap().sand);
+        glSetting.addTexture(13, objectListener.getHolderBitmap().tree_1);
+        glSetting.addTexture(14, objectListener.getHolderBitmap().tree_2);
+        glSetting.addTexture(15, objectListener.getHolderBitmap().tree_3);
 
     }
 

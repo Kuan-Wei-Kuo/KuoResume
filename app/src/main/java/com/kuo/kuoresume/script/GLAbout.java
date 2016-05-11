@@ -7,9 +7,11 @@ import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLText;
+import com.kuo.kuoresume.object.GLTrees;
 import com.kuo.kuoresume.object.Image;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by Kuo on 2016/5/5.
@@ -18,14 +20,20 @@ public class GLAbout extends ComputeRect{
 
     private static final int SEA_MIN_SIZE = 12;
     private static final int SEA_MAX_SIZE = 15;
+    private static final int CLOUD_SIZE = 5;
+    private static final int CLOUD_WIDTH = 140;
+    private static final int CLOUD_HEIGHT = 95;
 
     private ArrayList<Image> plants = new ArrayList<>();
+    private ArrayList<Image> clouds = new ArrayList<>();
 
     private Image levelSign, ticketStation, build85, signWood;
 
-    public GLImageText glImageText1, glImageText2;
+    private GLImageText glImageText1, glImageText2;
 
-    public GLText signText, aboutText;
+    private GLText signText, aboutText;
+
+    private GLTrees glTrees;
 
     public GLAbout(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
@@ -38,6 +46,7 @@ public class GLAbout extends ComputeRect{
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
 
+        createClouds();
         createPlants();
         createImages();
 
@@ -45,6 +54,10 @@ public class GLAbout extends ComputeRect{
     }
 
     public void draw(float[] mvpMatrix) {
+
+        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
+        drawClouds(mvpMatrix);
+        drawPlants(mvpMatrix);
 
         levelSign.draw(mvpMatrix, 3);
         signText.draw(mvpMatrix);
@@ -57,8 +70,21 @@ public class GLAbout extends ComputeRect{
         build85.draw(mvpMatrix, 8);
 
         glImageText1.draw(mvpMatrix);
+    }
 
-        drawPlants(mvpMatrix);
+    private void drawClouds(float[] m) {
+
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+        for(Image image : clouds) {
+
+            RectF rectF = image.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
+                image.draw(m, 11);
+
+        }
 
     }
 
@@ -102,6 +128,22 @@ public class GLAbout extends ComputeRect{
 
         glImageText1 = new GLImageText("Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
 
+        glTrees = new GLTrees(6, width, height);
+    }
+
+    public void createClouds() {
+
+        for(int i = 0 ; i < CLOUD_SIZE ; i++) {
+
+            Random random = new Random();
+
+            float left = random.nextInt(width - CLOUD_WIDTH);
+            float top = random.nextInt(height / 2);
+            float right = left + CLOUD_WIDTH;
+            float bottom = top + CLOUD_HEIGHT;
+
+            clouds.add(new Image(new RectF(left, top, right, bottom)));
+        }
     }
 
     private void createPlants() {
@@ -120,7 +162,8 @@ public class GLAbout extends ComputeRect{
     }
 
     public void computeRect() {
-
+        glTrees.computeTrees(dstRect);
+        computeClouds();
         computePlants();
         computeAbout();
         computeLevelSign();
@@ -205,6 +248,22 @@ public class GLAbout extends ComputeRect{
             image.setDstRect(left, top, right, bottom);
 
             count++;
+        }
+    }
+
+    private void computeClouds() {
+
+        for(Image image : clouds) {
+
+            RectF srcRect = image.getSrcRect();
+
+            float left = dstRect.left + srcRect.left;
+            float top = dstRect.top + srcRect.top;
+            float right = left + srcRect.width();
+            float bottom = top + srcRect.height();
+
+            image.setDstRect(left, top, right, bottom);
+
         }
     }
 

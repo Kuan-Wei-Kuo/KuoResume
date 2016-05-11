@@ -3,11 +3,12 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
-import com.kuo.kuoresume.data.ChartData;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
+import com.kuo.kuoresume.object.GLClouds;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLText;
+import com.kuo.kuoresume.object.GLTrees;
 import com.kuo.kuoresume.object.Image;
 import com.kuo.kuoresume.until.Until;
 
@@ -26,11 +27,15 @@ public class GLExperience extends ComputeRect {
 
     private GLText signText, experience;
 
+    private GLClouds glClouds;
+
+    private GLTrees glTrees;
+
     private ArrayList<Image> videoTapes = new ArrayList<>();
     private ArrayList<Image> images = new ArrayList<>();
-    private ArrayList<GLText> glImageTexts = new ArrayList<>();
+    private ArrayList<GLImageText> glImageTexts = new ArrayList<>();
 
-    private String[] texts = {"MyChartLib", "急救小幫手", "籃球戰術版", "UrCoco", "MyBlog"};
+    private String[] texts = {"MyChartLib", "FirstAidSprite", "Basketball Board", "UrCoco", "MyBlog"};
 
     public GLExperience(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
@@ -44,7 +49,6 @@ public class GLExperience extends ComputeRect {
         createPlants();
         createImage();
         createVideoTapes();
-        createGLImageTexts();
         computeRect();
     }
 
@@ -61,17 +65,10 @@ public class GLExperience extends ComputeRect {
         signWood = new Image(new RectF(plantSize * 4, plantHeight - plantSize * 2, plantSize * 6, plantHeight));
 
         experience = new GLText("EXPERIENCE", 0, 0);
-    }
 
-    private void createGLImageTexts() {
+        glClouds = new GLClouds(7, width, height);
 
-        for(int i = 0 ; i < texts.length ; i++) {
-
-            GLText glImageText = new GLText(texts[i], 0, 0);
-            glImageTexts.add(glImageText);
-
-        }
-
+        glTrees = new GLTrees(6, width, height);
     }
 
     private void createVideoTapes() {
@@ -93,6 +90,13 @@ public class GLExperience extends ComputeRect {
                     taps.getSrcRect().centerY() - VIDEO_TAPES_SIZE * 0.8f / 2,
                     taps.getSrcRect().centerX() + VIDEO_TAPES_SIZE * 0.8f / 2,
                     taps.getSrcRect().centerY() + VIDEO_TAPES_SIZE * 0.8f / 2));
+
+            GLImageText glImageText = new GLImageText(texts[i], 0, 0);
+
+            glImageText.setPosition(taps.getSrcRect().centerX() - glImageText.getSrcRect().width() / 2,
+                    bottom + glImageText.getSrcRect().height());
+
+            glImageTexts.add(glImageText);
 
             images.add(image);
             videoTapes.add(taps);
@@ -117,6 +121,9 @@ public class GLExperience extends ComputeRect {
 
     public void draw(float[] mvpMatrix) {
 
+        glClouds.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
+        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
+
         levelSign.draw(mvpMatrix, 3);
         signText.draw(mvpMatrix);
 
@@ -128,13 +135,12 @@ public class GLExperience extends ComputeRect {
         drawGLImageTexts(mvpMatrix);
 
         drawPlants(mvpMatrix);
-
     }
 
     private void drawGLImageTexts(float[] mvpMatrix) {
 
         int count = 0;
-        for(GLText glImageText : glImageTexts) {
+        for(GLImageText glImageText : glImageTexts) {
             glImageText.draw(mvpMatrix);
             count++;
         }
@@ -176,13 +182,15 @@ public class GLExperience extends ComputeRect {
     }
 
     public void computeRect() {
-
+        glClouds.computeClouds(dstRect);
+        glTrees.computeTrees(dstRect);
         computePlants();
         computeLevelSign();
         computeExperience();
         computeVideoTapes();
         computeImages();
         computeGLImageTexts();
+
     }
 
     private void computeLevelSign() {
@@ -236,10 +244,10 @@ public class GLExperience extends ComputeRect {
     private void computeGLImageTexts() {
 
         int count = 0;
-        for(GLText glImageText : glImageTexts) {
+        for(GLImageText glImageText : glImageTexts) {
 
-            float left = dstRect.left + glImageText.x;
-            float top = dstRect.top + glImageText.y;
+            float left = dstRect.left + glImageText.getX();
+            float top = dstRect.top + glImageText.getY();
             float right = left + VIDEO_TAPES_SIZE * 0.8f;
             float bottom = top + VIDEO_TAPES_SIZE * 0.8f;
 
@@ -247,7 +255,6 @@ public class GLExperience extends ComputeRect {
 
             count++;
         }
-
     }
 
     private void computeImages() {

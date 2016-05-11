@@ -12,6 +12,8 @@ public class GLImageText {
     private Image image;
     private GLText glText;
 
+    private float x, y, rawX, rawY;
+
     public GLImageText(String text, float x, float y) {
 
         glText = new GLText(text, x, y);
@@ -34,12 +36,28 @@ public class GLImageText {
 
     }
 
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public void setLocation(float x, float y) {
+
+        this.rawX = x;
+        this.rawY = y;
 
         image.setDstRect(x, y, x + image.getSrcRect().width(), y + image.getSrcRect().height());
 
         glText.setLocation(x + glText.getWidth() * WEIDTHED, y + glText.getHeight() * WEIDTHED);
 
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
     }
 
     public RectF getSrcRect() {

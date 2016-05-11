@@ -63,6 +63,10 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         holderBitmap.font = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.font);
 
         holderBitmap.signWood = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.sign_wood);
+        holderBitmap.cloud = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.cloud);
+        holderBitmap.tree_1 = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.tree_1);
+        holderBitmap.tree_2 = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.tree_2);
+        holderBitmap.tree_3 = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.tree_3);
     }
 
     @Override

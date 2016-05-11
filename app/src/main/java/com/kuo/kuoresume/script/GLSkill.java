@@ -7,8 +7,10 @@ import com.kuo.kuoresume.data.ChartData;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLChartRect;
+import com.kuo.kuoresume.object.GLClouds;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLText;
+import com.kuo.kuoresume.object.GLTrees;
 import com.kuo.kuoresume.object.Image;
 import com.kuo.kuoresume.until.Until;
 
@@ -29,6 +31,10 @@ public class GLSkill extends ComputeRect{
     private GLChartRect glChartRect, languageChart;
 
     public GLImageText glImageText1, glImageText2;
+
+    private GLClouds glClouds;
+
+    private GLTrees glTrees;
 
     public GLSkill(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
@@ -125,10 +131,16 @@ public class GLSkill extends ComputeRect{
         languageChart.setPosition(plantSize * 10 + glChartRect.getWidth(), plantHeight - languageChart.getHeight());
 
         glImageText2= new GLImageText("Language", plantSize * 8, plantHeight / 6);
+
+        glClouds = new GLClouds(7, width, height);
+
+        glTrees = new GLTrees(6, width, height);
     }
 
     public void draw(float[] mvpMatrix) {
 
+        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
+        glClouds.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
         drawPlants(mvpMatrix);
         drawGrounds(mvpMatrix);
 
@@ -156,7 +168,7 @@ public class GLSkill extends ComputeRect{
 
             if(contentRect.contains(rectF.left, rectF.top)
                     || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
-                image.draw(mvpMatrix, 2);
+                image.draw(mvpMatrix, 12);
         }
     }
 
@@ -181,6 +193,8 @@ public class GLSkill extends ComputeRect{
         computeSkill();
         computeSoftwareRect();
         computeLanguageRect();
+        glClouds.computeClouds(dstRect);
+        glTrees.computeTrees(dstRect);
     }
 
     private void computeLevelSign() {

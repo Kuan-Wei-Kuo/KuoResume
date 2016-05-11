@@ -19,6 +19,6 @@ public class HolderBitmap {
 
     public Bitmap spiderHead, deadPoolHead;
 
-    public Bitmap font;
+    public Bitmap font, cloud, tree_1, tree_2, tree_3;
 
 }
