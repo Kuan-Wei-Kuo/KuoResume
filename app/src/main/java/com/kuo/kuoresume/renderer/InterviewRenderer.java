@@ -5,6 +5,7 @@ import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.compute.ViewCompute;
@@ -14,6 +15,7 @@ import com.kuo.kuoresume.object.Square;
 import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLCharacter;
 import com.kuo.kuoresume.script.GLExperience;
+import com.kuo.kuoresume.script.GLMessage;
 import com.kuo.kuoresume.script.GLSetting;
 import com.kuo.kuoresume.script.GLSkill;
 import com.kuo.kuoresume.until.Until;
@@ -51,6 +53,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLSkill glSkill;
     GLExperience glExperience;
     GLCharacter glCharacter;
+    GLMessage glMessage;
 
     public InterviewRenderer(Context context, ObjectListener objectListener) {
         mContext = context;
@@ -105,11 +108,12 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
         glExperience = new GLExperience(mContext, this, objectListener);
+        glMessage = new GLMessage(mContext, this, objectListener);
 
         glAbout.setSrcRect(0, glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight() * 2);
         glSkill.setSrcRect(0, 0, glAbout.getWidth(), glAbout.getHeight());
         glExperience.setSrcRect(0, glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight() * 2);
-
+        glMessage.setSrcRect(0, glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight() * 2);
         createTexture();
         computeCurrentRect();
         computeRect();
@@ -134,6 +138,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSkill.draw(mMVPMatrix);
 
         glExperience.draw(mMVPMatrix);
+
+        glMessage.draw(mMVPMatrix);
 
         //glCharacter.draw(mMVPMatrix);
     }
@@ -223,7 +229,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     private void computeCurrentRect() {
 
-        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth()};
+        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
 
         float totalWidth = 0;
         for(float f : widths) {
@@ -237,9 +243,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         RectF currentRect = viewCompute.getCurRect();
 
-        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth()};
-        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight()};
-        float[] tops = {glAbout.getSrcRect().top, glSkill.getSrcRect().top, glExperience.getSrcRect().top};
+        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
+        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
+        float[] tops = {glAbout.getSrcRect().top, glSkill.getSrcRect().top, glExperience.getSrcRect().top, glMessage.getSrcRect().top};
 
         float left, top, right = 0, bottom;
 
@@ -256,33 +262,40 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 glSkill.setDstRect(left, top, right, bottom);
             else if(i == 2)
                 glExperience.setDstRect(left, top, right, bottom);
+            else if(i == 3)
+                glMessage.setDstRect(left, top, right, bottom);
         }
 
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();
+        glMessage.computeRect();
     }
 
     public void onTouchEvent(MotionEvent event) {
 
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+        if(!glMessage.onTouchContact(event) && !glMessage.isTactFocus()) {
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
+            if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
-            isTouch = true;
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
-        } else if(event.getAction() == MotionEvent.ACTION_UP) {
+                isTouch = true;
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
+            } else if(event.getAction() == MotionEvent.ACTION_UP) {
 
-            isTouch = false;
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
+
+                isTouch = false;
+
+            }
+
+            if(event.getX() <= mScreenWidth / 2)
+                glCharacter.setDirection(-1);
+            else
+                glCharacter.setDirection(1);
 
         }
-
-        if(event.getX() <= mScreenWidth / 2)
-            glCharacter.setDirection(-1);
-        else
-            glCharacter.setDirection(1);
 
     }
 

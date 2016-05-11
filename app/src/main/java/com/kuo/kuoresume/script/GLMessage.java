@@ -1,7 +1,11 @@
 package com.kuo.kuoresume.script;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.RectF;
+import android.net.Uri;
+import android.util.Log;
+import android.view.MotionEvent;
 
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
@@ -43,7 +47,33 @@ public class GLMessage extends ComputeRect {
 
     public void computeRect() {
         computeContactImage();
-        computeSahreImage();
+        computeShareImage();
+    }
+
+    boolean isTactFocus = false;
+
+    public boolean onTouchContact(MotionEvent e) {
+
+        boolean isTactClick = false;
+
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                if(contactImage.getDstRect().contains(e.getX(), e.getY()))
+                    isTactFocus = true;
+                break;
+            case MotionEvent.ACTION_UP:
+                if(isTactFocus && contactImage.getDstRect().contains(e.getX(), e.getY())) {
+                    isTactFocus = false;
+                    isTactClick = true;
+                }
+                break;
+
+        }
+        return isTactClick;
+    }
+
+    public boolean isTactFocus() {
+        return isTactFocus;
     }
 
     private void computeContactImage() {
@@ -57,9 +87,11 @@ public class GLMessage extends ComputeRect {
 
         contactImage.setDstRect(left, top, right, bottom);
 
+        Log.d("top", top + "");
+
     }
 
-    private void computeSahreImage() {
+    private void computeShareImage() {
 
         RectF srcRect = shareImage.getSrcRect();
 
