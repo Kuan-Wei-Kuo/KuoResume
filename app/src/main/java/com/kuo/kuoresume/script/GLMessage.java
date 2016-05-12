@@ -1,12 +1,10 @@
 package com.kuo.kuoresume.script;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.RectF;
-import android.net.Uri;
-import android.util.Log;
 import android.view.MotionEvent;
 
+import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.Image;
@@ -18,7 +16,9 @@ public class GLMessage extends ComputeRect {
 
     private Image shareImage, contactImage;
 
-    public GLMessage(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
+    private ActivityListener activityListener;
+
+    public GLMessage(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener, ActivityListener activityListener) {
         super(context, viewComputeListener, objectListener);
 
         PLANT_RANGE_SIZE = 20;
@@ -29,6 +29,8 @@ public class GLMessage extends ComputeRect {
 
         createImage();
         computeRect();
+
+        this.activityListener = activityListener;
     }
 
     private void createImage() {
@@ -54,7 +56,7 @@ public class GLMessage extends ComputeRect {
 
     public boolean onTouchContact(MotionEvent e) {
 
-        boolean isTactClick = false;
+        boolean isClick = false;
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -64,16 +66,44 @@ public class GLMessage extends ComputeRect {
             case MotionEvent.ACTION_UP:
                 if(isTactFocus && contactImage.getDstRect().contains(e.getX(), e.getY())) {
                     isTactFocus = false;
-                    isTactClick = true;
+                    isClick = true;
+                    activityListener.showDialogContact();
                 }
                 break;
 
         }
-        return isTactClick;
+        return isClick;
+    }
+
+    boolean isShareFocus = false;
+
+    public boolean onTouchShare(MotionEvent e) {
+
+        boolean isClick = false;
+
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                if(shareImage.getDstRect().contains(e.getX(), e.getY()))
+                    isShareFocus = true;
+                break;
+            case MotionEvent.ACTION_UP:
+                if(isShareFocus  && shareImage.getDstRect().contains(e.getX(), e.getY())) {
+                    isShareFocus = false;
+                    isClick = true;
+                    activityListener.showDialogShare();
+                }
+                break;
+
+        }
+        return isClick;
     }
 
     public boolean isTactFocus() {
         return isTactFocus;
+    }
+
+    public boolean isShareFocus() {
+        return isShareFocus;
     }
 
     private void computeContactImage() {
@@ -86,8 +116,6 @@ public class GLMessage extends ComputeRect {
         float bottom = top + srcRect.height();
 
         contactImage.setDstRect(left, top, right, bottom);
-
-        Log.d("top", top + "");
 
     }
 

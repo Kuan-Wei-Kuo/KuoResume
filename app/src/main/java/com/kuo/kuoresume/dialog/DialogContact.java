@@ -1,6 +1,9 @@
 package com.kuo.kuoresume.dialog;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,6 +24,17 @@ public class DialogContact extends DialogFragment implements Button.OnClickListe
 
     private EditText editSubject, editMessage;
     private Button buttonCancel, buttonEnter;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+    }
 
     @Nullable
     @Override

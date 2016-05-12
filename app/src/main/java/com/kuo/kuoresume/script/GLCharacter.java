@@ -2,7 +2,6 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.kuo.kuoresume.animation.SpriteAnimation;
 import com.kuo.kuoresume.animation.SpriteController;
@@ -27,7 +26,7 @@ public class GLCharacter extends ComputeRect{
     private SpriteAnimation ownAirAnimation;
     private SpriteController deadPoolIdleController, deadPoolRunController, deadPoolDownController, deadPoolUpController;
 
-    private int moveSpeed = 40;
+    private int moveSpeed = 70;
     private int direction = 1, airDirection = 1;
 
     private Image deadPoolRun;
@@ -110,8 +109,6 @@ public class GLCharacter extends ComputeRect{
             float curLeft = curRect.left - moveSpeed * direction;
             float curRight = curLeft + width;
 
-            Log.d("w", width + "");
-
             if(curLeft > contentRect.left) {
                 curLeft = contentRect.left;
                 curRight = curLeft + width;
@@ -154,7 +151,7 @@ public class GLCharacter extends ComputeRect{
                 bottom = top + height;
             } else if(contentRect.bottom > bottom) {
                 bottom = contentRect.bottom;
-                top = contentRect.top - height;
+                top = bottom - height;
             }
 
             currentRect.top = top;

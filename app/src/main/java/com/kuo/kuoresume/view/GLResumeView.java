@@ -3,11 +3,13 @@ package com.kuo.kuoresume.view;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.R;
 import com.kuo.kuoresume.compute.HolderBitmap;
 import com.kuo.kuoresume.compute.ViewCompute;
+import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.renderer.InterviewRenderer;
 import com.kuo.kuoresume.script.Human;
@@ -21,7 +23,7 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
 
     private HolderBitmap holderBitmap;
 
-    public GLResumeView(Context context) {
+    public GLResumeView(Context context, ActivityListener activityListener) {
         super(context);
 
         createBitmap();
@@ -29,8 +31,10 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         setEGLContextClientVersion(2);
 
         // Set the Renderer for drawing on the GLSurfaceView
-        mInterviewRenderer = new InterviewRenderer(context, this);
+        mInterviewRenderer = new InterviewRenderer(context, this, activityListener);
         setRenderer(mInterviewRenderer);
+
+        Log.d("createView", "true");
     }
 
     private void createBitmap() {

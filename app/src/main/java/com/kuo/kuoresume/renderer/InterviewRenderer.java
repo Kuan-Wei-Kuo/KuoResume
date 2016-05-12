@@ -9,9 +9,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.compute.ViewCompute;
+import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
-import com.kuo.kuoresume.object.Square;
+import com.kuo.kuoresume.object.GLProgress;
 import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLCharacter;
 import com.kuo.kuoresume.script.GLExperience;
@@ -38,37 +39,41 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     float   mScreenWidth = 1280;
     float   mScreenHeight = 768;
 
+    boolean isLoading = false;
     // Misc
     Context mContext;
     long mLastTime;
-
-    Square mSquare;
 
     ObjectListener objectListener;
 
     ViewCompute viewCompute;
 
+    GLProgress glProgress;
     GLSetting glSetting;
     GLAbout glAbout;
     GLSkill glSkill;
     GLExperience glExperience;
     GLCharacter glCharacter;
     GLMessage glMessage;
+    ActivityListener activityListener;
 
-    public InterviewRenderer(Context context, ObjectListener objectListener) {
+    public InterviewRenderer(Context context, ObjectListener objectListener, ActivityListener activityListener) {
         mContext = context;
         mLastTime = System.currentTimeMillis() + 100;
         this.objectListener = objectListener;
+        this.activityListener = activityListener;
+
+        viewCompute = new ViewCompute();
+
+        Log.d("RendererCreate", "1");
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        GLES20.glClearColor(1, 1, 1, 1);
+        glSetting = new GLSetting(16);
 
-        viewCompute = new ViewCompute();
-
-        mSquare = new Square();
+        Log.d("onSurfaceCreated", "2");
     }
 
     @Override
@@ -79,7 +84,11 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         viewCompute.setPlantSize(Until.dp2px(mContext .getResources().getDisplayMetrics().density, 50));
         viewCompute.setContentRect(new RectF(0, 0, width, height));
-        viewCompute.setCurRect(new RectF(0, - height, width, height));
+        viewCompute.setCurRect(new RectF(0, -height, width, height));
+
+        glSetting.addTexture(0, objectListener.getHolderBitmap().deadPool_run);
+
+        glProgress = new GLProgress(mContext, this, objectListener);
 
         GLES20.glViewport(0, 0, (int) mScreenWidth, (int) mScreenHeight);
 
@@ -89,8 +98,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         // Screen to the drawing coordinates
         final float left = 0;
-        final float right = width;
-        final float bottom = height;
+        final float right = mScreenWidth;
+        final float bottom = mScreenHeight;
         final float top = 0;
         final float near = 0f;
         final float far = 50f;
@@ -103,17 +112,17 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        glSetting = new GLSetting(16);
         glCharacter = new GLCharacter(mContext, this, objectListener);
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
         glExperience = new GLExperience(mContext, this, objectListener);
-        glMessage = new GLMessage(mContext, this, objectListener);
+        glMessage = new GLMessage(mContext, this, objectListener, activityListener);
 
         glAbout.setSrcRect(0, glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight() * 2);
         glSkill.setSrcRect(0, 0, glAbout.getWidth(), glAbout.getHeight());
         glExperience.setSrcRect(0, glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight() * 2);
         glMessage.setSrcRect(0, glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight() * 2);
+
         createTexture();
         computeCurrentRect();
         computeRect();
@@ -130,9 +139,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             computeRect();
         }
 
-
-        mSquare.draw(mMVPMatrix);
-
         glAbout.draw(mMVPMatrix);
 
         glSkill.draw(mMVPMatrix);
@@ -140,7 +146,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glExperience.draw(mMVPMatrix);
 
         glMessage.draw(mMVPMatrix);
-
         //glCharacter.draw(mMVPMatrix);
     }
 
@@ -208,7 +213,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     private void createTexture() {
 
-        glSetting.addTexture(0, objectListener.getHolderBitmap().deadPool_run);
         glSetting.addTexture(1, objectListener.getHolderBitmap().font);
         glSetting.addTexture(2, objectListener.getHolderBitmap().plantSand);
         glSetting.addTexture(3, objectListener.getHolderBitmap().signs);
@@ -236,7 +240,10 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             totalWidth += f;
         }
 
-        viewCompute.setCurRect(new RectF(0, - glAbout.getHeight(), totalWidth, glAbout.getHeight()));
+        if(viewCompute.getCacheRect() != null)
+            viewCompute.setCurRect(viewCompute.getCacheRect());
+        else
+            viewCompute.setCurRect(new RectF(0, - glAbout.getHeight(), totalWidth, glAbout.getHeight()));
     }
 
     private void computeRect() {
@@ -266,15 +273,19 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 glMessage.setDstRect(left, top, right, bottom);
         }
 
+        glProgress.setDstRect(0, 0, mScreenWidth, mScreenHeight);
+
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();
         glMessage.computeRect();
+        glProgress.computeRect();
     }
 
     public void onTouchEvent(MotionEvent event) {
 
-        if(!glMessage.onTouchContact(event) && !glMessage.isTactFocus()) {
+        if(!glMessage.onTouchContact(event) && !glMessage.isTactFocus()
+                && !glMessage.onTouchShare(event) && !glMessage.isShareFocus()) {
 
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
@@ -311,10 +322,14 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     public void onPause() {
         /* Do stuff to pause the renderer */
+        viewCompute.setCacheRect(viewCompute.getCurRect());
+        Log.d("onSurfaceOnPause", "4");
     }
 
     public void onResume() {
         /* Do stuff to resume the renderer */
         mLastTime = System.currentTimeMillis();
+
+        Log.d("onSurfaceOnResume", "5");
     }
 }

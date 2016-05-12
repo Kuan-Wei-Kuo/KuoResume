@@ -8,7 +8,7 @@ import android.graphics.RectF;
  */
 public class ViewCompute {
 
-    private RectF currentRect, contentRect, plantRect;
+    private RectF currentRect, contentRect, plantRect, cacheRect;
 
     private float columnWidth, marginWidth, radius;
 
@@ -44,6 +44,10 @@ public class ViewCompute {
         this.plantRect = plantRect;
     }
 
+    public void setCacheRect(RectF cacheRect) {
+        this.cacheRect = cacheRect;
+    }
+
     public void setColumnWidth(float columnWidth) {
         this.columnWidth = columnWidth;
     }
@@ -62,6 +66,10 @@ public class ViewCompute {
 
     public RectF getCurRect() {
         return currentRect;
+    }
+
+    public RectF getCacheRect() {
+        return cacheRect;
     }
 
     public RectF getPlantRect() {
