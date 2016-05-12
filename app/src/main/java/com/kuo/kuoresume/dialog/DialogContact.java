@@ -30,10 +30,12 @@ public class DialogContact extends DialogFragment implements Button.OnClickListe
         super.onStart();
 
         Dialog dialog = getDialog();
+
         if (dialog != null) {
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
+
     }
 
     @Nullable

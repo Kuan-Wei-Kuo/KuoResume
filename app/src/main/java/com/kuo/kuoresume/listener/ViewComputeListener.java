@@ -7,6 +7,9 @@ import com.kuo.kuoresume.script.GLCharacter;
  * Created by Kuo on 2016/5/4.
  */
 public interface ViewComputeListener {
+
+    float getScaling();
+
     ViewCompute getViewCompute();
 
     GLCharacter getGLCharacter();

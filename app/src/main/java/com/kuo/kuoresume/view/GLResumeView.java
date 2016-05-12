@@ -3,6 +3,7 @@ package com.kuo.kuoresume.view;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -29,12 +30,22 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         createBitmap();
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
+        Log.d("createView", "true");
+    }
 
-        // Set the Renderer for drawing on the GLSurfaceView
+    public GLResumeView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        createBitmap();
+        // Create an OpenGL ES 2.0 context.
+        setEGLContextClientVersion(2);
+        Log.d("createView", "true");
+
+    }
+
+    public void setGLRenderer(Context context, ActivityListener activityListener) {
         mInterviewRenderer = new InterviewRenderer(context, this, activityListener);
         setRenderer(mInterviewRenderer);
-
-        Log.d("createView", "true");
     }
 
     private void createBitmap() {

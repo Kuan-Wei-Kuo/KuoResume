@@ -1,37 +1,42 @@
 package com.kuo.kuoresume;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 import com.kuo.kuoresume.dialog.DialogContact;
+import com.kuo.kuoresume.dialog.DialogProgress;
 import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.view.GLResumeView;
+import com.kuo.kuoresume.view.LoadingScreen;
 
 public class MainActivity extends AppCompatActivity implements ActivityListener {
 
     private ProgressDialog progressDialog;
     private GLResumeView glResumeView;
 
+    private Dialog dialog;
+
+    private LoadingScreen loadingScreen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         super.onCreate(savedInstanceState);
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_main);
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Loading");
-
-        glResumeView = new GLResumeView(this, this);
-        setContentView(glResumeView);
+        glResumeView = (GLResumeView) findViewById(R.id.glResumeView);
+        glResumeView.setGLRenderer(this, this);
 
         Log.d("onCreate", "true");
     }
@@ -61,6 +66,11 @@ public class MainActivity extends AppCompatActivity implements ActivityListener 
     }
 
     @Override
+    public AppCompatActivity getActivity() {
+        return this;
+    }
+
+    @Override
     public void showDialogContact() {
         DialogContact dialogContact = new DialogContact();
         dialogContact.show(getSupportFragmentManager(), "contact");
@@ -74,33 +84,16 @@ public class MainActivity extends AppCompatActivity implements ActivityListener 
         startActivity(Intent.createChooser(shareIntent, "Share"));
     }
 
-    private boolean isDismiss = false;
+    DialogProgress dialogProgress = new DialogProgress();
 
     @Override
     public void showProgress() {
-        progressDialog = ProgressDialog.show(this,
-                "Loading", "Please Wait...",true);
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                try{
-
-                    while(isDismiss) {
-                        Thread.sleep(3000);
-                    }
-
-                    isDismiss = false;
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        dialogProgress.show(getSupportFragmentManager(), "dialog");
     }
 
     @Override
     public void dismissProgrees() {
-        isDismiss = true;
+        dialogProgress.dismiss();
     }
 
 

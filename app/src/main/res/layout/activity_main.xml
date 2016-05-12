@@ -3,4 +3,10 @@
     android:id="@+id/gamelayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
+
+    <com.kuo.kuoresume.view.GLResumeView
+        android:id="@+id/glResumeView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

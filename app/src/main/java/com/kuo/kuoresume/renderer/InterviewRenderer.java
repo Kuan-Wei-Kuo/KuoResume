@@ -1,12 +1,18 @@
 package com.kuo.kuoresume.renderer;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
+import android.view.Window;
 
 import com.kuo.kuoresume.compute.ViewCompute;
 import com.kuo.kuoresume.listener.ActivityListener;
@@ -20,6 +26,7 @@ import com.kuo.kuoresume.script.GLMessage;
 import com.kuo.kuoresume.script.GLSetting;
 import com.kuo.kuoresume.script.GLSkill;
 import com.kuo.kuoresume.until.Until;
+import com.kuo.kuoresume.view.LoadingScreen;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -38,6 +45,11 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     // Our screenresolution
     float   mScreenWidth = 1280;
     float   mScreenHeight = 768;
+    float 	ssu = 1.0f;
+    float 	ssx = 1.0f;
+    float 	ssy = 1.0f;
+    float 	swp = 320.0f;
+    float 	shp = 480.0f;
 
     boolean isLoading = false;
     // Misc
@@ -48,7 +60,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     ViewCompute viewCompute;
 
-    GLProgress glProgress;
     GLSetting glSetting;
     GLAbout glAbout;
     GLSkill glSkill;
@@ -56,6 +67,10 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLCharacter glCharacter;
     GLMessage glMessage;
     ActivityListener activityListener;
+
+    Dialog dialog;
+
+    //DialogFragment dialog;
 
     public InterviewRenderer(Context context, ObjectListener objectListener, ActivityListener activityListener) {
         mContext = context;
@@ -65,15 +80,13 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         viewCompute = new ViewCompute();
 
-        Log.d("RendererCreate", "1");
+        activityListener.showProgress();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
         glSetting = new GLSetting(16);
-
-        Log.d("onSurfaceCreated", "2");
     }
 
     @Override
@@ -82,13 +95,12 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         mScreenWidth = width;
         mScreenHeight = height;
 
+        computeScaling();
+
         viewCompute.setPlantSize(Until.dp2px(mContext .getResources().getDisplayMetrics().density, 50));
         viewCompute.setContentRect(new RectF(0, 0, width, height));
         viewCompute.setCurRect(new RectF(0, -height, width, height));
 
-        glSetting.addTexture(0, objectListener.getHolderBitmap().deadPool_run);
-
-        glProgress = new GLProgress(mContext, this, objectListener);
 
         GLES20.glViewport(0, 0, (int) mScreenWidth, (int) mScreenHeight);
 
@@ -126,6 +138,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         createTexture();
         computeCurrentRect();
         computeRect();
+
+        activityListener.dismissProgrees();
     }
 
     @Override
@@ -213,6 +227,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     private void createTexture() {
 
+        glSetting.addTexture(0, objectListener.getHolderBitmap().deadPool_run);
         glSetting.addTexture(1, objectListener.getHolderBitmap().font);
         glSetting.addTexture(2, objectListener.getHolderBitmap().plantSand);
         glSetting.addTexture(3, objectListener.getHolderBitmap().signs);
@@ -273,13 +288,30 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 glMessage.setDstRect(left, top, right, bottom);
         }
 
-        glProgress.setDstRect(0, 0, mScreenWidth, mScreenHeight);
-
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();
         glMessage.computeRect();
-        glProgress.computeRect();
+    }
+
+    private void computeScaling()
+    {
+        // The screen resolutions
+        swp = mContext.getResources().getDisplayMetrics().widthPixels;
+        shp = mContext.getResources().getDisplayMetrics().heightPixels;
+
+        // Orientation is assumed portrait
+        ssx = swp / 320.0f;
+        ssy = shp / 480.0f;
+
+        // Get our uniform scaler
+        if(ssx > ssy)
+            ssu = ssy;
+        else
+            ssu = ssx;
+
+        Log.d("swp", swp + "");
+        Log.d("shp", shp + "");
     }
 
     public void onTouchEvent(MotionEvent event) {
@@ -308,6 +340,11 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         }
 
+    }
+
+    @Override
+    public float getScaling() {
+        return ssu;
     }
 
     @Override
