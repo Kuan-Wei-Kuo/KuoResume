@@ -61,8 +61,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLMessage glMessage;
     ActivityListener activityListener;
 
-    Dialog dialog;
-
     //DialogFragment dialog;
 
     public InterviewRenderer(Context context, ObjectListener objectListener, ActivityListener activityListener) {
@@ -123,13 +121,14 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glExperience = new GLExperience(mContext, this, objectListener);
         glMessage = new GLMessage(mContext, this, objectListener, activityListener);
 
-        glAbout.setSrcRect(0, glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight() * 2);
-        glSkill.setSrcRect(0, 0, glAbout.getWidth(), glAbout.getHeight());
-        glExperience.setSrcRect(0, glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight() * 2);
-        glMessage.setSrcRect(0, glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight() * 2);
+        computeCurrentRect();
+
+        glAbout.setSrcRect(0, viewCompute.getCurRect().height() - glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight());
+        glSkill.setSrcRect(0, 0, glSkill.getWidth(), glSkill.getHeight());
+        glExperience.setSrcRect(0, viewCompute.getCurRect().height() - glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight());
+        glMessage.setSrcRect(0, viewCompute.getCurRect().height() - glMessage.getHeight(), glMessage.getWidth(), glMessage.getHeight());
 
         createTexture();
-        computeCurrentRect();
         computeRect();
 
         activityListener.dismissProgrees();
@@ -243,16 +242,22 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     private void computeCurrentRect() {
 
         float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
+        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
 
         float totalWidth = 0;
+        float maxHeight = 0;
+
+        int count = 0;
         for(float f : widths) {
             totalWidth += f;
+            maxHeight = Math.max(maxHeight, heights[count]);
+            count++;
         }
 
         if(viewCompute.getCacheRect() != null)
             viewCompute.setCurRect(viewCompute.getCacheRect());
         else
-            viewCompute.setCurRect(new RectF(0, - glAbout.getHeight(), totalWidth, glAbout.getHeight()));
+            viewCompute.setCurRect(new RectF(0, maxHeight - mScreenHeight, totalWidth, mScreenHeight));
     }
 
     private void computeRect() {

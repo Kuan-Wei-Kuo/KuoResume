@@ -21,6 +21,8 @@ import java.util.ArrayList;
  */
 public class GLSkill extends ComputeRect{
 
+    private static final int PLANT_FLOOR = 3;
+
     private ArrayList<Image> plants = new ArrayList<>();
     private ArrayList<Image> grounds = new ArrayList<>();
 
@@ -43,7 +45,8 @@ public class GLSkill extends ComputeRect{
 
         width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
 
-        height = (int) viewComputeListener.getViewCompute().getContentRect().height();
+        height = (int) viewComputeListener.getViewCompute().getContentRect().height()
+                + (int) viewComputeListener.getViewCompute().getPlantSize() * PLANT_FLOOR;
 
         createPlants();
         createGrounds();
@@ -57,9 +60,7 @@ public class GLSkill extends ComputeRect{
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
 
-        int groundVerticalSize = ((int) currentRect.height() - height) / (int) plantSize + 1;
-
-        for(int j = 0 ; j < groundVerticalSize ; j++) {
+        for(int j = 0 ; j < PLANT_FLOOR ; j++) {
             for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
 
                 float left = dstRect.left + plantSize * i;
