@@ -1,6 +1,9 @@
 package com.kuo.kuoresume.object;
 
+import android.content.Context;
 import android.graphics.RectF;
+
+import com.kuo.kuoresume.until.Until;
 
 /**
  * Created by Kuo on 2016/5/6.
@@ -14,9 +17,10 @@ public class GLImageText {
 
     private float x, y, rawX, rawY;
 
-    public GLImageText(String text, float x, float y) {
+    public GLImageText(Context context, String text, float x, float y) {
 
-        glText = new GLText(text, x, y);
+        glText = new GLText(text, Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
+                x, y);
 
         float tX = x + glText.getWidth() * WEIDTHED;
         float tY = y + glText.getHeight() * WEIDTHED;

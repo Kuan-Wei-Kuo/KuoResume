@@ -17,7 +17,7 @@ public class HolderBitmap {
 
     public Bitmap about, skill, exprience;
 
-    public Bitmap spiderHead, deadPoolHead;
+    public Bitmap spiderHead, deadPoolHead, buddha;
 
     public Bitmap font, cloud, tree_1, tree_2, tree_3;
 

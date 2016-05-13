@@ -2,12 +2,8 @@ package com.kuo.kuoresume.object;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.kuo.kuoresume.data.ChartData;
-import com.kuo.kuoresume.listener.ObjectListener;
-import com.kuo.kuoresume.listener.ViewComputeListener;
-import com.kuo.kuoresume.script.ComputeRect;
 
 import java.util.ArrayList;
 
@@ -34,7 +30,11 @@ public class GLChartRect {
 
     private int width, height, maxValue;
 
-    public GLChartRect(float x, float y, ArrayList<ChartData> chartDatas) {
+    private Context context;
+
+    public GLChartRect(Context context, float x, float y, ArrayList<ChartData> chartDatas) {
+
+        this.context = context;
 
         this.x = x;
         this.y = y;
@@ -75,7 +75,7 @@ public class GLChartRect {
 
         for(ChartData chartData : mChartData) {
 
-            GLImageText glImageText = new GLImageText(chartData.getName(), 0, 0);
+            GLImageText glImageText = new GLImageText(context, chartData.getName(), 0, 0);
 
             glImageTexts.add(glImageText);
 

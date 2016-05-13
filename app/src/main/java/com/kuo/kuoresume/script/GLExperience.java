@@ -60,15 +60,17 @@ public class GLExperience extends ComputeRect {
 
         levelSign = new Image(new RectF(0, plantHeight - plantSize * 4, plantSize * 4, plantHeight));
 
-        signText = new GLText("Level 3", 0, plantHeight - plantSize * 4);
+        signText = new GLText("Level 3", Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
+                0, plantHeight - plantSize * 4);
 
         signWood = new Image(new RectF(plantSize * 4, plantHeight - plantSize * 2, plantSize * 6, plantHeight));
 
-        experience = new GLText("EXPERIENCE", 0, 0);
+        experience = new GLText("EXPERIENCE", Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
+                0, 0);
 
         glClouds = new GLClouds(7, width, height);
 
-        glTrees = new GLTrees(6, width, height);
+        glTrees = new GLTrees(6, viewComputeListener.getScaling(), width, height);
     }
 
     private void createVideoTapes() {
@@ -91,7 +93,7 @@ public class GLExperience extends ComputeRect {
                     taps.getSrcRect().centerX() + VIDEO_TAPES_SIZE * 0.8f / 2,
                     taps.getSrcRect().centerY() + VIDEO_TAPES_SIZE * 0.8f / 2));
 
-            GLImageText glImageText = new GLImageText(texts[i], 0, 0);
+            GLImageText glImageText = new GLImageText(context, texts[i], 0, 0);
 
             glImageText.setPosition(taps.getSrcRect().centerX() - glImageText.getSrcRect().width() / 2,
                     bottom + glImageText.getSrcRect().height());

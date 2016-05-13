@@ -3,6 +3,7 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
+import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImageText;
@@ -27,7 +28,7 @@ public class GLAbout extends ComputeRect{
     private ArrayList<Image> plants = new ArrayList<>();
     private ArrayList<Image> clouds = new ArrayList<>();
 
-    private Image levelSign, ticketStation, build85, signWood;
+    private Image levelSign, ticketStation, build85, signWood, buddha;
 
     private GLImageText glImageText1, glImageText2;
 
@@ -68,7 +69,7 @@ public class GLAbout extends ComputeRect{
         ticketStation.draw(mvpMatrix, 5);
 
         build85.draw(mvpMatrix, 8);
-
+        buddha.draw(mvpMatrix, 16);
         glImageText1.draw(mvpMatrix);
     }
 
@@ -114,21 +115,39 @@ public class GLAbout extends ComputeRect{
 
         float plantHeight = height - plantSize;
 
-        levelSign = new Image(new RectF(0, plantHeight - plantSize * 4, plantSize * 4, plantHeight));
+        float scaling = viewComputeListener.getScaling();
 
-        signText = new GLText("Level 1", 0, plantHeight - plantSize * 4);
+        levelSign = new Image(new RectF(0,
+                plantHeight - ImageDefaultSize.SIGN_HEIGHT * scaling,
+                ImageDefaultSize.SIGN_WIDTH * scaling,
+                plantHeight));
 
-        signWood = new Image(new RectF(plantSize * 4, plantHeight - plantSize * 2, plantSize * 6, plantHeight));
+        String signString = "Level 1";
+        signText = new GLText(signString, (int) (ImageDefaultSize.SIGN_TEXT_SIZE * scaling),
+                0, plantHeight - plantSize * 4);
 
-        aboutText = new GLText("about", 0, 0);
+        signWood = new Image(new RectF(plantSize * 4,
+                plantHeight - ImageDefaultSize.SIGN_WOOD_HEIGHT * scaling,
+                plantSize * 4 + ImageDefaultSize.SIGN_WOOD_WIDTH * scaling,
+                plantHeight));
+
+        aboutText = new GLText("about",(int) (ImageDefaultSize.SIGN_WOOD_TEXT_SIZE * scaling),
+                0, 0);
 
         ticketStation = new Image(new RectF(plantSize * 9, plantHeight - plantSize * 2, plantSize * 11, plantHeight));
 
-        build85 = new Image(new RectF(plantSize * 13, plantHeight - plantSize * 4, plantSize * 15, plantHeight));
+        build85 = new Image(new RectF(plantSize * 13,
+                plantHeight - ImageDefaultSize.BUILD85_HEIGHT * scaling,
+                plantSize * 13 + ImageDefaultSize.BUILD85_WIDTH * scaling, plantHeight));
 
-        glImageText1 = new GLImageText("Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
+        buddha = new Image(new RectF(plantSize * 16,
+                plantHeight - ImageDefaultSize.BUDDHA_HEIGHT * scaling,
+                plantSize * 16 + ImageDefaultSize.BUDDHA_WIDTH * scaling,
+                plantHeight));
 
-        glTrees = new GLTrees(6, width, height);
+        glImageText1 = new GLImageText(context, "Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
+
+        glTrees = new GLTrees(6, scaling, width, height);
     }
 
     public void createClouds() {
@@ -169,7 +188,7 @@ public class GLAbout extends ComputeRect{
         computeLevelSign();
         computeTicketStation();
         computeBuild85();
-
+        computeBuddha();
     }
 
     private void computeLevelSign() {
@@ -198,7 +217,7 @@ public class GLAbout extends ComputeRect{
 
         signWood.setDstRect(left, top, right, bottom);
 
-        aboutText.setLocation(signWood.getDstRect().centerX() - signText.getWidth() / 2,
+        aboutText.setLocation(signWood.getDstRect().centerX() - aboutText.getWidth() / 2,
                 signWood.getDstRect().top + aboutText.getHeight() / 2);
 
     }
@@ -231,6 +250,18 @@ public class GLAbout extends ComputeRect{
 
         glImageText1.setLocation(build85.getDstRect().centerX() - textSrcRect.width() / 2,
                 dstRect.top + textSrcRect.top);
+    }
+
+    private void computeBuddha() {
+
+        RectF srcRect = buddha.getSrcRect();
+
+        float left = dstRect.left + srcRect.left;
+        float top = dstRect.top + srcRect.top;
+        float right = left + srcRect.width();
+        float bottom = top + srcRect.height();
+
+        buddha.setDstRect(left, top, right, bottom);
     }
 
     private void computePlants() {

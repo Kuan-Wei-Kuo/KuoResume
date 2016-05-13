@@ -2,31 +2,24 @@ package com.kuo.kuoresume.renderer;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.RectF;
-import android.graphics.drawable.ColorDrawable;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
-import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
-import android.view.Window;
 
+import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.compute.ViewCompute;
 import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
-import com.kuo.kuoresume.object.GLProgress;
 import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLCharacter;
 import com.kuo.kuoresume.script.GLExperience;
 import com.kuo.kuoresume.script.GLMessage;
 import com.kuo.kuoresume.script.GLSetting;
 import com.kuo.kuoresume.script.GLSkill;
-import com.kuo.kuoresume.until.Until;
-import com.kuo.kuoresume.view.LoadingScreen;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -86,7 +79,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        glSetting = new GLSetting(16);
+        glSetting = new GLSetting(17);
     }
 
     @Override
@@ -97,7 +90,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         computeScaling();
 
-        viewCompute.setPlantSize(Until.dp2px(mContext .getResources().getDisplayMetrics().density, 50));
+        viewCompute.setPlantSize(ImageDefaultSize.PLANT_SIZE * ssu);
         viewCompute.setContentRect(new RectF(0, 0, width, height));
         viewCompute.setCurRect(new RectF(0, -height, width, height));
 
@@ -243,6 +236,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(13, objectListener.getHolderBitmap().tree_1);
         glSetting.addTexture(14, objectListener.getHolderBitmap().tree_2);
         glSetting.addTexture(15, objectListener.getHolderBitmap().tree_3);
+        glSetting.addTexture(16, objectListener.getHolderBitmap().buddha);
 
     }
 

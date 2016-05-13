@@ -2,6 +2,8 @@ package com.kuo.kuoresume.object;
 
 import android.graphics.RectF;
 
+import com.kuo.kuoresume.compute.ImageDefaultSize;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,22 +12,28 @@ import java.util.Random;
  */
 public class GLTrees {
 
-    private static final int TREE_WIDTH = 117 * 2;
-    private static final int TREE_HEIGHT = 172 * 2;
+    private int TREE_WIDTH = 117;
+    private int TREE_HEIGHT = 172;
     //private static final int[] TREE_POSITION = {13, 14, 15};
 
     private int TREE_SIZE = 5, width, height;
+
+    private float scaling;
 
     private Random random = new Random();
 
     private ArrayList<Image> trees = new ArrayList<>();
 
-    public GLTrees(int treeSize, int width, int height) {
+    public GLTrees(int treeSize, float scaling, int width, int height) {
+
+        TREE_WIDTH = (int) (TREE_WIDTH * scaling);
+        TREE_HEIGHT = (int) (TREE_HEIGHT * scaling);
 
         TREE_SIZE = treeSize;
 
         this.width = width;
         this.height = height;
+        this.scaling = scaling;
 
         createTrees();
     }
@@ -35,7 +43,7 @@ public class GLTrees {
         for(int i = 0 ; i < TREE_SIZE ; i++) {
 
             float left = random.nextInt(width - TREE_WIDTH);
-            float top = height - TREE_HEIGHT - 150;
+            float top = height - TREE_HEIGHT - ImageDefaultSize.PLANT_SIZE * scaling;
             float right = left + TREE_WIDTH;
             float bottom = top + TREE_HEIGHT;
 

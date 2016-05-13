@@ -17,9 +17,11 @@ import java.util.ArrayList;
 public class GLText {
 
     private static final int COORDS_PER_VERTEX = 3;
-    private static final float TEXT_SPACESIZE = 64f; // 512 / 8 = 64
     private static final float TEXT_UV_BOX_WIDTH = 0.125f; // 64 / 512 = 0.125;
     private static final float RI_TEXT_SPACESIZE = 20f;
+    private static final float TEXT_SPEACESIZE = 64f; // 512 / 8 = 64
+
+    private int textSize = 64;
 
     private static final int SQUARE_SIZE = 12;
     private static final int UVS_SIZE = 8;
@@ -28,6 +30,8 @@ public class GLText {
     public float x;
     public float y;
     public float[] color;
+
+    private float scaling;
 
     public int width, height;
 
@@ -56,12 +60,16 @@ public class GLText {
     // 索引值緩衝區
     private ShortBuffer drawListBuffer;
 
-    public GLText(String txt, float xcoord, float ycoord) {
+    public GLText(String txt, int textSize,float xcoord, float ycoord) {
 
         text = txt;
         x = xcoord;
         y = ycoord;
         color = new float[] {0f, 0f, 0f, 0f};
+
+        this.textSize = textSize;
+
+        scaling = textSize / TEXT_SPEACESIZE;
 
         computeCoords();
         setGLES();
@@ -179,10 +187,10 @@ public class GLText {
 
             float left = x + sumX;
             float top = y;
-            float right = left + TEXT_SPACESIZE;
-            float bottom = top + TEXT_SPACESIZE;
+            float right = left + TEXT_SPEACESIZE * scaling;
+            float bottom = top + TEXT_SPEACESIZE * scaling;
 
-            sumX += charSize[index];
+            sumX += charSize[index] * scaling;
 
             float[] squareCoords = new float[]{left, top, 0f,
                     left, bottom, 0f,
@@ -210,7 +218,7 @@ public class GLText {
         }
 
         width = sumX;
-        height = (int) TEXT_SPACESIZE;
+        height = (int) (TEXT_SPEACESIZE * scaling);
     }
 
     public void setLocation(float x, float y) {

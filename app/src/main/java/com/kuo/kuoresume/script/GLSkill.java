@@ -96,11 +96,13 @@ public class GLSkill extends ComputeRect{
 
         levelSign = new Image(new RectF(0, plantHeight - plantSize * 4, plantSize * 4, plantHeight));
 
-        signText = new GLText("Level 2", 0, plantHeight - plantSize * 4);
+        signText = new GLText("Level 2", Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
+                0, plantHeight - plantSize * 4);
 
         signWood = new Image(new RectF(plantSize * 4,  plantHeight - plantSize *2, plantSize * 6, plantHeight));
 
-        skillText = new GLText("SKILL", 0, 0);
+        skillText = new GLText("SKILL", Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
+                0, 0);
 
 
         String[] softwareAxisY = {"Android Studio", "Eclipse", "Git", "Unity"};
@@ -122,19 +124,19 @@ public class GLSkill extends ComputeRect{
 
         }
 
-        glChartRect = new GLChartRect(0, 0, softwareChartData);
+        glChartRect = new GLChartRect(context, 0, 0, softwareChartData);
         glChartRect.setPosition(plantSize * 8, plantHeight - glChartRect.getHeight());
 
-        glImageText1 = new GLImageText("SoftWare", plantSize * 8, plantHeight / 6);
+        glImageText1 = new GLImageText(context, "SoftWare", plantSize * 8, plantHeight / 6);
 
-        languageChart = new GLChartRect(0, 0, languageChartData);
+        languageChart = new GLChartRect(context, 0, 0, languageChartData);
         languageChart.setPosition(plantSize * 10 + glChartRect.getWidth(), plantHeight - languageChart.getHeight());
 
-        glImageText2= new GLImageText("Language", plantSize * 8, plantHeight / 6);
+        glImageText2= new GLImageText(context, "Language", plantSize * 8, plantHeight / 6);
 
         glClouds = new GLClouds(7, width, height);
 
-        glTrees = new GLTrees(6, width, height);
+        glTrees = new GLTrees(6, viewComputeListener.getScaling(), width, height);
     }
 
     public void draw(float[] mvpMatrix) {

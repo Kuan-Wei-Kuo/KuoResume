@@ -33,7 +33,7 @@ public class GLProgress extends ComputeRect{
         super(context, viewComputeListener, objectListener);
 
         image = new Image(new RectF(0, 0, 150, 150));
-        glText = new GLImageText("we love you just the way you are", 0, 0);
+        glText = new GLImageText(context, "we love you just the way you are", 0, 0);
 
         width = (int) viewComputeListener.getViewCompute().getContentRect().width();
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
