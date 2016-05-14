@@ -3,6 +3,7 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
+import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLClouds;
@@ -58,14 +59,23 @@ public class GLExperience extends ComputeRect {
 
         float plantHeight = height - plantSize;
 
-        levelSign = new Image(new RectF(0, plantHeight - plantSize * 4, plantSize * 4, plantHeight));
+        float scaling = viewComputeListener.getScaling();
 
-        signText = new GLText("Level 3", Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
+        levelSign = new Image(new RectF(0,
+                plantHeight - ImageDefaultSize.SIGN_HEIGHT * scaling,
+                ImageDefaultSize.SIGN_WIDTH * scaling,
+                plantHeight));
+
+        String signString = "Level 3";
+        signText = new GLText(signString, (int) (ImageDefaultSize.SIGN_TEXT_SIZE * scaling),
                 0, plantHeight - plantSize * 4);
 
-        signWood = new Image(new RectF(plantSize * 4, plantHeight - plantSize * 2, plantSize * 6, plantHeight));
+        signWood = new Image(new RectF(plantSize * 4,
+                plantHeight - ImageDefaultSize.SIGN_WOOD_HEIGHT * scaling,
+                plantSize * 4 + ImageDefaultSize.SIGN_WOOD_WIDTH * scaling,
+                plantHeight));
 
-        experience = new GLText("EXPERIENCE", Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
+        experience = new GLText("experience",(int) (ImageDefaultSize.SIGN_WOOD_TEXT_SIZE * scaling),
                 0, 0);
 
         glClouds = new GLClouds(7, width, height);
@@ -206,8 +216,8 @@ public class GLExperience extends ComputeRect {
 
         levelSign.setDstRect(left, top, right, bottom);
 
-        signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 1.5f,
-                levelSign.getDstRect().top + srcRect.height() / 4);
+        signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
+                levelSign.getDstRect().top + signText.getHeight());
     }
 
     private void computeExperience() {
@@ -221,7 +231,7 @@ public class GLExperience extends ComputeRect {
 
         signWood.setDstRect(left, top, right, bottom);
 
-        experience.setLocation(signWood.getDstRect().centerX() - signText.getWidth() / 2,
+        experience.setLocation(signWood.getDstRect().centerX() - experience.getWidth() / 2,
                 signWood.getDstRect().top + experience.getHeight() / 2);
 
     }

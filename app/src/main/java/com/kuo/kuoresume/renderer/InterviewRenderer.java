@@ -77,7 +77,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        glSetting = new GLSetting(17);
+        glSetting = new GLSetting(18);
     }
 
     @Override
@@ -236,6 +236,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(14, objectListener.getHolderBitmap().tree_2);
         glSetting.addTexture(15, objectListener.getHolderBitmap().tree_3);
         glSetting.addTexture(16, objectListener.getHolderBitmap().buddha);
+        glSetting.addTexture(17, objectListener.getHolderBitmap().deadPoolHead);
 
     }
 
@@ -254,10 +255,12 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             count++;
         }
 
+        Log.d("maxHeight", maxHeight + "");
+
         if(viewCompute.getCacheRect() != null)
             viewCompute.setCurRect(viewCompute.getCacheRect());
         else
-            viewCompute.setCurRect(new RectF(0, maxHeight - mScreenHeight, totalWidth, mScreenHeight));
+            viewCompute.setCurRect(new RectF(0, mScreenHeight - maxHeight, totalWidth, mScreenHeight));
     }
 
     private void computeRect() {

@@ -203,7 +203,7 @@ public class GLAbout extends ComputeRect{
         levelSign.setDstRect(left, top, right, bottom);
 
         signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
-                levelSign.getDstRect().top + srcRect.height() / 4);
+                levelSign.getDstRect().top + signText.getHeight());
     }
 
     private void computeAbout() {

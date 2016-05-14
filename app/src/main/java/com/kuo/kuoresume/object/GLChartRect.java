@@ -3,7 +3,9 @@ package com.kuo.kuoresume.object;
 import android.content.Context;
 import android.graphics.RectF;
 
+import com.kuo.kuoresume.compute.ViewCompute;
 import com.kuo.kuoresume.data.ChartData;
+import com.kuo.kuoresume.listener.ViewComputeListener;
 
 import java.util.ArrayList;
 
@@ -12,9 +14,9 @@ import java.util.ArrayList;
  */
 public class GLChartRect {
 
-    public static final float WEIDTHED = 0.1f;
+    public static final float WEIGTHED = 0.1f;
 
-    public static final int IMAGE_SIZE = 150;
+    public int IMAGE_SIZE = 70;
 
     public static final int MAX_X = 5;
 
@@ -32,7 +34,9 @@ public class GLChartRect {
 
     private Context context;
 
-    public GLChartRect(Context context, float x, float y, ArrayList<ChartData> chartDatas) {
+    private ViewComputeListener viewComputeListener;
+
+    public GLChartRect(Context context, float x, float y, ArrayList<ChartData> chartDatas, ViewComputeListener viewComputeListener) {
 
         this.context = context;
 
@@ -40,6 +44,9 @@ public class GLChartRect {
         this.y = y;
 
         this.mChartData = chartDatas;
+        this.viewComputeListener = viewComputeListener;
+
+        IMAGE_SIZE = IMAGE_SIZE * (int) viewComputeListener.getScaling();
 
         createGLImageTexts();
         createImage();
@@ -52,8 +59,8 @@ public class GLChartRect {
 
             for(int i = 0 ; i < chartData.getValue() ; i++) {
 
-                float left = maxTextWidth + maxTextWidth * WEIDTHED + IMAGE_SIZE * i;
-                float top = IMAGE_SIZE * count;
+                float left = maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * i;
+                float top = (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * count;
                 float right = left + IMAGE_SIZE;
                 float bottom = top + IMAGE_SIZE;
 
@@ -63,12 +70,12 @@ public class GLChartRect {
 
                 maxValue = Math.max(chartData.getValue(), maxValue);
 
+                height = (int) Math.max(height, bottom);
             }
             count++;
         }
 
-        width = (int) (maxTextWidth + maxTextWidth * WEIDTHED + IMAGE_SIZE * maxValue);
-        height = IMAGE_SIZE * mChartData.size();
+        width = (int) (maxTextWidth + maxTextWidth * WEIGTHED + IMAGE_SIZE * maxValue);
     }
 
     private void createGLImageTexts() {
@@ -102,15 +109,15 @@ public class GLChartRect {
 
         for(Image image : images) {
 
-            image.draw(m, 2);
+            image.draw(m, 17);
 
         }
     }
 
     private void computeRect() {
 
-        computeGLImageTexts();
         computeImageRect();
+        computeGLImageTexts();
 
     }
 
@@ -137,7 +144,8 @@ public class GLChartRect {
         for(GLImageText glImageText : glImageTexts) {
 
             float x = rawX + maxTextWidth - glImageText.getSrcRect().width();
-            float y = rawY + IMAGE_SIZE / 4 + (maxTextHeight + IMAGE_SIZE / 2) * count;
+            //float y = rawY + IMAGE_SIZE / 4 + (maxTextHeight + IMAGE_SIZE / 2) * count;
+            float y = rawY + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * count + IMAGE_SIZE / 2 - glImageText.getSrcRect().height() / 2;
 
             glImageText.setLocation(x, y);
 
