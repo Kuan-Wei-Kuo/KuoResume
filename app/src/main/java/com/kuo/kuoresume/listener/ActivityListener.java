@@ -20,6 +20,8 @@ public interface ActivityListener {
 
     void showDialogShare();
 
+    void showGitHubBrowser();
+
     void showProgress();
 
     void dismissProgrees();

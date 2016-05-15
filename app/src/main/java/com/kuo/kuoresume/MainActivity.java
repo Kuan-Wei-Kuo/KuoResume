@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -82,6 +83,12 @@ public class MainActivity extends AppCompatActivity implements ActivityListener 
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, "http://kuan-wei-kuo-blog.logdown.com");
         startActivity(Intent.createChooser(shareIntent, "Share"));
+    }
+
+    @Override
+    public void showGitHubBrowser() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Kuan-Wei-Kuo"));
+        startActivity(browserIntent);
     }
 
     DialogProgress dialogProgress = new DialogProgress();

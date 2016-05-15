@@ -21,4 +21,5 @@ public class HolderBitmap {
 
     public Bitmap font, cloud, tree_1, tree_2, tree_3;
 
+    public Bitmap my_chart_lib, urcoco, basketball_board, my_logdown, firstaid, gmail_icon, share_icon, github_icon, gold_box;
 }

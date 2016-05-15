@@ -82,8 +82,18 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         holderBitmap.tree_1 = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.tree_1);
         holderBitmap.tree_2 = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.tree_2);
         holderBitmap.tree_3 = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.tree_3);
-
         holderBitmap.buddha = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.buddha);
+
+        holderBitmap.my_chart_lib = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.my_chart_lib_icon);
+        holderBitmap.urcoco = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.urcoco_icon);
+        holderBitmap.firstaid = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.firstaid);
+        holderBitmap.my_logdown = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logdown_main);
+        holderBitmap.basketball_board = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.basketball_board_icon);
+        holderBitmap.gmail_icon = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_gmail_128px);
+        holderBitmap.share_icon = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.share_icon);
+        holderBitmap.github_icon = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.github_logo);
+        holderBitmap.gold_box = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.gold_box);
+
     }
 
     @Override

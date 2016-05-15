@@ -54,4 +54,8 @@ public class ImageDefaultSize {
 
     public static final int MAP_WIDTH = 400;
     public static final int MAP_HEIGHT = 250;
+
+    public static final int ICON_WIDTH = 100;
+    public static final int ICON_HEIGHT = 100;
+
 }

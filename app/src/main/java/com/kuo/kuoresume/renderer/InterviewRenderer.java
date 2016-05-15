@@ -77,7 +77,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        glSetting = new GLSetting(18);
+        glSetting = new GLSetting(27);
     }
 
     @Override
@@ -237,7 +237,15 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(15, objectListener.getHolderBitmap().tree_3);
         glSetting.addTexture(16, objectListener.getHolderBitmap().buddha);
         glSetting.addTexture(17, objectListener.getHolderBitmap().deadPoolHead);
-
+        glSetting.addTexture(18, objectListener.getHolderBitmap().my_chart_lib);
+        glSetting.addTexture(19, objectListener.getHolderBitmap().firstaid);
+        glSetting.addTexture(20, objectListener.getHolderBitmap().basketball_board);
+        glSetting.addTexture(21, objectListener.getHolderBitmap().urcoco);
+        glSetting.addTexture(22, objectListener.getHolderBitmap().my_logdown);
+        glSetting.addTexture(23, objectListener.getHolderBitmap().gmail_icon);
+        glSetting.addTexture(24, objectListener.getHolderBitmap().share_icon);
+        glSetting.addTexture(25, objectListener.getHolderBitmap().github_icon);
+        glSetting.addTexture(26, objectListener.getHolderBitmap().gold_box);
     }
 
     private void computeCurrentRect() {
@@ -254,8 +262,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             maxHeight = Math.max(maxHeight, heights[count]);
             count++;
         }
-
-        Log.d("maxHeight", maxHeight + "");
 
         if(viewCompute.getCacheRect() != null)
             viewCompute.setCurRect(viewCompute.getCacheRect());
@@ -311,15 +317,13 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             ssu = ssy;
         else
             ssu = ssx;
-
-        Log.d("swp", swp + "");
-        Log.d("shp", shp + "");
     }
 
     public void onTouchEvent(MotionEvent event) {
 
         if(!glMessage.onTouchContact(event) && !glMessage.isTactFocus()
-                && !glMessage.onTouchShare(event) && !glMessage.isShareFocus()) {
+                && !glMessage.onTouchShare(event) && !glMessage.isShareFocus()
+                && !glMessage.onTouchGithub(event) && !glMessage.isGithubFocus()) {
 
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
 

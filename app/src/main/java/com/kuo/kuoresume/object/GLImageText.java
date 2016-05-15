@@ -67,4 +67,8 @@ public class GLImageText {
     public RectF getSrcRect() {
         return image.getSrcRect();
     }
+
+    public RectF getDstRect() {
+        return image.getDstRect();
+    }
 }
