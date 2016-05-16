@@ -76,7 +76,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        glSetting = new GLSetting(30);
+        glSetting = new GLSetting(31);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             if(isTouch) {
 
                 if(glMessage.getDstRect().left + viewCompute.getPlantSize() < viewCompute.getContentRect().width() / 2
-                        && glMessage.getDstRect().left + viewCompute.getPlantSize() * (glMessage.MAX_SEA + 1) > viewCompute.getContentRect().width() / 2)
+                        && glMessage.getDstRect().left + viewCompute.getPlantSize() * (glMessage.MAX_SEA + 1) > glCharacter.getDstRect().centerX())
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
                 else
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
@@ -260,6 +260,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(27, objectListener.getHolderBitmap().deadPool_idle);
         glSetting.addTexture(28, objectListener.getHolderBitmap().own_music);
         glSetting.addTexture(29, objectListener.getHolderBitmap().characterBoat);
+        glSetting.addTexture(30, objectListener.getHolderBitmap().flickerLight);
     }
 
     private void computeCurrentRect() {

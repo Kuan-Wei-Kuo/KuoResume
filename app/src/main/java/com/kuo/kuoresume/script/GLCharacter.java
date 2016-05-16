@@ -15,7 +15,7 @@ import com.kuo.kuoresume.object.Image;
 public class GLCharacter extends ComputeRect{
 
     private static final float OWN_IDLE_UV_BOX_WIDTH = 1f;
-    private static final float OWN_RUN_UV_BOX_WIDTH = 0.5f;
+    private static final float CHARACTER_RUN_UV_BOX_WIDTH = 0.2f;
 
     public static final int CHARACTER_IDLE = 0;
     public static final int CHARACTER_RUN = 1;
@@ -24,8 +24,8 @@ public class GLCharacter extends ComputeRect{
     public static final int CHARACTER_DOWN = 4;
     public static final int CHARACTER_BOAT = 5;
 
-    private float CHARACTER_WIDTH = 71;
-    private float CHARACTER_HEIGHT = 142;
+    private float CHARACTER_RUN_WIDTH = 86;
+    private float CHARACTER_RUN_HEIGHT = 142;
 
     private float CHARACTER_BOAT_WIDTH = 142;
     private float CHARACTER_BOAT_HEIGHT = 142;
@@ -43,22 +43,22 @@ public class GLCharacter extends ComputeRect{
     public GLCharacter(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
-        CHARACTER_WIDTH = CHARACTER_WIDTH * viewComputeListener.getScaling();
-        CHARACTER_HEIGHT = CHARACTER_HEIGHT * viewComputeListener.getScaling();
+        CHARACTER_RUN_WIDTH = CHARACTER_RUN_WIDTH * viewComputeListener.getScaling();
+        CHARACTER_RUN_HEIGHT = CHARACTER_RUN_HEIGHT * viewComputeListener.getScaling();
 
         CHARACTER_BOAT_WIDTH = CHARACTER_BOAT_WIDTH * viewComputeListener.getScaling();
         CHARACTER_BOAT_HEIGHT = CHARACTER_BOAT_HEIGHT * viewComputeListener.getScaling();
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-        dstRect.set(contentRect.centerX() - CHARACTER_WIDTH / 2,
-                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize() - CHARACTER_HEIGHT,
-                contentRect.centerX() + CHARACTER_WIDTH / 2,
+        dstRect.set(contentRect.centerX() - CHARACTER_RUN_WIDTH / 2,
+                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize() - CHARACTER_RUN_HEIGHT,
+                contentRect.centerX() + CHARACTER_RUN_WIDTH / 2,
                 contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize());
 
-        characterRunController = new SpriteController(400,
+        characterRunController = new SpriteController(100,
                 objectListener.getHolderBitmap().deadPool_run.getWidth() / 2,
-                objectListener.getHolderBitmap().deadPool_run.getHeight(), 2);
+                objectListener.getHolderBitmap().deadPool_run.getHeight(), 5);
         characterRunController.setOnUpdateListener(deadPoolRunListener);
 
         deadPoolDownController = new SpriteController(10,
@@ -89,18 +89,38 @@ public class GLCharacter extends ComputeRect{
         switch (CHARACTER_STATE) {
             case CHARACTER_IDLE:
                 character_idle.draw(mvpMatrix, 27);
+                setDstRect(character_idle.getDstRect());
                 break;
             case CHARACTER_RUN:
                 character_run.draw(mvpMatrix, 0);
+                setDstRect(character_run.getDstRect());
                 break;
             case CHARACTER_UP:
                 character_idle.draw(mvpMatrix, 27);
+                setDstRect(character_idle.getDstRect());
                 break;
             case CHARACTER_DOWN:
                 character_idle.draw(mvpMatrix, 27);
+                setDstRect(character_idle.getDstRect());
                 break;
             case CHARACTER_BOAT:
+                if(direction == 1)
+                    characterBoat.setUVS(new float[] {
+                            0.0f, 0.0f,
+                            0.0f, 1.0f,
+                            1.0f, 1.0f,
+                            1.0f, 0.0f,
+                    });
+                else if(direction == -1)
+                    characterBoat.setUVS(new float[] {
+                            1.0f, 0.0f,
+                            1.0f, 1.0f,
+                            0.0f, 1.0f,
+                            0.0f, 0.0f,
+                    });
                 characterBoat.draw(mvpMatrix, 29);
+                setDstRect(characterBoat.getDstRect());
+                break;
         }
     }
 
@@ -152,8 +172,8 @@ public class GLCharacter extends ComputeRect{
                 characterMove();
             }
 
-            float left = currentHorizontalFrame * OWN_RUN_UV_BOX_WIDTH;
-            float right = left + OWN_RUN_UV_BOX_WIDTH;
+            float left = currentHorizontalFrame * CHARACTER_RUN_UV_BOX_WIDTH;
+            float right = left + CHARACTER_RUN_UV_BOX_WIDTH;
             float top = 0;
             float bottom = 1;
 

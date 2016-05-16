@@ -18,12 +18,12 @@ import java.util.ArrayList;
 public class GLMessage extends ComputeRect {
 
     private float FLICKER_LIGHT_WIDTH = 156;
-    private float FLICKER_LIGHT_HEIGHT = 98;
+    private float FLICKER_LIGHT_HEIGHT = 156;
 
     private float FLICKER_LIGHT_UV_BOX_WIDTH = 0.333f;
 
     public static final int MIN_SEA = 1;
-    public static final int MAX_SEA = 9;
+    public static final int MAX_SEA = 12;
 
     private Image shareImage, contactImage, githubImage, goldBoxImage, flickerLight;
 
@@ -100,7 +100,7 @@ public class GLMessage extends ComputeRect {
                 goldBoxImage.getSrcRect().centerX() + FLICKER_LIGHT_WIDTH / 2,
                 goldBoxImage.getSrcRect().top));
 
-        flickerLightSprite = new SpriteController(200, 0, 0, 3);
+        flickerLightSprite = new SpriteController(350, 0, 0, 3);
         flickerLightSprite.setOnUpdateListener(flickerLightSpriteListener);
     }
 
@@ -160,6 +160,7 @@ public class GLMessage extends ComputeRect {
         githubImage.computeDstRect(dstRect);
         shareImage.computeDstRect(dstRect);
         goldBoxImage.computeDstRect(dstRect);
+        flickerLight.computeDstRect(dstRect);
     }
 
     boolean isTactFocus = false;

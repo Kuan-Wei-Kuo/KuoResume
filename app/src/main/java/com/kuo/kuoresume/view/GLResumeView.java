@@ -65,8 +65,8 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         holderBitmap.skill = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.skill);
         holderBitmap.exprience = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.experience);
 
-        holderBitmap.deadPool_run = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.own_run);
-        holderBitmap.deadPool_idle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.own_idle);
+        holderBitmap.deadPool_run = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.stickman_run);
+        holderBitmap.deadPool_idle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.stickman_idle);
         holderBitmap.deadPool_down = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.deadpool_down);
         holderBitmap.spider_deadpool = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.spider_deadpool);
         holderBitmap.own_music = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.own_music);
@@ -95,6 +95,7 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         holderBitmap.share_icon = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.share_icon);
         holderBitmap.github_icon = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.github_logo);
         holderBitmap.gold_box = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.gold_box);
+        holderBitmap.flickerLight = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.flicker_light);
 
     }
 

@@ -40,6 +40,10 @@ public class ComputeRect {
         dstRect.set(left, top, right, bottom);
     }
 
+    public void setDstRect(RectF dstRect) {
+        this.dstRect = dstRect;
+    }
+
     public void computeDstRect(RectF rawDstRect) {
 
         float left = rawDstRect.left + srcRect.left;
