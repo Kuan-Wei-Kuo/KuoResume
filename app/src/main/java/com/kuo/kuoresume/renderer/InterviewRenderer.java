@@ -1,6 +1,5 @@
 package com.kuo.kuoresume.renderer;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.RectF;
 import android.opengl.GLES20;
@@ -77,7 +76,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        glSetting = new GLSetting(27);
+        glSetting = new GLSetting(30);
     }
 
     @Override
@@ -91,7 +90,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         viewCompute.setPlantSize(ImageDefaultSize.PLANT_SIZE * ssu);
         viewCompute.setContentRect(new RectF(0, 0, width, height));
         viewCompute.setCurRect(new RectF(0, -height, width, height));
-
 
         GLES20.glViewport(0, 0, (int) mScreenWidth, (int) mScreenHeight);
 
@@ -140,10 +138,22 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         if (jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch) {
-            if(isTouch)
+            if(isTouch) {
+
+                if(glMessage.getDstRect().left + viewCompute.getPlantSize() < viewCompute.getContentRect().width() / 2
+                        && glMessage.getDstRect().left + viewCompute.getPlantSize() * (glMessage.MAX_SEA + 1) > viewCompute.getContentRect().width() / 2)
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
+                else
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
+
                 glCharacter.computeSprite(GLCharacter.CHARACTER_RUN);
+
+            }
             computeRect();
         }
+
+        if (!isTouch)
+            glCharacter.computeSprite(GLCharacter.CHARACTER_IDLE);
 
         glAbout.draw(mMVPMatrix);
 
@@ -152,7 +162,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glExperience.draw(mMVPMatrix);
 
         glMessage.draw(mMVPMatrix);
-        //glCharacter.draw(mMVPMatrix);
+
+        glCharacter.draw(mMVPMatrix);
     }
 
     private boolean jumpAndDownToSkill() {
@@ -246,6 +257,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSetting.addTexture(24, objectListener.getHolderBitmap().share_icon);
         glSetting.addTexture(25, objectListener.getHolderBitmap().github_icon);
         glSetting.addTexture(26, objectListener.getHolderBitmap().gold_box);
+        glSetting.addTexture(27, objectListener.getHolderBitmap().deadPool_idle);
+        glSetting.addTexture(28, objectListener.getHolderBitmap().own_music);
+        glSetting.addTexture(29, objectListener.getHolderBitmap().characterBoat);
     }
 
     private void computeCurrentRect() {
@@ -327,13 +341,14 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
-
                 isTouch = true;
 
             } else if(event.getAction() == MotionEvent.ACTION_UP) {
 
-                glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
+                if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_BOAT)
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
+                else
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
 
                 isTouch = false;
 

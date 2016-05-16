@@ -3,6 +3,7 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
+import com.kuo.kuoresume.animation.SpriteController;
 import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
@@ -19,16 +20,23 @@ import java.util.Random;
  */
 public class GLAbout extends ComputeRect{
 
+    private static final float OWN_MUSIC_UV_BOX_WIDTH = 0.5f;
+
     private static final int SEA_MIN_SIZE = 12;
     private static final int SEA_MAX_SIZE = 15;
     private static final int CLOUD_SIZE = 5;
     private static final int CLOUD_WIDTH = 140;
     private static final int CLOUD_HEIGHT = 95;
 
+    private float CHARACTER_MUSIC_WIDTH = 107;
+    private float CHARACTER_MUSIC_HEIGHT = 142;
+
     private ArrayList<Image> plants = new ArrayList<>();
     private ArrayList<Image> clouds = new ArrayList<>();
 
-    private Image levelSign, ticketStation, build85, signWood, buddha;
+    private SpriteController ownMusicSpriteController;
+
+    private Image levelSign, ticketStation, build85, signWood, buddha, characterMusic;
 
     private GLImageText glImageText1, glImageText2;
 
@@ -43,9 +51,15 @@ public class GLAbout extends ComputeRect{
 
         PLANT_RANGE_SIZE = 27;
 
+        CHARACTER_MUSIC_WIDTH = CHARACTER_MUSIC_WIDTH * viewComputeListener.getScaling();
+        CHARACTER_MUSIC_HEIGHT = CHARACTER_MUSIC_HEIGHT * viewComputeListener.getScaling();
+
         width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
+
+        ownMusicSpriteController = new SpriteController(300, 0, 0, 2);
+        ownMusicSpriteController.setOnUpdateListener(onUpdateListener);
 
         createClouds();
         createPlants();
@@ -54,7 +68,28 @@ public class GLAbout extends ComputeRect{
         setDstRect(0, 0, width, height);
     }
 
+    private SpriteController.OnUpdateListener onUpdateListener = new SpriteController.OnUpdateListener() {
+        @Override
+        public void onUpdate(int currentHorizontalFrame) {
+
+            float left = currentHorizontalFrame * OWN_MUSIC_UV_BOX_WIDTH;
+            float right = left + OWN_MUSIC_UV_BOX_WIDTH;
+            float top = 0;
+            float bottom = 1;
+
+            characterMusic.setUVS(new float[] {
+                    left, top,
+                    left, bottom,
+                    right, bottom,
+                    right, top
+            });
+
+        }
+    };
+
     public void draw(float[] mvpMatrix) {
+
+        ownMusicSpriteController.start();
 
         glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
         drawClouds(mvpMatrix);
@@ -71,6 +106,9 @@ public class GLAbout extends ComputeRect{
         build85.draw(mvpMatrix, 8);
         buddha.draw(mvpMatrix, 16);
         glImageText1.draw(mvpMatrix);
+
+        characterMusic.draw(mvpMatrix, 28);
+        glImageText2.draw(mvpMatrix);
     }
 
     private void drawClouds(float[] m) {
@@ -93,19 +131,13 @@ public class GLAbout extends ComputeRect{
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-        int count = 0;
         for(Image image : plants) {
 
             RectF rectF = image.getDstRect();
 
             if(contentRect.contains(rectF.left, rectF.top)
-                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
-                if (count >= SEA_MIN_SIZE && count <= SEA_MAX_SIZE)
-                    image.draw(mvpMatrix, 9);
-                else
-                    image.draw(mvpMatrix, 2);
-            }
-            count++;
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
+                image.draw(mvpMatrix, 2);
         }
     }
 
@@ -147,6 +179,11 @@ public class GLAbout extends ComputeRect{
 
         glImageText1 = new GLImageText(context, "Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
 
+        characterMusic = new Image(new RectF(buddha.getSrcRect().right + plantSize * 4, plantHeight - CHARACTER_MUSIC_HEIGHT,
+                buddha.getSrcRect().right + CHARACTER_MUSIC_WIDTH, plantHeight));
+
+        glImageText2 = new GLImageText(context, "My hobby", buddha.getSrcRect().right + plantSize * 4, plantHeight / 6);
+
         glTrees = new GLTrees(6, scaling, width, height);
     }
 
@@ -182,25 +219,19 @@ public class GLAbout extends ComputeRect{
 
     public void computeRect() {
         glTrees.computeTrees(dstRect);
+        ticketStation.computeDstRect(dstRect);
+        buddha.computeDstRect(dstRect);
         computeClouds();
         computePlants();
         computeAbout();
         computeLevelSign();
-        computeTicketStation();
         computeBuild85();
-        computeBuddha();
+        computeOwnMusic();
     }
 
     private void computeLevelSign() {
 
-        RectF srcRect = levelSign.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        levelSign.setDstRect(left, top, right, bottom);
+        levelSign.computeDstRect(dstRect);
 
         signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
                 levelSign.getDstRect().top + signText.getHeight());
@@ -208,43 +239,16 @@ public class GLAbout extends ComputeRect{
 
     private void computeAbout() {
 
-        RectF srcRect = signWood.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top =  dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        signWood.setDstRect(left, top, right, bottom);
+        signWood.computeDstRect(dstRect);
 
         aboutText.setLocation(signWood.getDstRect().centerX() - aboutText.getWidth() / 2,
                 signWood.getDstRect().top + aboutText.getHeight() / 2);
 
     }
 
-    private void computeTicketStation() {
-
-        RectF srcRect = ticketStation.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        ticketStation.setDstRect(left, top, right, bottom);
-
-    }
-
     private void computeBuild85() {
 
-        RectF srcRect = build85.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        build85.setDstRect(left, top, right, bottom);
+        build85.computeDstRect(dstRect);
 
         RectF textSrcRect = glImageText1.getSrcRect();
 
@@ -252,16 +256,14 @@ public class GLAbout extends ComputeRect{
                 dstRect.top + textSrcRect.top);
     }
 
-    private void computeBuddha() {
+    private void computeOwnMusic() {
 
-        RectF srcRect = buddha.getSrcRect();
+        characterMusic.computeDstRect(dstRect);
 
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
+        RectF textSrcRect = glImageText2.getSrcRect();
 
-        buddha.setDstRect(left, top, right, bottom);
+        glImageText2.setLocation(characterMusic.getDstRect().centerX() - textSrcRect.width() / 2,
+                dstRect.top + textSrcRect.top);
     }
 
     private void computePlants() {

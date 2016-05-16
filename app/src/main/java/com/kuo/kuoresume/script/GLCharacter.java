@@ -14,52 +14,73 @@ import com.kuo.kuoresume.object.Image;
  */
 public class GLCharacter extends ComputeRect{
 
+    private static final float OWN_IDLE_UV_BOX_WIDTH = 1f;
+    private static final float OWN_RUN_UV_BOX_WIDTH = 0.5f;
+
     public static final int CHARACTER_IDLE = 0;
     public static final int CHARACTER_RUN = 1;
     public static final int CHARACTER_JUMP = 2;
     public static final int CHARACTER_UP = 3;
     public static final int CHARACTER_DOWN = 4;
-    public static final int CHARACTER_BAT = 5;
+    public static final int CHARACTER_BOAT = 5;
+
+    private float CHARACTER_WIDTH = 71;
+    private float CHARACTER_HEIGHT = 142;
+
+    private float CHARACTER_BOAT_WIDTH = 142;
+    private float CHARACTER_BOAT_HEIGHT = 142;
 
     public int CHARACTER_STATE;
 
     private SpriteAnimation ownAirAnimation;
-    private SpriteController deadPoolIdleController, deadPoolRunController, deadPoolDownController, deadPoolUpController;
+    private SpriteController deadPoolIdleController, characterRunController, deadPoolDownController, deadPoolUpController;
 
     private int moveSpeed = 70;
     private int direction = 1, airDirection = 1;
 
-    private Image deadPoolRun;
+    private Image character_run, character_idle, characterBoat;
 
     public GLCharacter(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
-        width = (int) viewComputeListener.getViewCompute().getPlantSize();
+        CHARACTER_WIDTH = CHARACTER_WIDTH * viewComputeListener.getScaling();
+        CHARACTER_HEIGHT = CHARACTER_HEIGHT * viewComputeListener.getScaling();
 
-        height = width * 2;
+        CHARACTER_BOAT_WIDTH = CHARACTER_BOAT_WIDTH * viewComputeListener.getScaling();
+        CHARACTER_BOAT_HEIGHT = CHARACTER_BOAT_HEIGHT * viewComputeListener.getScaling();
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-        dstRect.set(contentRect.centerX() - width / 2,
-                contentRect.bottom - width - height,
-                contentRect.centerX() + width / 2,
-                contentRect.bottom - width);
+        dstRect.set(contentRect.centerX() - CHARACTER_WIDTH / 2,
+                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize() - CHARACTER_HEIGHT,
+                contentRect.centerX() + CHARACTER_WIDTH / 2,
+                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize());
 
-        deadPoolRunController = new SpriteController(300,
+        characterRunController = new SpriteController(400,
                 objectListener.getHolderBitmap().deadPool_run.getWidth() / 2,
                 objectListener.getHolderBitmap().deadPool_run.getHeight(), 2);
-        deadPoolRunController.setOnUpdateListener(deadPoolRunListener);
+        characterRunController.setOnUpdateListener(deadPoolRunListener);
 
         deadPoolDownController = new SpriteController(10,
                 objectListener.getHolderBitmap().deadPool_down.getWidth() / 2,
                 objectListener.getHolderBitmap().deadPool_down.getHeight(), 2);
         deadPoolDownController.setOnUpdateListener(deadPoolDownListener);
 
-        deadPoolRun = new Image(dstRect);
-        deadPoolRun.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
+        character_run = new Image(dstRect);
+        character_run.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
 
-        deadPoolRun = new Image(dstRect);
-        deadPoolRun.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
+        character_idle = new Image(dstRect);
+        character_idle.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
+
+        characterBoat = new Image(new RectF(contentRect.centerX() - CHARACTER_BOAT_WIDTH / 2,
+                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize() - CHARACTER_BOAT_HEIGHT,
+                contentRect.centerX() + CHARACTER_BOAT_WIDTH / 2,
+                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize()));
+        characterBoat.setDstRect(contentRect.centerX() - CHARACTER_BOAT_WIDTH / 2,
+                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize() - CHARACTER_BOAT_HEIGHT,
+                contentRect.centerX() + CHARACTER_BOAT_WIDTH / 2,
+                contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize());
+
         CHARACTER_STATE = CHARACTER_IDLE;
     }
 
@@ -67,26 +88,27 @@ public class GLCharacter extends ComputeRect{
 
         switch (CHARACTER_STATE) {
             case CHARACTER_IDLE:
+                character_idle.draw(mvpMatrix, 27);
                 break;
             case CHARACTER_RUN:
-                deadPoolRun.draw(mvpMatrix, 0);
+                character_run.draw(mvpMatrix, 0);
                 break;
             case CHARACTER_UP:
-                deadPoolRun.draw(mvpMatrix, 2);
+                character_idle.draw(mvpMatrix, 27);
                 break;
             case CHARACTER_DOWN:
+                character_idle.draw(mvpMatrix, 27);
                 break;
+            case CHARACTER_BOAT:
+                characterBoat.draw(mvpMatrix, 29);
         }
-
     }
 
     public void computeSprite(int CHARACTER_STATE) {
 
         switch (CHARACTER_STATE) {
-            case CHARACTER_IDLE:
-                break;
             case CHARACTER_RUN:
-                deadPoolRunController.start();
+                characterRunController.start();
                 break;
             case CHARACTER_UP:
                 deadPoolDownController.start();
@@ -104,33 +126,53 @@ public class GLCharacter extends ComputeRect{
             RectF curRect = viewComputeListener.getViewCompute().getCurRect();
             RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-            float width = curRect.width();
+            if(character_run.getDstRect().centerX() == contentRect.centerX()) {
 
-            float curLeft = curRect.left - moveSpeed * direction;
-            float curRight = curLeft + width;
+                float width = curRect.width();
 
-            if(curLeft > contentRect.left) {
-                curLeft = contentRect.left;
-                curRight = curLeft + width;
-            } else if(curRight < contentRect.right) {
-                curRight = contentRect.right;
-                curLeft = contentRect.right - width;
+                float curLeft = curRect.left - moveSpeed * direction;
+                float curRight = curLeft + width;
+
+                if(curLeft > contentRect.left) {
+                    curLeft = contentRect.left;
+                    curRight = curLeft + width;
+
+                    characterMove();
+                } else if(curRight < contentRect.right) {
+                    curRight = contentRect.right;
+                    curLeft = contentRect.right - width;
+
+                    characterMove();
+                }
+
+                curRect.left = curLeft;
+                curRect.right = curRight;
+
+            } else {
+                characterMove();
             }
 
-            curRect.left = curLeft;
-            curRect.right = curRight;
-
-            float left = (float) (currentHorizontalFrame * deadPoolRunController.getFrameWidth()) / deadPoolRunController.getWidth();
-            float right = left + (float) deadPoolRunController.getFrameWidth() / deadPoolRunController.getWidth();
+            float left = currentHorizontalFrame * OWN_RUN_UV_BOX_WIDTH;
+            float right = left + OWN_RUN_UV_BOX_WIDTH;
             float top = 0;
-            float bottom = top + deadPoolRunController.getFrameHeight() / deadPoolRunController.getWidth();
+            float bottom = 1;
 
-            deadPoolRun.setUVS(new float[] {
-                    left, top,
-                    left, bottom,
-                    right, bottom,
-                    right, top
-            });
+            if(direction == 1) {
+                character_run.setUVS(new float[] {
+                        left, top,
+                        left, bottom,
+                        right, bottom,
+                        right, top
+                });
+            } else if(direction == -1) {
+                character_run.setUVS(new float[] {
+                        right, top,
+                        right, bottom,
+                        left, bottom,
+                        left, top,
+                });
+            }
+
         }
     };
 
@@ -156,22 +198,45 @@ public class GLCharacter extends ComputeRect{
 
             currentRect.top = top;
             currentRect.bottom = bottom;
-
-            //int left = currentHorizontalFrame * deadPoolDownController.getFrameWidth();
-            //int right = left + deadPoolDownController.getFrameWidth();
-            //int top = 0;
-            //int bottom = top + deadPoolDownController.getFrameHeight();
-
-            deadPoolRun.setUVS(new float[] {
-                    0.0f, 0.0f, //left top
-                    0.0f, 1.0f, //left bottom
-                    1.0f, 1.0f, //right bottom
-                    1.0f, 0.0f, //right top
-            });
-
         }
     };
 
+    private void characterMove() {
+
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+        float[] widths = {character_idle.getSrcRect().width(), character_run.getSrcRect().width(), characterBoat.getSrcRect().width()};
+        float[] lefts = {character_idle.getDstRect().left, character_run.getDstRect().left, characterBoat.getDstRect().left};
+
+        for(int i = 0 ; i < widths.length ; i++) {
+
+            float left = lefts[i] + moveSpeed * direction;
+            float right = left + widths[i];
+
+            if(left < contentRect.left) {
+                left = contentRect.left;
+                right = left +  widths[i];
+            } else if (right > contentRect.right) {
+                right = contentRect.right;
+                left = contentRect.right - widths[i];
+            } else if (left < contentRect.centerX() - widths[i] / 2
+                    && character_run.getDstRect().centerX() > contentRect.centerX()) {
+                right = contentRect.centerX() + widths[i] / 2;
+                left = right - widths[i];
+            } else if(right > contentRect.centerX() + widths[i] / 2
+                    && character_run.getDstRect().centerX() < contentRect.centerX()) {
+                left = contentRect.centerX() - widths[i] / 2;
+                right = left +  widths[i];
+            }
+
+            if (i == 0)
+                character_idle.setDstRect(left, character_idle.getSrcRect().top, right, character_run.getSrcRect().bottom);
+            else if(i == 1)
+                character_run.setDstRect(left, character_run.getSrcRect().top, right, character_run.getSrcRect().bottom);
+            else if(i == 2)
+                characterBoat.setDstRect(left, characterBoat.getSrcRect().top, right, characterBoat.getSrcRect().bottom);
+        }
+    }
 
     public void setDirection(int direction) {
         this.direction = direction;

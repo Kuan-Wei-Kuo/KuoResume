@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
+import com.kuo.kuoresume.animation.SpriteController;
 import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
@@ -16,10 +17,17 @@ import java.util.ArrayList;
  */
 public class GLMessage extends ComputeRect {
 
-    private static final int MIN_SEA = 1;
-    private static final int MAX_SEA = 9;
+    private float FLICKER_LIGHT_WIDTH = 156;
+    private float FLICKER_LIGHT_HEIGHT = 98;
 
-    private Image shareImage, contactImage, githubImage, goldBoxImage;
+    private float FLICKER_LIGHT_UV_BOX_WIDTH = 0.333f;
+
+    public static final int MIN_SEA = 1;
+    public static final int MAX_SEA = 9;
+
+    private Image shareImage, contactImage, githubImage, goldBoxImage, flickerLight;
+
+    private SpriteController flickerLightSprite;
 
     private ActivityListener activityListener;
 
@@ -33,6 +41,9 @@ public class GLMessage extends ComputeRect {
         width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
+
+        FLICKER_LIGHT_WIDTH = FLICKER_LIGHT_WIDTH * viewComputeListener.getScaling();
+        FLICKER_LIGHT_HEIGHT = FLICKER_LIGHT_HEIGHT * viewComputeListener.getScaling();
 
         createPlants();
         createImage();
@@ -79,16 +90,44 @@ public class GLMessage extends ComputeRect {
                 contactImage = new Image(new RectF(left, top, right, bottom));
         }
 
-        goldBoxImage = new Image(new RectF(width - plantSize * 2 - imageSize, height - plantSize - imageSize,
-                width - plantSize * 2, height - plantSize));
+        goldBoxImage = new Image(new RectF(width - plantSize * 2 - imageSize,
+                height - plantSize - imageSize,
+                width - plantSize * 2,
+                height - plantSize));
 
+        flickerLight = new Image(new RectF(goldBoxImage.getSrcRect().centerX() - FLICKER_LIGHT_WIDTH / 2,
+                goldBoxImage.getSrcRect().top - FLICKER_LIGHT_HEIGHT,
+                goldBoxImage.getSrcRect().centerX() + FLICKER_LIGHT_WIDTH / 2,
+                goldBoxImage.getSrcRect().top));
+
+        flickerLightSprite = new SpriteController(200, 0, 0, 3);
+        flickerLightSprite.setOnUpdateListener(flickerLightSpriteListener);
     }
 
-    public void draw(float[] m) {
+    private SpriteController.OnUpdateListener flickerLightSpriteListener = new SpriteController.OnUpdateListener() {
+        @Override
+        public void onUpdate(int currentHorizontalFrame) {
 
+            float left = currentHorizontalFrame * FLICKER_LIGHT_UV_BOX_WIDTH;
+            float right = left + FLICKER_LIGHT_UV_BOX_WIDTH;
+            float top = 0;
+            float bottom = 1;
+
+            flickerLight.setUVS(new float[] {
+                    left, top,
+                    left, bottom,
+                    right, bottom,
+                    right, top
+            });
+        }
+    };
+
+    public void draw(float[] m) {
+        flickerLightSprite.start();
         contactImage.draw(m, 23);
         githubImage.draw(m, 25);
         shareImage.draw(m, 24);
+        flickerLight.draw(m, 30);
         goldBoxImage.draw(m, 26);
         drawPlants(m);
 
@@ -117,10 +156,10 @@ public class GLMessage extends ComputeRect {
 
     public void computeRect() {
         computePlants();
-        computeContactImage();
-        computeShareImage();
-        computeGithubImage();
-        computeGoldBoxImage();
+        contactImage.computeDstRect(dstRect);
+        githubImage.computeDstRect(dstRect);
+        shareImage.computeDstRect(dstRect);
+        goldBoxImage.computeDstRect(dstRect);
     }
 
     boolean isTactFocus = false;
@@ -210,58 +249,6 @@ public class GLMessage extends ComputeRect {
 
     public boolean isGithubFocus() {
         return isGithubFocus;
-    }
-
-    private void computeContactImage() {
-
-        RectF srcRect = contactImage.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        contactImage.setDstRect(left, top, right, bottom);
-
-    }
-
-    private void computeGithubImage() {
-
-        RectF srcRect = githubImage.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        githubImage.setDstRect(left, top, right, bottom);
-
-    }
-
-    private void computeShareImage() {
-
-        RectF srcRect = shareImage.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        shareImage.setDstRect(left, top, right, bottom);
-
-    }
-
-    private void computeGoldBoxImage() {
-
-        RectF srcRect = goldBoxImage.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        goldBoxImage.setDstRect(left, top, right, bottom);
-
     }
 
     private void computePlants() {

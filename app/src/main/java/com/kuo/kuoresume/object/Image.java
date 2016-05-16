@@ -148,6 +148,16 @@ public class Image {
 
     }
 
+    public void computeDstRect(RectF rawDstRect) {
+
+        float left = rawDstRect.left + srcRect.left;
+        float top = rawDstRect.top + srcRect.top;
+        float right = left + srcRect.width();
+        float bottom = top + srcRect.height();
+
+        setDstRect(left, top, right, bottom);
+    }
+
     public void setUVS(float [] uvs) {
         ByteBuffer bbr = ByteBuffer.allocateDirect(uvs.length * 4);
         bbr.order(ByteOrder.nativeOrder());

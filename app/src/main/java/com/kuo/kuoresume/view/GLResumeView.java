@@ -65,10 +65,12 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         holderBitmap.skill = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.skill);
         holderBitmap.exprience = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.experience);
 
-        holderBitmap.deadPool_run = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.deadpool_run);
-        holderBitmap.deadPool_idle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.deadpool_idle);
+        holderBitmap.deadPool_run = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.own_run);
+        holderBitmap.deadPool_idle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.own_idle);
         holderBitmap.deadPool_down = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.deadpool_down);
         holderBitmap.spider_deadpool = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.spider_deadpool);
+        holderBitmap.own_music = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.own_music);
+        holderBitmap.characterBoat = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.own_boat);
 
         holderBitmap.spiderHead = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.spider_head);
         holderBitmap.deadPoolHead = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.deadpool_head);

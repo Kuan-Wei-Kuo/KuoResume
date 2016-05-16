@@ -40,6 +40,16 @@ public class ComputeRect {
         dstRect.set(left, top, right, bottom);
     }
 
+    public void computeDstRect(RectF rawDstRect) {
+
+        float left = rawDstRect.left + srcRect.left;
+        float top = rawDstRect.top + srcRect.top;
+        float right = left + srcRect.width();
+        float bottom = top + srcRect.height();
+
+        setDstRect(left, top, right, bottom);
+    }
+
     public RectF getSrcRect() {
         return srcRect;
     }
