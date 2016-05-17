@@ -8,13 +8,10 @@ public class SampleAnimation {
     protected long lastFrameChangeTime = 0;
     protected long frameLengthInMilliseconds = 100;
 
-    protected int count, frameCount = 0;
-
     private OnUpdateListener onUpdateListener;
 
-    public SampleAnimation(long frameLengthInMilliseconds, int count) {
+    public SampleAnimation(long frameLengthInMilliseconds) {
         this.frameLengthInMilliseconds = frameLengthInMilliseconds;
-        this.count = count;
     }
 
     public void start() {
@@ -25,20 +22,16 @@ public class SampleAnimation {
 
             lastFrameChangeTime = time;
 
-            frameCount++;
 
-            if(onUpdateListener != null) {
+            if(onUpdateListener != null)
                 onUpdateListener.onUpdate();
-                if(frameCount >= count)
-                    onUpdateListener.onEnd();
-            }
+
         }
 
     }
 
     public interface OnUpdateListener {
         void onUpdate();
-        void onEnd();
     }
 
     public void setOnUpdateListener(OnUpdateListener onUpdateListener) {

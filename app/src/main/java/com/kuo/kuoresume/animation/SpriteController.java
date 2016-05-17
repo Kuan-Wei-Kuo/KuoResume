@@ -1,5 +1,7 @@
 package com.kuo.kuoresume.animation;
 
+import android.util.Log;
+
 /**
  * Created by Kuo on 2016/5/1.
  */
@@ -14,7 +16,7 @@ public class SpriteController {
 
     private OnUpdateListener onUpdateListener;
 
-    private boolean isEnd = false;
+    private boolean isEnd = true;
 
     public SpriteController(long frameLengthInMilliseconds, int frameWidth, int frameHeight, int countFrame) {
 
@@ -48,14 +50,37 @@ public class SpriteController {
 
                 isEnd = true;
 
-                if(onUpdateListener != null)
+                if(onUpdateListener != null) {
                     onUpdateListener.onEnd();
+                }
             }
         }
 
         if(onUpdateListener != null)
             onUpdateListener.onUpdate(currentHorizontalFrame);
 
+    }
+
+    private boolean isKeep = false;
+
+    public void keepHorizontalFrame(int horizontalFrame) {
+
+        long time  = System.currentTimeMillis();
+        isKeep = true;
+
+        if (time > lastFrameChangeTime + frameLengthInMilliseconds) {
+            lastFrameChangeTime = time;
+
+            onUpdateListener.onUpdate(horizontalFrame);
+        }
+    }
+
+    public void setKeep(boolean keep) {
+        isKeep = keep;
+    }
+
+    public boolean isKeep() {
+        return isKeep;
     }
 
     public void setOnUpdateListener(OnUpdateListener onUpdateListener) {

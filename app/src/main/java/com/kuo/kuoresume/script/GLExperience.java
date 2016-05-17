@@ -173,10 +173,8 @@ public class GLExperience extends ComputeRect {
 
     private void drawVideoTapes(float[] mvpMatrix) {
 
-        int count = 0;
         for(Image image : videoTapes) {
             image.draw(mvpMatrix, 10);
-            count++;
         }
     }
 
@@ -184,7 +182,6 @@ public class GLExperience extends ComputeRect {
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-        int count = 0;
         for(Image image : plants) {
 
             RectF rectF = image.getDstRect();
@@ -192,8 +189,6 @@ public class GLExperience extends ComputeRect {
             if(contentRect.contains(rectF.left, rectF.top)
                     || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
                 image.draw(mvpMatrix, 2);
-
-            count++;
         }
     }
 
@@ -211,14 +206,7 @@ public class GLExperience extends ComputeRect {
 
     private void computeLevelSign() {
 
-        RectF srcRect = levelSign.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        levelSign.setDstRect(left, top, right, bottom);
+        levelSign.computeDstRect(dstRect);
 
         signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
                 levelSign.getDstRect().top + signText.getHeight());
@@ -226,24 +214,15 @@ public class GLExperience extends ComputeRect {
 
     private void computeExperience() {
 
-        RectF srcRect = signWood.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        signWood.setDstRect(left, top, right, bottom);
+        signWood.computeDstRect(dstRect);
 
         experience.setLocation(signWood.getDstRect().centerX() - experience.getWidth() / 2,
                 signWood.getDstRect().top + experience.getHeight() / 2);
 
     }
 
-
     private void computeVideoTapes() {
 
-        int count = 0;
         for(Image image : videoTapes) {
 
             float left = dstRect.left + image.getSrcRect().left;
@@ -252,26 +231,18 @@ public class GLExperience extends ComputeRect {
             float bottom = top + VIDEO_TAPES_SIZE;
 
             image.setDstRect(left, top, right, bottom);
-
-            count++;
         }
     }
 
     private void computeGLImageTexts() {
 
-        float scaling = viewComputeListener.getScaling();
-
-        int count = 0;
         for(GLImageText glImageText : glImageTexts) {
 
             float left = dstRect.left + glImageText.getX();
             float top = dstRect.top + glImageText.getY();
-            float right = left + ImageDefaultSize.ICON_WIDTH * scaling;
-            float bottom = top + ImageDefaultSize.ICON_HEIGHT * scaling;
 
             glImageText.setLocation(left, top);
 
-            count++;
         }
     }
 
@@ -279,7 +250,6 @@ public class GLExperience extends ComputeRect {
 
         float scaling = viewComputeListener.getScaling();
 
-        int count = 0;
         for(Image image : images) {
 
             float left = dstRect.left + image.getSrcRect().left;
@@ -289,7 +259,6 @@ public class GLExperience extends ComputeRect {
 
             image.setDstRect(left, top, right, bottom);
 
-            count++;
         }
     }
 

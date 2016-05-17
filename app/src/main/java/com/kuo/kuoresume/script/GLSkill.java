@@ -23,7 +23,7 @@ import java.util.ArrayList;
  */
 public class GLSkill extends ComputeRect{
 
-    private static final int PLANT_FLOOR_SIZE = 3;
+    public static final int PLANT_FLOOR_SIZE = 3;
 
     private ArrayList<Image> grounds = new ArrayList<>();
 
@@ -102,7 +102,7 @@ public class GLSkill extends ComputeRect{
         String[] softwareAxisY = {"Android Studio", "Eclipse", "Git", "Unity"};
         int[] values = {5, 3, 2, 2};
 
-        String[] languageAxisY = {"Java", "C", "C#", "JavaScript"};
+        String[] languageAxisY = {"Java", "C", "C Sharp", "JavaScript"};
         int[] lvalues = {5, 3, 3, 2};
 
         ArrayList<ChartData> softwareChartData = new ArrayList<>();
@@ -133,23 +133,81 @@ public class GLSkill extends ComputeRect{
         glTrees = new GLTrees(6, viewComputeListener.getScaling(), width, (int) (plantHeight + plantSize));
     }
 
-    public void draw(float[] mvpMatrix) {
+    public void computeRect() {
+        computeGrounds();
+        computeLevelSign();
+        computeSkill();
+        computeSoftwareRect();
+        computeLanguageRect();
+        glClouds.computeClouds(dstRect);
+        glTrees.computeTrees(dstRect);
+    }
 
-        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-        glClouds.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-        drawGrounds(mvpMatrix);
+    private void computeLevelSign() {
 
-        levelSign.draw(mvpMatrix, 3);
-        signText.draw(mvpMatrix);
+        levelSign.computeDstRect(dstRect);
 
-        signWood.draw(mvpMatrix, 6);
-        skillText.draw(mvpMatrix);
+        signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
+                levelSign.getDstRect().top + signText.getHeight());
+    }
 
-        glChartRect.draw(mvpMatrix);
-        glImageText1.draw(mvpMatrix);
+    private void computeSkill() {
 
-        languageChart.draw(mvpMatrix);
-        glImageText2.draw(mvpMatrix);
+        signWood.computeDstRect(dstRect);
+
+        skillText.setLocation(signWood.getDstRect().centerX() - skillText.getWidth() / 2,
+                signWood.getDstRect().top + skillText.getHeight() / 2);
+
+    }
+
+    private void computeSoftwareRect() {
+
+
+        float x = dstRect.left + glChartRect.getX();
+        float y = dstRect.top + glChartRect.getY();
+
+        glChartRect.setRawPosition(x, y);
+
+        RectF textSrcRect = glImageText1.getSrcRect();
+
+        glImageText1.setLocation(glChartRect.getRawCenterX() - textSrcRect.width() / 2,
+                dstRect.top + textSrcRect.top);
+    }
+
+    private void computeLanguageRect() {
+
+
+        float x = dstRect.left + languageChart.getX();
+        float y = dstRect.top + languageChart.getY();
+
+        languageChart.setRawPosition(x, y);
+
+        RectF textSrcRect = glImageText2.getSrcRect();
+
+        glImageText2.setLocation(languageChart.getRawCenterX() - textSrcRect.width() / 2,
+                dstRect.top + textSrcRect.top);
+    }
+
+    private void computeGrounds() {
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        int count = 0;
+        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
+            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+                float left = dstRect.left + plantSize * i;
+                float top = dstRect.bottom - plantSize - plantSize * j;
+                float right = left + plantSize;
+                float bottom = top + plantSize;
+
+                if(count == grounds.size())
+                    continue;
+
+                grounds.get(count).setDstRect(left, top, right, bottom);
+                count ++;
+            }
+        }
 
     }
 
@@ -175,98 +233,23 @@ public class GLSkill extends ComputeRect{
         }
     }
 
-    public void computeRect() {
-        computeGrounds();
-        computeLevelSign();
-        computeSkill();
-        computeSoftwareRect();
-        computeLanguageRect();
-        glClouds.computeClouds(dstRect);
-        glTrees.computeTrees(dstRect);
-    }
+    public void draw(float[] mvpMatrix) {
 
-    private void computeLevelSign() {
+        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
+        glClouds.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
+        drawGrounds(mvpMatrix);
 
-        RectF srcRect = levelSign.getSrcRect();
+        levelSign.draw(mvpMatrix, 3);
+        signText.draw(mvpMatrix);
 
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
+        signWood.draw(mvpMatrix, 6);
+        skillText.draw(mvpMatrix);
 
-        levelSign.setDstRect(left, top, right, bottom);
+        glChartRect.draw(mvpMatrix);
+        glImageText1.draw(mvpMatrix);
 
-        signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
-                levelSign.getDstRect().top + signText.getHeight());
-    }
-
-    private void computeSkill() {
-
-        RectF srcRect = signWood.getSrcRect();
-
-        float left = dstRect.left + srcRect.left;
-        float top = dstRect.top + srcRect.top;
-        float right = left + srcRect.width();
-        float bottom = top + srcRect.height();
-
-        signWood.setDstRect(left, top, right, bottom);
-
-        skillText.setLocation(signWood.getDstRect().centerX() - skillText.getWidth() / 2,
-                signWood.getDstRect().top + skillText.getHeight() / 2);
-
-    }
-
-    private void computeSoftwareRect() {
-
-
-        float x = dstRect.left + glChartRect.getX();
-        float y = dstRect.top + glChartRect.getY();
-
-        glChartRect.setRawPosition(x, y);
-
-
-        RectF textSrcRect = glImageText1.getSrcRect();
-
-        glImageText1.setLocation(glChartRect.getRawCenterX() - textSrcRect.width() / 2,
-                dstRect.top + textSrcRect.top);
-    }
-
-    private void computeLanguageRect() {
-
-
-        float x = dstRect.left + languageChart.getX();
-        float y = dstRect.top + languageChart.getY();
-
-        languageChart.setRawPosition(x, y);
-
-        RectF textSrcRect = glImageText2.getSrcRect();
-
-        glImageText2.setLocation(languageChart.getRawCenterX() - textSrcRect.width() / 2,
-                dstRect.top + textSrcRect.top);
-    }
-
-    private void computeGrounds() {
-
-        RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        int count = 0;
-        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
-            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
-
-                float left = dstRect.left + plantSize * i;
-                float top = dstRect.bottom - plantSize - plantSize * j;
-                float right = left + plantSize;
-                float bottom = top + plantSize;
-
-                if(count == grounds.size())
-                    continue;
-
-                grounds.get(count).setDstRect(left, top, right, bottom);
-                count ++;
-            }
-        }
+        languageChart.draw(mvpMatrix);
+        glImageText2.draw(mvpMatrix);
 
     }
 }

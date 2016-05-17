@@ -132,8 +132,8 @@ public class GLMessage extends ComputeRect {
         contactImage.draw(m, 23);
         githubImage.draw(m, 25);
         shareImage.draw(m, 24);
-        flickerLight.draw(m, 30);
-        goldBoxImage.draw(m, 26);
+        flickerLight.draw(m, 29);
+        goldBoxImage.draw(m, 30);
         drawPlants(m);
 
     }
@@ -166,6 +166,24 @@ public class GLMessage extends ComputeRect {
         shareImage.computeDstRect(dstRect);
         goldBoxImage.computeDstRect(dstRect);
         flickerLight.computeDstRect(dstRect);
+    }
+
+    private void computePlants() {
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        int count = 0;
+        for(Image image : plants) {
+
+            float left = dstRect.left + plantSize * count;
+            float top = dstRect.bottom - plantSize;
+            float right = left + plantSize;
+            float bottom = top + plantSize;
+
+            image.setDstRect(left, top, right, bottom);
+
+            count++;
+        }
     }
 
     boolean isTactFocus = false;
@@ -255,23 +273,5 @@ public class GLMessage extends ComputeRect {
 
     public boolean isGithubFocus() {
         return isGithubFocus;
-    }
-
-    private void computePlants() {
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        int count = 0;
-        for(Image image : plants) {
-
-            float left = dstRect.left + plantSize * count;
-            float top = dstRect.bottom - plantSize;
-            float right = left + plantSize;
-            float bottom = top + plantSize;
-
-            image.setDstRect(left, top, right, bottom);
-
-            count++;
-        }
     }
 }

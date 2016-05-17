@@ -137,27 +137,12 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        if (jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch) {
-            if(isTouch) {
+        if(jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch || glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP) {
 
-                if(glMessage.getDstRect().left + viewCompute.getPlantSize() < viewCompute.getContentRect().width() / 2
-                        && glMessage.getDstRect().left + viewCompute.getPlantSize() * (glMessage.MAX_SEA + 1) > glCharacter.getDstRect().centerX())
-                    glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
+            if(isTouch && glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
-                //glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-                //glCharacter.computeSprite(GLCharacter.CHARACTER_JUMP);
-                //glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
-                //glCharacter.computeSprite(GLCharacter.CHARACTER_RUN);
-
-            }
-            computeRect();
-        }
-
-        //if (!isTouch)
-            //glCharacter.computeSprite(GLCharacter.CHARACTER_IDLE);
-
-        if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP) {
-            glCharacter.computeSprite(GLCharacter.CHARACTER_JUMP);
+            glCharacter.computeSprite(glCharacter.getCharacterState());
             computeRect();
         }
 
@@ -172,30 +157,60 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glCharacter.draw(mMVPMatrix);
     }
 
+    public void onTouchEvent(MotionEvent event) {
+
+        if(!glMessage.onTouchContact(event) && !glMessage.isTactFocus()
+                && !glMessage.onTouchShare(event) && !glMessage.isShareFocus()
+                && !glMessage.onTouchGithub(event) && !glMessage.isGithubFocus()) {
+
+            if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
+
+                isTouch = true;
+
+            } else if(event.getAction() == MotionEvent.ACTION_UP) {
+
+                if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_BOAT)
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
+                else if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP)
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+                else
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
+
+                isTouch = false;
+
+            }
+
+            if(event.getX() <= mScreenWidth / 2)
+                glCharacter.setDirection(-1);
+            else
+                glCharacter.setDirection(1);
+
+        }
+
+    }
+
     private boolean jumpAndDownToSkill() {
 
         boolean needInvalidate = false;
 
-        RectF currentRect = viewCompute.getCurRect();
-        RectF contentRect = viewCompute.getContentRect();
-
         if(glCharacter.getDstRect().right > glAbout.getDstRect().right
                 && glCharacter.getDirection() == 1
-                && glCharacter.getDstRect().right < glSkill.getDstRect().right
-                && currentRect.top < contentRect.top) {
+                && glCharacter.getDstRect().left < glAbout.getDstRect().right) {
 
-            glCharacter.setAirDirection(1);
-            glCharacter.computeSprite(GLCharacter.CHARACTER_UP);
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            viewCompute.setFloorHeight((GLSkill.PLANT_FLOOR_SIZE - 1) * viewCompute.getPlantSize());
 
             needInvalidate = true;
 
         } else if(glCharacter.getDstRect().left < glAbout.getDstRect().right
                 && glCharacter.getDirection() == -1
-                && glCharacter.getDstRect().left < glSkill.getDstRect().right
-                && currentRect.bottom > contentRect.bottom) {
+                && glCharacter.getDstRect().right > glAbout.getDstRect().right) {
 
-            glCharacter.setAirDirection(-1);
-            glCharacter.computeSprite(GLCharacter.CHARACTER_DOWN);
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            viewCompute.setFloorHeight(0);
 
             needInvalidate = true;
         }
@@ -207,26 +222,21 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         boolean needInvalidate = false;
 
-        RectF currentRect = viewCompute.getCurRect();
-        RectF contentRect = viewCompute.getContentRect();
-
         if(glCharacter.getDstRect().right > glSkill.getDstRect().right
                 && glCharacter.getDirection() == 1
-                && glCharacter.getDstRect().right > glAbout.getDstRect().right
-                && currentRect.bottom > contentRect.bottom) {
+                && glCharacter.getDstRect().left < glSkill.getDstRect().right) {
 
-            glCharacter.setAirDirection(-1);
-            glCharacter.computeSprite(GLCharacter.CHARACTER_DOWN);
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            viewCompute.setFloorHeight(0);
 
             needInvalidate = true;
 
         } else if(glCharacter.getDstRect().left < glSkill.getDstRect().right
                 && glCharacter.getDirection() == -1
-                && glCharacter.getDstRect().left > glAbout.getDstRect().right
-                && currentRect.top < contentRect.top) {
+                && glCharacter.getDstRect().right > glSkill.getDstRect().right) {
 
-            glCharacter.setAirDirection(1);
-            glCharacter.computeSprite(GLCharacter.CHARACTER_UP);
+            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            viewCompute.setFloorHeight((GLSkill.PLANT_FLOOR_SIZE - 1) * viewCompute.getPlantSize());
 
             needInvalidate = true;
         }
@@ -288,8 +298,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glMessage.computeRect();
     }
 
-    private void computeScaling()
-    {
+    private void computeScaling() {
         // The screen resolutions
         swp = mContext.getResources().getDisplayMetrics().widthPixels;
         shp = mContext.getResources().getDisplayMetrics().heightPixels;
@@ -303,50 +312,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             ssu = ssy;
         else
             ssu = ssx;
-    }
-
-    private PointF lastPoint = new PointF();
-
-    public void onTouchEvent(MotionEvent event) {
-
-        if(!glMessage.onTouchContact(event) && !glMessage.isTactFocus()
-                && !glMessage.onTouchShare(event) && !glMessage.isShareFocus()
-                && !glMessage.onTouchGithub(event) && !glMessage.isGithubFocus()) {
-
-            if(event.getAction() == MotionEvent.ACTION_DOWN) {
-
-                lastPoint.set(event.getX(), event.getY());
-
-                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-                //isTouch = true;
-
-            } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
-
-                if(Math.abs(lastPoint.x - event.getX()) < 10
-                        && Math.abs(lastPoint.y - event.getY()) > 20) {
-                    glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-                }
-
-            } else if(event.getAction() == MotionEvent.ACTION_UP) {
-
-                if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_BOAT)
-                    glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
-                else if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP)
-                    glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-                else
-                    glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
-
-                //isTouch = false;
-
-            }
-
-            if(event.getX() <= mScreenWidth / 2)
-                glCharacter.setDirection(-1);
-            else
-                glCharacter.setDirection(1);
-
-        }
-
     }
 
     @Override
@@ -367,13 +332,10 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     public void onPause() {
         /* Do stuff to pause the renderer */
         viewCompute.setCacheRect(viewCompute.getCurRect());
-        Log.d("onSurfaceOnPause", "4");
     }
 
     public void onResume() {
         /* Do stuff to resume the renderer */
         mLastTime = System.currentTimeMillis();
-
-        Log.d("onSurfaceOnResume", "5");
     }
 }

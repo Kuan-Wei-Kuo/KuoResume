@@ -10,7 +10,7 @@ public class ViewCompute {
 
     private RectF currentRect, contentRect, plantRect, cacheRect;
 
-    private float columnWidth, marginWidth, radius;
+    private float columnWidth, marginWidth, radius, floorHeight;
 
     private Bitmap plantSand;
 
@@ -60,6 +60,10 @@ public class ViewCompute {
         this.radius = radius;
     }
 
+    public void setFloorHeight(float floorHeight) {
+        this.floorHeight = floorHeight;
+    }
+
     public RectF getContentRect() {
         return contentRect;
     }
@@ -86,5 +90,9 @@ public class ViewCompute {
 
     public float getRadius() {
         return radius;
+    }
+
+    public float getFloorHeight() {
+        return floorHeight;
     }
 }
