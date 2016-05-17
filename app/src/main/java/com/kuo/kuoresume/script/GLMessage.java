@@ -120,6 +120,11 @@ public class GLMessage extends ComputeRect {
                     right, top
             });
         }
+
+        @Override
+        public void onEnd() {
+
+        }
     };
 
     public void draw(float[] m) {

@@ -14,6 +14,8 @@ public class SpriteController {
 
     private OnUpdateListener onUpdateListener;
 
+    private boolean isEnd = false;
+
     public SpriteController(long frameLengthInMilliseconds, int frameWidth, int frameHeight, int countFrame) {
 
         this.frameLengthInMilliseconds = frameLengthInMilliseconds;
@@ -25,6 +27,7 @@ public class SpriteController {
 
     public interface OnUpdateListener {
         void onUpdate(int currentHorizontalFrame);
+        void onEnd();
     }
 
     public void start() {
@@ -33,13 +36,21 @@ public class SpriteController {
 
         if ( time > lastFrameChangeTime + frameLengthInMilliseconds) {
 
+            isEnd = false;
+
             lastFrameChangeTime = time;
 
             currentHorizontalFrame++;
 
-            if (currentHorizontalFrame >= countFrame)
+            if (currentHorizontalFrame >= countFrame) {
+
                 currentHorizontalFrame = 0;
 
+                isEnd = true;
+
+                if(onUpdateListener != null)
+                    onUpdateListener.onEnd();
+            }
         }
 
         if(onUpdateListener != null)
@@ -65,5 +76,9 @@ public class SpriteController {
 
     public int getCountFrame() {
         return countFrame;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
     }
 }

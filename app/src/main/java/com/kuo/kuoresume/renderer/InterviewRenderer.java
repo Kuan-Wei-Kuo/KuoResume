@@ -1,6 +1,7 @@
 package com.kuo.kuoresume.renderer;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
@@ -76,7 +77,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        glSetting = new GLSetting(31);
+        glSetting = new GLSetting(mContext, 31);
     }
 
     @Override
@@ -126,7 +127,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glExperience.setSrcRect(0, viewCompute.getCurRect().height() - glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight());
         glMessage.setSrcRect(0, viewCompute.getCurRect().height() - glMessage.getHeight(), glMessage.getWidth(), glMessage.getHeight());
 
-        createTexture();
         computeRect();
 
         activityListener.dismissProgrees();
@@ -143,17 +143,23 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 if(glMessage.getDstRect().left + viewCompute.getPlantSize() < viewCompute.getContentRect().width() / 2
                         && glMessage.getDstRect().left + viewCompute.getPlantSize() * (glMessage.MAX_SEA + 1) > glCharacter.getDstRect().centerX())
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
-                else
-                    glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
-                glCharacter.computeSprite(GLCharacter.CHARACTER_RUN);
+                //glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+                //glCharacter.computeSprite(GLCharacter.CHARACTER_JUMP);
+                //glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
+                //glCharacter.computeSprite(GLCharacter.CHARACTER_RUN);
 
             }
             computeRect();
         }
 
-        if (!isTouch)
-            glCharacter.computeSprite(GLCharacter.CHARACTER_IDLE);
+        //if (!isTouch)
+            //glCharacter.computeSprite(GLCharacter.CHARACTER_IDLE);
+
+        if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP) {
+            glCharacter.computeSprite(GLCharacter.CHARACTER_JUMP);
+            computeRect();
+        }
 
         glAbout.draw(mMVPMatrix);
 
@@ -228,41 +234,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         return needInvalidate;
     }
 
-    private void createTexture() {
-
-        glSetting.addTexture(0, objectListener.getHolderBitmap().deadPool_run);
-        glSetting.addTexture(1, objectListener.getHolderBitmap().font);
-        glSetting.addTexture(2, objectListener.getHolderBitmap().plantSand);
-        glSetting.addTexture(3, objectListener.getHolderBitmap().signs);
-        glSetting.addTexture(4, objectListener.getHolderBitmap().about);
-        glSetting.addTexture(5, objectListener.getHolderBitmap().ticketStation);
-        glSetting.addTexture(6, objectListener.getHolderBitmap().signWood);
-        glSetting.addTexture(7, objectListener.getHolderBitmap().pinkTag);
-        glSetting.addTexture(8, objectListener.getHolderBitmap().build85);
-        glSetting.addTexture(9, objectListener.getHolderBitmap().plantSea);
-        glSetting.addTexture(10, objectListener.getHolderBitmap().videoTape);
-        glSetting.addTexture(11, objectListener.getHolderBitmap().cloud);
-        glSetting.addTexture(12, objectListener.getHolderBitmap().sand);
-        glSetting.addTexture(13, objectListener.getHolderBitmap().tree_1);
-        glSetting.addTexture(14, objectListener.getHolderBitmap().tree_2);
-        glSetting.addTexture(15, objectListener.getHolderBitmap().tree_3);
-        glSetting.addTexture(16, objectListener.getHolderBitmap().buddha);
-        glSetting.addTexture(17, objectListener.getHolderBitmap().deadPoolHead);
-        glSetting.addTexture(18, objectListener.getHolderBitmap().my_chart_lib);
-        glSetting.addTexture(19, objectListener.getHolderBitmap().firstaid);
-        glSetting.addTexture(20, objectListener.getHolderBitmap().basketball_board);
-        glSetting.addTexture(21, objectListener.getHolderBitmap().urcoco);
-        glSetting.addTexture(22, objectListener.getHolderBitmap().my_logdown);
-        glSetting.addTexture(23, objectListener.getHolderBitmap().gmail_icon);
-        glSetting.addTexture(24, objectListener.getHolderBitmap().share_icon);
-        glSetting.addTexture(25, objectListener.getHolderBitmap().github_icon);
-        glSetting.addTexture(26, objectListener.getHolderBitmap().gold_box);
-        glSetting.addTexture(27, objectListener.getHolderBitmap().deadPool_idle);
-        glSetting.addTexture(28, objectListener.getHolderBitmap().own_music);
-        glSetting.addTexture(29, objectListener.getHolderBitmap().characterBoat);
-        glSetting.addTexture(30, objectListener.getHolderBitmap().flickerLight);
-    }
-
     private void computeCurrentRect() {
 
         float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
@@ -334,6 +305,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             ssu = ssx;
     }
 
+    private PointF lastPoint = new PointF();
+
     public void onTouchEvent(MotionEvent event) {
 
         if(!glMessage.onTouchContact(event) && !glMessage.isTactFocus()
@@ -342,16 +315,28 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                isTouch = true;
+                lastPoint.set(event.getX(), event.getY());
+
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+                //isTouch = true;
+
+            } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
+
+                if(Math.abs(lastPoint.x - event.getX()) < 10
+                        && Math.abs(lastPoint.y - event.getY()) > 20) {
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+                }
 
             } else if(event.getAction() == MotionEvent.ACTION_UP) {
 
                 if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_BOAT)
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
+                else if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP)
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
                 else
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
 
-                isTouch = false;
+                //isTouch = false;
 
             }
 

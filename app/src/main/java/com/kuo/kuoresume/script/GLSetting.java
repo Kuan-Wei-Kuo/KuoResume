@@ -1,19 +1,24 @@
 package com.kuo.kuoresume.script;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+
+import com.kuo.kuoresume.R;
 
 /**
  * Created by Kuo on 2016/5/6.
  */
 public class GLSetting {
 
-    int[] textureNames;
+    private int[] textureNames;
 
-    public GLSetting(int textureSize) {
 
-        textureNames = new int[textureSize];
+    public GLSetting(Context context, int textureSize) {
+
+        textureNames = new int[31];
         //GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, textureNames, 0);
         GLES20.glGenTextures(textureSize, textureNames, 0);
 
@@ -29,9 +34,27 @@ public class GLSetting {
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
+        createBitmap(context);
     }
 
-    public void addTexture(int index, Bitmap bitmap) {
+    private void createBitmap(Context context) {
+
+        int[] resId = {R.mipmap.stickman_run, R.mipmap.font, R.mipmap.plant_1, R.mipmap.tag, R.mipmap.stickman_jump,
+                R.mipmap.ticket, R.mipmap.sign_wood, R.mipmap.tag_1, R.mipmap.build_85, R.mipmap.sea, R.mipmap.videotape,
+                R.mipmap.cloud, R.mipmap.sand, R.mipmap.tree_1, R.mipmap.tree_2, R.mipmap.tree_3, R.mipmap.buddha,
+                R.mipmap.deadpool_head, R.mipmap.my_chart_lib_icon, R.mipmap.firstaid, R.mipmap.basketball_board_icon,
+                R.mipmap.urcoco_icon, R.mipmap.logdown_main, R.mipmap.logo_gmail_128px, R.mipmap.share_icon,
+                R.mipmap.github_logo, R.mipmap.stickman_idle, R.mipmap.own_music, R.mipmap.own_boat, R.mipmap.flicker_light};
+
+        for(int i = 0 ; i < resId.length ; i++) {
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId[i]);
+            addTexture(i, bitmap);
+            bitmap.recycle();
+        }
+
+    }
+
+    private void addTexture(int index, Bitmap bitmap) {
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + index);
 

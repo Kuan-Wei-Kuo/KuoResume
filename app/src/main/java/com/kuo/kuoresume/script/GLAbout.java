@@ -85,6 +85,11 @@ public class GLAbout extends ComputeRect{
             });
 
         }
+
+        @Override
+        public void onEnd() {
+
+        }
     };
 
     public void draw(float[] mvpMatrix) {
@@ -107,7 +112,7 @@ public class GLAbout extends ComputeRect{
         buddha.draw(mvpMatrix, 16);
         glImageText1.draw(mvpMatrix);
 
-        characterMusic.draw(mvpMatrix, 28);
+        characterMusic.draw(mvpMatrix, 27);
         glImageText2.draw(mvpMatrix);
     }
 

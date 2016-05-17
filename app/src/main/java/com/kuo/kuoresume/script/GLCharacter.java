@@ -14,8 +14,8 @@ import com.kuo.kuoresume.object.Image;
  */
 public class GLCharacter extends ComputeRect{
 
-    private static final float OWN_IDLE_UV_BOX_WIDTH = 1f;
-    private static final float CHARACTER_RUN_UV_BOX_WIDTH = 0.2f;
+    private static final float CHARACTER_RUN_UV_BOX_WIDTH = 0.167f;
+    private static final float CHARACTER_JUMP_UV_BOX_WIDTH = 0.25f;
 
     public static final int CHARACTER_IDLE = 0;
     public static final int CHARACTER_RUN = 1;
@@ -24,8 +24,8 @@ public class GLCharacter extends ComputeRect{
     public static final int CHARACTER_DOWN = 4;
     public static final int CHARACTER_BOAT = 5;
 
-    private float CHARACTER_RUN_WIDTH = 86;
-    private float CHARACTER_RUN_HEIGHT = 142;
+    private float CHARACTER_RUN_WIDTH = 101;
+    private float CHARACTER_RUN_HEIGHT = 139;
 
     private float CHARACTER_BOAT_WIDTH = 142;
     private float CHARACTER_BOAT_HEIGHT = 142;
@@ -33,12 +33,12 @@ public class GLCharacter extends ComputeRect{
     public int CHARACTER_STATE;
 
     private SpriteAnimation ownAirAnimation;
-    private SpriteController deadPoolIdleController, characterRunController, deadPoolDownController, deadPoolUpController;
+    private SpriteController deadPoolIdleController, characterRunController, deadPoolDownController, characterJumpController;
 
     private int moveSpeed = 70;
     private int direction = 1, airDirection = 1;
 
-    private Image character_run, character_idle, characterBoat;
+    private Image character_run, character_idle, characterBoat, characterJump;
 
     public GLCharacter(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
@@ -58,8 +58,11 @@ public class GLCharacter extends ComputeRect{
 
         characterRunController = new SpriteController(100,
                 objectListener.getHolderBitmap().deadPool_run.getWidth() / 2,
-                objectListener.getHolderBitmap().deadPool_run.getHeight(), 5);
+                objectListener.getHolderBitmap().deadPool_run.getHeight(), 6);
         characterRunController.setOnUpdateListener(deadPoolRunListener);
+
+        characterJumpController = new SpriteController(200, 0, 0, 4);
+        characterJumpController.setOnUpdateListener(characterJumpListener);
 
         deadPoolDownController = new SpriteController(10,
                 objectListener.getHolderBitmap().deadPool_down.getWidth() / 2,
@@ -81,6 +84,9 @@ public class GLCharacter extends ComputeRect{
                 contentRect.centerX() + CHARACTER_BOAT_WIDTH / 2,
                 contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize());
 
+        characterJump = new Image(dstRect);
+        characterJump.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
+
         CHARACTER_STATE = CHARACTER_IDLE;
     }
 
@@ -88,7 +94,7 @@ public class GLCharacter extends ComputeRect{
 
         switch (CHARACTER_STATE) {
             case CHARACTER_IDLE:
-                character_idle.draw(mvpMatrix, 27);
+                character_idle.draw(mvpMatrix, 26);
                 setDstRect(character_idle.getDstRect());
                 break;
             case CHARACTER_RUN:
@@ -96,12 +102,12 @@ public class GLCharacter extends ComputeRect{
                 setDstRect(character_run.getDstRect());
                 break;
             case CHARACTER_UP:
-                character_idle.draw(mvpMatrix, 27);
+                characterJump.draw(mvpMatrix, 4);
                 setDstRect(character_idle.getDstRect());
                 break;
             case CHARACTER_DOWN:
-                character_idle.draw(mvpMatrix, 27);
-                setDstRect(character_idle.getDstRect());
+                characterJump.draw(mvpMatrix, 4);
+                setDstRect(characterJump.getDstRect());
                 break;
             case CHARACTER_BOAT:
                 if(direction == 1)
@@ -121,21 +127,28 @@ public class GLCharacter extends ComputeRect{
                 characterBoat.draw(mvpMatrix, 29);
                 setDstRect(characterBoat.getDstRect());
                 break;
+            case CHARACTER_JUMP:
+                characterJump.draw(mvpMatrix, 4);
+                break;
         }
     }
 
     public void computeSprite(int CHARACTER_STATE) {
 
-        switch (CHARACTER_STATE) {
-            case CHARACTER_RUN:
-                characterRunController.start();
-                break;
-            case CHARACTER_UP:
-                deadPoolDownController.start();
-                break;
-            case CHARACTER_DOWN:
-                deadPoolDownController.start();
-                break;
+        if(CHARACTER_STATE != CHARACTER_JUMP) {
+            switch (CHARACTER_STATE) {
+                case CHARACTER_RUN:
+                    characterRunController.start();
+                    break;
+                case CHARACTER_UP:
+                    deadPoolDownController.start();
+                    break;
+                case CHARACTER_DOWN:
+                    deadPoolDownController.start();
+                    break;
+            }
+        } else {
+            characterJumpController.start();
         }
     }
 
@@ -194,6 +207,70 @@ public class GLCharacter extends ComputeRect{
             }
 
         }
+
+        @Override
+        public void onEnd() {
+
+        }
+    };
+
+    private SpriteController.OnUpdateListener characterJumpListener = new SpriteController.OnUpdateListener() {
+        @Override
+        public void onUpdate(int currentHorizontalFrame) {
+
+            if(!characterJumpController.isEnd()) {
+                RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
+                RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+                if(currentHorizontalFrame > 2)
+                    airDirection = -1;
+                else
+                    airDirection = 1;
+
+                float height = currentRect.height();
+
+                float top = currentRect.top + moveSpeed * airDirection;
+                float bottom = top + height;
+
+                if(top > contentRect.top) {
+                    top = contentRect.top;
+                    bottom = top + height;
+                } else if(contentRect.bottom > bottom) {
+                    bottom = contentRect.bottom;
+                    top = bottom - height;
+                }
+
+                currentRect.top = top;
+                currentRect.bottom = bottom;
+
+                float left = currentHorizontalFrame * CHARACTER_JUMP_UV_BOX_WIDTH;
+                float right = left + CHARACTER_JUMP_UV_BOX_WIDTH;
+                top = 0;
+                bottom = 1;
+
+                if(direction == 1) {
+                    characterJump.setUVS(new float[] {
+                            left, top,
+                            left, bottom,
+                            right, bottom,
+                            right, top
+                    });
+                } else if(direction == -1) {
+                    characterJump.setUVS(new float[] {
+                            right, top,
+                            right, bottom,
+                            left, bottom,
+                            left, top,
+                    });
+                }
+            }
+
+        }
+
+        @Override
+        public void onEnd() {
+            CHARACTER_STATE = CHARACTER_IDLE;
+        }
     };
 
     private SpriteController.OnUpdateListener deadPoolDownListener = new SpriteController.OnUpdateListener() {
@@ -202,6 +279,11 @@ public class GLCharacter extends ComputeRect{
 
             RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
             RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+            if(currentHorizontalFrame > 2)
+                airDirection = -1;
+            else
+                airDirection = 1;
 
             float height = currentRect.height();
 
@@ -218,6 +300,32 @@ public class GLCharacter extends ComputeRect{
 
             currentRect.top = top;
             currentRect.bottom = bottom;
+
+            float left = currentHorizontalFrame * CHARACTER_JUMP_UV_BOX_WIDTH;
+            float right = left + CHARACTER_JUMP_UV_BOX_WIDTH;
+            top = 0;
+            bottom = 1;
+
+            if(direction == 1) {
+                characterJump.setUVS(new float[] {
+                        left, top,
+                        left, bottom,
+                        right, bottom,
+                        right, top
+                });
+            } else if(direction == -1) {
+                characterJump.setUVS(new float[] {
+                        right, top,
+                        right, bottom,
+                        left, bottom,
+                        left, top,
+                });
+            }
+        }
+
+        @Override
+        public void onEnd() {
+            CHARACTER_STATE = CHARACTER_IDLE;
         }
     };
 
@@ -251,9 +359,10 @@ public class GLCharacter extends ComputeRect{
 
             if (i == 0)
                 character_idle.setDstRect(left, character_idle.getSrcRect().top, right, character_run.getSrcRect().bottom);
-            else if(i == 1)
+            else if(i == 1) {
                 character_run.setDstRect(left, character_run.getSrcRect().top, right, character_run.getSrcRect().bottom);
-            else if(i == 2)
+                characterJump.setDstRect(left, character_run.getSrcRect().top, right, character_run.getSrcRect().bottom);
+            } else if(i == 2)
                 characterBoat.setDstRect(left, characterBoat.getSrcRect().top, right, characterBoat.getSrcRect().bottom);
         }
     }

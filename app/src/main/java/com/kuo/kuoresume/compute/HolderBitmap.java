@@ -13,7 +13,8 @@ public class HolderBitmap {
 
     public Bitmap build85, ticketStation;
 
-    public Bitmap deadPool_run, deadPool_idle, deadPool_down, spider_deadpool, own_music, characterBoat, flickerLight;
+    public Bitmap deadPool_run, deadPool_idle, deadPool_down, spider_deadpool,
+            own_music, characterBoat, flickerLight, stickman_jump;
 
     public Bitmap about, skill, exprience;
 

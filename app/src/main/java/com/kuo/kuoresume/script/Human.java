@@ -198,6 +198,11 @@ public class Human {
 
             testCount++;
         }
+
+        @Override
+        public void onEnd() {
+
+        }
     };
 
     private SpriteController.OnUpdateListener deadPoolUpListener = new SpriteController.OnUpdateListener() {
@@ -228,6 +233,11 @@ public class Human {
 
             srcRect.set(left, top, right, bottom);
         }
+
+        @Override
+        public void onEnd() {
+
+        }
     };
 
     private SpriteController.OnUpdateListener deadPoolIdleListener = new SpriteController.OnUpdateListener() {
@@ -240,6 +250,11 @@ public class Human {
             int bottom = top + deadPoolIdleController.getFrameHeight();
 
             srcRect.set(left, top, right, bottom);
+
+        }
+
+        @Override
+        public void onEnd() {
 
         }
     };
@@ -260,6 +275,11 @@ public class Human {
             int bottom = top + deadPoolRunController.getFrameHeight();
 
             srcRect.set(left, top, right, bottom);
+
+        }
+
+        @Override
+        public void onEnd() {
 
         }
     };

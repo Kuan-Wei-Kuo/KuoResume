@@ -49,6 +49,7 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
     }
 
     private void createBitmap() {
+
         holderBitmap = new HolderBitmap();
         holderBitmap.plantSand = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.plant_1);
         holderBitmap.plantSea = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.sea);
@@ -96,6 +97,7 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         holderBitmap.github_icon = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.github_logo);
         holderBitmap.gold_box = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.gold_box);
         holderBitmap.flickerLight = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.flicker_light);
+        holderBitmap.stickman_jump = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.stickman_jump);
 
     }
 
