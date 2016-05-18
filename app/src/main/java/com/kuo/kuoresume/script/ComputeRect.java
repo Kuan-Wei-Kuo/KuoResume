@@ -15,7 +15,9 @@ public class ComputeRect {
 
     protected RectF dstRect = new RectF(0, 0, 0, 0);
 
-    protected int width, height, PLANT_RANGE_SIZE;
+    protected float width, height;
+
+    protected int PLANT_RANGE_SIZE;
 
     protected ViewComputeListener viewComputeListener;
 
@@ -62,11 +64,11 @@ public class ComputeRect {
         return dstRect;
     }
 
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 }

@@ -181,7 +181,7 @@ public class GLCharacter extends ComputeRect{
 
             float left = currentRect.left;
             float right = left + width;
-            float top = currentRect.top + moveSpeed * 0.5f * airDirection;
+            float top = currentRect.top + moveSpeed * airDirection;
             float bottom = top + height;
 
             if (left > contentRect.left) {

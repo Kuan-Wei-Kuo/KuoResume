@@ -16,15 +16,15 @@ public class GLTrees {
     private int TREE_HEIGHT = 172;
     //private static final int[] TREE_POSITION = {13, 14, 15};
 
-    private int TREE_SIZE = 5, width, height;
+    private int TREE_SIZE = 5;
 
-    private float scaling;
+    private float scaling, width, height;
 
     private Random random = new Random();
 
     private ArrayList<Image> trees = new ArrayList<>();
 
-    public GLTrees(int treeSize, float scaling, int width, int height) {
+    public GLTrees(int treeSize, float scaling, float width, float height) {
 
         TREE_WIDTH = (int) (TREE_WIDTH * scaling);
         TREE_HEIGHT = (int) (TREE_HEIGHT * scaling);
@@ -42,7 +42,7 @@ public class GLTrees {
 
         for(int i = 0 ; i < TREE_SIZE ; i++) {
 
-            float left = random.nextInt(width - TREE_WIDTH);
+            float left = random.nextInt((int) (width - TREE_WIDTH));
             float top = height - TREE_HEIGHT - ImageDefaultSize.PLANT_SIZE * scaling;
             float right = left + TREE_WIDTH;
             float bottom = top + TREE_HEIGHT;

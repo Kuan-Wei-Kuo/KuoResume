@@ -13,11 +13,13 @@ public class GLClouds {
     private static final int CLOUD_WIDTH = 140 * 2;
     private static final int CLOUD_HEIGHT = 95 * 2;
 
-    private int CLOUD_SIZE = 5, width, height;
+    private int CLOUD_SIZE = 5;
+
+    private float width, height;
 
     private ArrayList<Image> clouds = new ArrayList<>();
 
-    public GLClouds(int cloudSize, int width, int height) {
+    public GLClouds(int cloudSize, float width, float height) {
 
         CLOUD_SIZE = cloudSize;
 
@@ -33,8 +35,8 @@ public class GLClouds {
 
             Random random = new Random();
 
-            float left = random.nextInt(width - CLOUD_WIDTH);
-            float top = random.nextInt(height / 2);
+            float left = random.nextInt((int) (width - CLOUD_WIDTH));
+            float top = random.nextInt((int) (height / 2));
             float right = left + CLOUD_WIDTH;
             float bottom = top + CLOUD_HEIGHT;
 

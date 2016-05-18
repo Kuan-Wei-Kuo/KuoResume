@@ -2,6 +2,7 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.data.ChartData;
@@ -28,12 +29,17 @@ public class GLSkill extends ComputeRect{
     public float OFFICE_COMPUTER_WIDTH = 192;
     public float OFFICE_COMPUTER_HEIGHT = 137;
 
+    public float OFFICE_DOOR_WIDTH = 106;
+    public float OFFICE_DOOR_HEIGHT = 200;
+
+    public float SKILL_TEXT_SIZE = 150;
+
     private ArrayList<Image> grounds = new ArrayList<>();
     private ArrayList<GLSquare> squares = new ArrayList<>();
 
     private ArrayList<GLSquare> backgroundSquares = new ArrayList<>();
 
-    private Image levelSign, signWood, officeComputer;
+    private Image levelSign, signWood, officeComputer, leftDoor, rightDoor;
 
     private GLText signText, skillText;
 
@@ -41,22 +47,25 @@ public class GLSkill extends ComputeRect{
 
     public GLImageText glImageText1, glImageText2;
 
-    private GLClouds glClouds;
-
-    private GLTrees glTrees;
+    private GLSquare bg_yellow_square, bg_coffee_square;
 
     public GLSkill(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
         PLANT_RANGE_SIZE = 30;
 
-        width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
+        width = PLANT_RANGE_SIZE * viewComputeListener.getViewCompute().getPlantSize();
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height()
                 + (int) viewComputeListener.getViewCompute().getPlantSize() * (PLANT_FLOOR_SIZE - 1);
 
         OFFICE_COMPUTER_WIDTH = OFFICE_COMPUTER_WIDTH * viewComputeListener.getScaling();
         OFFICE_COMPUTER_HEIGHT = OFFICE_COMPUTER_HEIGHT * viewComputeListener.getScaling();
+
+        OFFICE_DOOR_WIDTH = OFFICE_DOOR_WIDTH * viewComputeListener.getScaling();
+        OFFICE_DOOR_HEIGHT = OFFICE_DOOR_HEIGHT * viewComputeListener.getScaling();
+
+        SKILL_TEXT_SIZE = SKILL_TEXT_SIZE * viewComputeListener.getScaling();
 
         createGrounds();
         createBackgroundSquares();
@@ -97,15 +106,13 @@ public class GLSkill extends ComputeRect{
         float[] color = new float[] {0, 0, 0, 1f};
 
         for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
-            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
 
-                float left = dstRect.left + plantSize * i;
-                float top = dstRect.bottom + plantSize * j;
-                float right = left + plantSize;
-                float bottom = top + plantSize;
+            float left = 0;
+            float top = height - plantSize - plantSize * j;
+            float right = left + width;
+            float bottom = top + plantSize;
 
-                squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
-            }
+            squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
         }
 
     }
@@ -135,6 +142,11 @@ public class GLSkill extends ComputeRect{
 
         float scaling = viewComputeListener.getScaling();
 
+        leftDoor = new Image(new RectF(0, plantHeight - OFFICE_DOOR_HEIGHT,
+                OFFICE_DOOR_WIDTH, plantHeight));
+
+        skillText = new GLText("Skill", (int) SKILL_TEXT_SIZE, 0, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
+
         levelSign = new Image(new RectF(0,
                 plantHeight - ImageDefaultSize.SIGN_HEIGHT * scaling,
                 ImageDefaultSize.SIGN_WIDTH * scaling,
@@ -149,9 +161,6 @@ public class GLSkill extends ComputeRect{
                 plantHeight - ImageDefaultSize.SIGN_WOOD_HEIGHT * scaling,
                 plantSize * 4 + ImageDefaultSize.SIGN_WOOD_WIDTH * scaling,
                 plantHeight));
-
-        skillText = new GLText("Skill",(int) (ImageDefaultSize.SIGN_WOOD_TEXT_SIZE * scaling),
-                0, 0);
 
         officeComputer = new Image(new RectF(plantSize * 7,
                 plantHeight - OFFICE_COMPUTER_HEIGHT,
@@ -187,21 +196,33 @@ public class GLSkill extends ComputeRect{
 
         glImageText2= new GLImageText(context, "Language", plantSize * 8, plantHeight / 6);
 
-        glClouds = new GLClouds(7, width, height);
+        float[] color_coffee = new float[] {0.7411764705882353f, 0.4823529411764706f, 0, 1f};
+        float[] color_yellow = new float[] {1f, 0.8862745098039216f, 0.6784313725490196f, 1f};
 
-        glTrees = new GLTrees(6, viewComputeListener.getScaling(), width, (int) (plantHeight + plantSize));
+        bg_yellow_square = new GLSquare(new RectF(0, 0, width, plantHeight), color_yellow);
+        bg_coffee_square = new GLSquare(new RectF(0, plantHeight - plantSize * 2, width, plantHeight), color_coffee);
     }
 
     public void computeRect() {
         //computeGrounds();
         //computeBackgroundSquares();
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        float plantHeight = height - plantSize * PLANT_FLOOR_SIZE;
+
+        bg_yellow_square.computeDstRect(dstRect);
+        bg_coffee_square.computeDstRect(dstRect);
+
+        leftDoor.computeDstRect(dstRect);
+        skillText.setLocation(dstRect.left, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
+
         computeSquares();
         computeLevelSign();
-        computeSkill();
+        //computeSkill();
         computeSoftwareRect();
         computeLanguageRect();
-        glClouds.computeClouds(dstRect);
-        glTrees.computeTrees(dstRect);
+
         officeComputer.computeDstRect(dstRect);
     }
 
@@ -250,23 +271,8 @@ public class GLSkill extends ComputeRect{
 
     private void computeSquares() {
 
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        int count = 0;
-        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
-            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
-
-                float left = dstRect.left + plantSize * i;
-                float top = dstRect.bottom - plantSize - plantSize * j;
-                float right = left + plantSize;
-                float bottom = top + plantSize;
-
-                if(count == squares.size())
-                    continue;
-
-                squares.get(count).setDstRect(left, top, right, bottom);
-                count ++;
-            }
+        for (GLSquare glSquare : squares) {
+            glSquare.computeDstRect(dstRect);
         }
 
     }
@@ -358,41 +364,48 @@ public class GLSkill extends ComputeRect{
 
     private void drawSquares(float[] mvpMatrix) {
 
-        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
-
-        int count = 0;
         for(GLSquare glSquare : squares) {
 
-            RectF rectF = glSquare.getDstRect();
-
-            if(contentRect.contains(rectF.left, rectF.top)
-                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
-                glSquare.draw(mvpMatrix);
-            }
-            count++;
+            glSquare.draw(mvpMatrix);
         }
     }
 
     public void draw(float[] mvpMatrix) {
 
-        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-        glClouds.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-        //drawGrounds(mvpMatrix);
-        drawSquares(mvpMatrix);
-        officeComputer.draw(mvpMatrix, 10);
-        //drawBackgroundSquares(mvpMatrix);
 
-        levelSign.draw(mvpMatrix, 3);
-        signText.draw(mvpMatrix);
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-        signWood.draw(mvpMatrix, 6);
-        skillText.draw(mvpMatrix);
+        if(dstRect.contains(contentRect.left, contentRect.top)
+                || dstRect.contains(contentRect.left, contentRect.bottom)
+                || dstRect.contains(contentRect.right, contentRect.top)
+                || dstRect.contains(contentRect.right, contentRect.bottom)) {
 
-        glChartRect.draw(mvpMatrix);
-        glImageText1.draw(mvpMatrix);
+            // Draw Background Square
+            bg_yellow_square.draw(mvpMatrix);
+            bg_coffee_square.draw(mvpMatrix);
 
-        languageChart.draw(mvpMatrix);
-        glImageText2.draw(mvpMatrix);
+            //drawGrounds(mvpMatrix);
+            drawSquares(mvpMatrix);
+
+            leftDoor.draw(mvpMatrix, 12);
+
+            skillText.draw(mvpMatrix);
+
+            officeComputer.draw(mvpMatrix, 10);
+
+            //drawBackgroundSquares(mvpMatrix);
+
+            //levelSign.draw(mvpMatrix, 3);
+            //signText.draw(mvpMatrix);
+
+            //signWood.draw(mvpMatrix, 6);
+
+            glChartRect.draw(mvpMatrix);
+            glImageText1.draw(mvpMatrix);
+
+            languageChart.draw(mvpMatrix);
+            glImageText2.draw(mvpMatrix);
+        }
 
     }
 

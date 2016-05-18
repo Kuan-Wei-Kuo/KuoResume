@@ -219,8 +219,8 @@ public class GLAbout extends ComputeRect{
 
             Random random = new Random();
 
-            float left = random.nextInt(width - CLOUD_WIDTH);
-            float top = random.nextInt(height / 2);
+            float left = random.nextInt((int) (width - CLOUD_WIDTH));
+            float top = random.nextInt((int) (height / 2));
             float right = left + CLOUD_WIDTH;
             float bottom = top + CLOUD_HEIGHT;
 

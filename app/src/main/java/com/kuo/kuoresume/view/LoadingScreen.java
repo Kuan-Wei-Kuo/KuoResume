@@ -105,7 +105,7 @@ public class LoadingScreen extends View {
 
     private void createLoadingBitmap() {
 
-        loadingBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.tag_1);
+        loadingBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.loading_image);
 
         srcRect = new RectF(0, 0, loadingBitmap.getWidth(), loadingBitmap.getHeight());
 

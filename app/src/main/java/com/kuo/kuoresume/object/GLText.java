@@ -197,10 +197,10 @@ public class GLText {
                     right, bottom, 0f,
                     right, top, 0f};
 
-            left = col * TEXT_UV_BOX_WIDTH + 0.001f;
-            top = row * TEXT_UV_BOX_WIDTH + 0.001f;
-            right = left + TEXT_UV_BOX_WIDTH - 0.001f;
-            bottom = top + TEXT_UV_BOX_WIDTH - 0.001f;
+            left = col * TEXT_UV_BOX_WIDTH + 0.005f;
+            top = row * TEXT_UV_BOX_WIDTH + 0.005f;
+            right = left + TEXT_UV_BOX_WIDTH - 0.005f;
+            bottom = top + TEXT_UV_BOX_WIDTH - 0.005f;
 
             float[] uvs = new float[]{left, top,
                     left, bottom,
