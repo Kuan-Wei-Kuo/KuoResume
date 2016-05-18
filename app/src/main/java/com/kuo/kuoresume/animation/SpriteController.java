@@ -1,7 +1,5 @@
 package com.kuo.kuoresume.animation;
 
-import android.util.Log;
-
 /**
  * Created by Kuo on 2016/5/1.
  */
@@ -56,7 +54,7 @@ public class SpriteController {
             }
         }
 
-        if(onUpdateListener != null)
+        if(onUpdateListener != null && !isEnd && !isKeep)
             onUpdateListener.onUpdate(currentHorizontalFrame);
 
     }
@@ -70,9 +68,18 @@ public class SpriteController {
 
         if (time > lastFrameChangeTime + frameLengthInMilliseconds) {
             lastFrameChangeTime = time;
-
-            onUpdateListener.onUpdate(horizontalFrame);
+            currentHorizontalFrame = horizontalFrame;
+            onUpdateListener.onUpdate(currentHorizontalFrame);
         }
+    }
+
+    public void setCurrentHorizontalFrame(int currentHorizontalFrame) {
+        this.currentHorizontalFrame = currentHorizontalFrame;
+    }
+
+    public void setEnd(boolean end) {
+        currentHorizontalFrame = 0;
+        isEnd = end;
     }
 
     public void setKeep(boolean keep) {
@@ -101,6 +108,10 @@ public class SpriteController {
 
     public int getCountFrame() {
         return countFrame;
+    }
+
+    public int getCurrentHorizontalFrame() {
+        return currentHorizontalFrame;
     }
 
     public boolean isEnd() {

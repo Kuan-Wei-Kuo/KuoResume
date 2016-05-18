@@ -2,7 +2,6 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.data.ChartData;
@@ -11,10 +10,10 @@ import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLChartRect;
 import com.kuo.kuoresume.object.GLClouds;
 import com.kuo.kuoresume.object.GLImageText;
+import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.GLText;
 import com.kuo.kuoresume.object.GLTrees;
 import com.kuo.kuoresume.object.Image;
-import com.kuo.kuoresume.until.Until;
 
 import java.util.ArrayList;
 
@@ -24,10 +23,17 @@ import java.util.ArrayList;
 public class GLSkill extends ComputeRect{
 
     public static final int PLANT_FLOOR_SIZE = 3;
+    public static final int BACKGROUND_FLOOR_SIZE = 5;
+
+    public float OFFICE_COMPUTER_WIDTH = 192;
+    public float OFFICE_COMPUTER_HEIGHT = 137;
 
     private ArrayList<Image> grounds = new ArrayList<>();
+    private ArrayList<GLSquare> squares = new ArrayList<>();
 
-    private Image levelSign, signWood;
+    private ArrayList<GLSquare> backgroundSquares = new ArrayList<>();
+
+    private Image levelSign, signWood, officeComputer;
 
     private GLText signText, skillText;
 
@@ -42,16 +48,66 @@ public class GLSkill extends ComputeRect{
     public GLSkill(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
-        PLANT_RANGE_SIZE = 35;
+        PLANT_RANGE_SIZE = 30;
 
         width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height()
                 + (int) viewComputeListener.getViewCompute().getPlantSize() * (PLANT_FLOOR_SIZE - 1);
 
+        OFFICE_COMPUTER_WIDTH = OFFICE_COMPUTER_WIDTH * viewComputeListener.getScaling();
+        OFFICE_COMPUTER_HEIGHT = OFFICE_COMPUTER_HEIGHT * viewComputeListener.getScaling();
+
         createGrounds();
+        createBackgroundSquares();
+        createSquares();
         createImage();
         computeRect();
+    }
+
+    private void createBackgroundSquares() {
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        float[] color_coffee = new float[] {0.521568f, 0.172549f, 0, 1f};
+        float[] color_yellow = new float[] {1f, 0.90588f, 0.439215f, 1f};
+
+        for(int j = 0 ; j < BACKGROUND_FLOOR_SIZE ; j++) {
+            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+                float left = dstRect.left + plantSize * i;
+                float top = dstRect.bottom - plantSize * PLANT_FLOOR_SIZE + plantSize * j;
+                float right = left + plantSize;
+                float bottom = top + plantSize;
+
+                if(j < 2)
+                    backgroundSquares.add(new GLSquare(new RectF(left, top, right, bottom), color_coffee));
+                else
+                    backgroundSquares.add(new GLSquare(new RectF(left, top, right, bottom), color_yellow));
+
+            }
+        }
+
+    }
+
+    private void createSquares() {
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        float[] color = new float[] {0, 0, 0, 1f};
+
+        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
+            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+                float left = dstRect.left + plantSize * i;
+                float top = dstRect.bottom + plantSize * j;
+                float right = left + plantSize;
+                float bottom = top + plantSize;
+
+                squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
+            }
+        }
+
     }
 
     private void createGrounds() {
@@ -69,7 +125,6 @@ public class GLSkill extends ComputeRect{
                 grounds.add(new Image(new RectF(left, top, right, bottom)));
             }
         }
-
     }
 
     private void createImage() {
@@ -98,6 +153,10 @@ public class GLSkill extends ComputeRect{
         skillText = new GLText("Skill",(int) (ImageDefaultSize.SIGN_WOOD_TEXT_SIZE * scaling),
                 0, 0);
 
+        officeComputer = new Image(new RectF(plantSize * 7,
+                plantHeight - OFFICE_COMPUTER_HEIGHT,
+                plantSize * 7 + OFFICE_COMPUTER_WIDTH,
+                plantHeight));
 
         String[] softwareAxisY = {"Android Studio", "Eclipse", "Git", "Unity"};
         int[] values = {5, 3, 2, 2};
@@ -134,13 +193,16 @@ public class GLSkill extends ComputeRect{
     }
 
     public void computeRect() {
-        computeGrounds();
+        //computeGrounds();
+        //computeBackgroundSquares();
+        computeSquares();
         computeLevelSign();
         computeSkill();
         computeSoftwareRect();
         computeLanguageRect();
         glClouds.computeClouds(dstRect);
         glTrees.computeTrees(dstRect);
+        officeComputer.computeDstRect(dstRect);
     }
 
     private void computeLevelSign() {
@@ -162,7 +224,6 @@ public class GLSkill extends ComputeRect{
 
     private void computeSoftwareRect() {
 
-
         float x = dstRect.left + glChartRect.getX();
         float y = dstRect.top + glChartRect.getY();
 
@@ -176,7 +237,6 @@ public class GLSkill extends ComputeRect{
 
     private void computeLanguageRect() {
 
-
         float x = dstRect.left + languageChart.getX();
         float y = dstRect.top + languageChart.getY();
 
@@ -186,6 +246,52 @@ public class GLSkill extends ComputeRect{
 
         glImageText2.setLocation(languageChart.getRawCenterX() - textSrcRect.width() / 2,
                 dstRect.top + textSrcRect.top);
+    }
+
+    private void computeSquares() {
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        int count = 0;
+        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
+            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+                float left = dstRect.left + plantSize * i;
+                float top = dstRect.bottom - plantSize - plantSize * j;
+                float right = left + plantSize;
+                float bottom = top + plantSize;
+
+                if(count == squares.size())
+                    continue;
+
+                squares.get(count).setDstRect(left, top, right, bottom);
+                count ++;
+            }
+        }
+
+    }
+
+    private void computeBackgroundSquares() {
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        int count = 0;
+        for(int j = 0 ; j < BACKGROUND_FLOOR_SIZE ; j++) {
+            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+                float left = dstRect.left + plantSize * i;
+                float top = dstRect.bottom - plantSize * PLANT_FLOOR_SIZE - plantSize * j - plantSize;
+                float right = left + plantSize;
+                float bottom = top + plantSize;
+
+                if(count == backgroundSquares.size())
+                    continue;
+
+                backgroundSquares.get(count).setDstRect(left, top, right, bottom);
+                count ++;
+            }
+        }
+
     }
 
     private void computeGrounds() {
@@ -233,11 +339,48 @@ public class GLSkill extends ComputeRect{
         }
     }
 
+    private void drawBackgroundSquares(float[] mvpMatrix) {
+
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+        int count = 0;
+        for(GLSquare glSquare : backgroundSquares) {
+
+            RectF rectF = glSquare.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
+                glSquare.draw(mvpMatrix);
+            }
+            count++;
+        }
+    }
+
+    private void drawSquares(float[] mvpMatrix) {
+
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+        int count = 0;
+        for(GLSquare glSquare : squares) {
+
+            RectF rectF = glSquare.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
+                glSquare.draw(mvpMatrix);
+            }
+            count++;
+        }
+    }
+
     public void draw(float[] mvpMatrix) {
 
         glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
         glClouds.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-        drawGrounds(mvpMatrix);
+        //drawGrounds(mvpMatrix);
+        drawSquares(mvpMatrix);
+        officeComputer.draw(mvpMatrix, 10);
+        //drawBackgroundSquares(mvpMatrix);
 
         levelSign.draw(mvpMatrix, 3);
         signText.draw(mvpMatrix);
@@ -252,4 +395,5 @@ public class GLSkill extends ComputeRect{
         glImageText2.draw(mvpMatrix);
 
     }
+
 }

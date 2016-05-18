@@ -14,15 +14,6 @@ public class ImageDefaultSize {
     public static final int TREE_WIDTH = 117;
     public static final int TREE_HEIGHT = 172;
 
-    public static final int OWN_IDLE_WIDTH = 96;
-    public static final int OWN_IDLE_HIEGHT = 192;
-
-    public static final int OWN_RUN_WIDTH = 192;
-    public static final int OWN_RUN_HIEGHT = 192;
-
-    public static final int OWN_MUSIC_WIDTH = 290;
-    public static final int OWN_MUSIC_HIEGHT = 192;
-
     public static final int PINKY_TAG_WIDTH = 192;
     public static final int PINKY_TAG_HEIGHT = 192;
 
@@ -44,7 +35,7 @@ public class ImageDefaultSize {
     public static final int SIGN_TEXT_SIZE = 70;
     public static final int SIGN_WOOD_TEXT_SIZE = 40;
 
-    public static final int PLANT_SIZE = 50;
+    public static final int PLANT_SIZE = 70;
 
     public static final int GLABOUT_WIDTH = 400;
     public static final int GLABOUT_HEIGHT = 150;

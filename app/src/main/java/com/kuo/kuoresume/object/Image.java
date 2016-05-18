@@ -54,7 +54,7 @@ public class Image {
 
         this.srcRect = srcRect;
 
-        setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
+        setDstRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom);
 
         setUVS(uvs);
 

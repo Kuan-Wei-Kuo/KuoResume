@@ -1,5 +1,6 @@
 package com.kuo.kuoresume.object;
 
+import android.graphics.RectF;
 import android.opengl.GLES20;
 
 import com.kuo.kuoresume.shaders.riGraphicTools;
@@ -12,7 +13,7 @@ import java.nio.ShortBuffer;
 /**
  * Created by Kuo on 2016/5/4.
  */
-public class Square {
+public class GLSquare {
 
     // Use to access and set the view transformation
     private int mMVPMatrixHandle;
@@ -62,8 +63,16 @@ public class Square {
     // 索引值緩衝區
     private ShortBuffer drawListBuffer;
 
-    public Square() {
+    private RectF dstRect = new RectF(0, 0, 0, 0);
+    private RectF srcRect = new RectF(0, 0, 0, 0);
 
+    public GLSquare(RectF srcRect, float[] color) {
+
+        this.srcRect = srcRect;
+
+        setDstRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom);
+
+        this.color = color;
         // initialize vertex byte buffer for shape coordinates
         ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4); // (# of coordinate values * 4 bytes per float)
         bb.order(ByteOrder.nativeOrder());
@@ -128,9 +137,47 @@ public class Square {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
 
         // Draw the triangle
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, vertexCount);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
+                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
+    }
+
+    public void setDstRect(float left, float top, float right, float bottom) {
+
+        dstRect.set(left, top, right, bottom);
+
+        squareCoords = new float[] {
+                dstRect.left, dstRect.top, 0.0f,
+                dstRect.left, dstRect.bottom, 0.0f,
+                dstRect.right, dstRect.bottom, 0.0f,
+                dstRect.right, dstRect.top, 0.0f};
+
+        // initialize vertex byte buffer for shape coordinates
+        ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4); // (# of coordinate values * 4 bytes per float)
+        bb.order(ByteOrder.nativeOrder());
+        vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer.put(squareCoords);
+        vertexBuffer.position(0);
+
+    }
+
+    public void computeDstRect(RectF rawDstRect) {
+
+        float left = rawDstRect.left + srcRect.left;
+        float top = rawDstRect.top + srcRect.top;
+        float right = left + srcRect.width();
+        float bottom = top + srcRect.height();
+
+        setDstRect(left, top, right, bottom);
+    }
+
+    public RectF getSrcRect() {
+        return srcRect;
+    }
+
+    public RectF getDstRect() {
+        return dstRect;
     }
 }

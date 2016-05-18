@@ -8,6 +8,7 @@ import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImageText;
+import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.GLText;
 import com.kuo.kuoresume.object.GLTrees;
 import com.kuo.kuoresume.object.Image;
@@ -33,6 +34,7 @@ public class GLAbout extends ComputeRect{
 
     private ArrayList<Image> plants = new ArrayList<>();
     private ArrayList<Image> clouds = new ArrayList<>();
+    private ArrayList<GLSquare> squares = new ArrayList<>();
 
     private SpriteController ownMusicSpriteController;
 
@@ -63,6 +65,7 @@ public class GLAbout extends ComputeRect{
 
         createClouds();
         createPlants();
+        createSquare();
         createImages();
 
         setDstRect(0, 0, width, height);
@@ -98,7 +101,9 @@ public class GLAbout extends ComputeRect{
 
         glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
         drawClouds(mvpMatrix);
-        drawPlants(mvpMatrix);
+        //drawPlants(mvpMatrix);
+
+        drawSuares(mvpMatrix);
 
         levelSign.draw(mvpMatrix, 3);
         signText.draw(mvpMatrix);
@@ -114,6 +119,7 @@ public class GLAbout extends ComputeRect{
 
         characterMusic.draw(mvpMatrix, 27);
         glImageText2.draw(mvpMatrix);
+
     }
 
     private void drawClouds(float[] m) {
@@ -130,6 +136,21 @@ public class GLAbout extends ComputeRect{
 
         }
 
+    }
+
+    public void drawSuares(float[] mvpMatrix) {
+
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+        for(GLSquare glSquare : squares) {
+
+            RectF rectF = glSquare.getDstRect();
+
+            if(contentRect.contains(rectF.left, rectF.top)
+                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
+                glSquare.draw(mvpMatrix);
+            }
+        }
     }
 
     public void drawPlants(float[] mvpMatrix) {
@@ -207,6 +228,20 @@ public class GLAbout extends ComputeRect{
         }
     }
 
+    private void createSquare() {
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+
+            float left = dstRect.left + plantSize * i;
+            float top = dstRect.bottom - plantSize;
+            float right = left + plantSize;
+            float bottom = top + plantSize;
+
+            squares.add(new GLSquare(new RectF(left, top, right, bottom), new float[] {0, 0, 0, 1.0f}));
+        }
+    }
+
     private void createPlants() {
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
@@ -226,8 +261,9 @@ public class GLAbout extends ComputeRect{
         glTrees.computeTrees(dstRect);
         ticketStation.computeDstRect(dstRect);
         buddha.computeDstRect(dstRect);
+        computeSquare();
         computeClouds();
-        computePlants();
+        //computePlants();
         computeAbout();
         computeLevelSign();
         computeBuild85();
@@ -284,6 +320,24 @@ public class GLAbout extends ComputeRect{
             float bottom = top + plantSize;
 
             image.setDstRect(left, top, right, bottom);
+
+            count++;
+        }
+    }
+
+    private void computeSquare() {
+
+        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+
+        int count = 0;
+        for(GLSquare glSquare : squares) {
+
+            float left = dstRect.left + plantSize * count;
+            float top = dstRect.bottom - plantSize;
+            float right = left + plantSize;
+            float bottom = top + plantSize;
+
+            glSquare.setDstRect(left, top, right, bottom);
 
             count++;
         }

@@ -6,7 +6,6 @@ import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.compute.ImageDefaultSize;
@@ -14,6 +13,7 @@ import com.kuo.kuoresume.compute.ViewCompute;
 import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
+import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLCharacter;
 import com.kuo.kuoresume.script.GLExperience;
@@ -24,7 +24,7 @@ import com.kuo.kuoresume.script.GLSkill;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-/**
+/*
  * Created by Kuo on 2016/5/4.
  */
 public class InterviewRenderer implements Renderer, ViewComputeListener {
@@ -44,14 +44,14 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     float 	swp = 320.0f;
     float 	shp = 480.0f;
 
-    boolean isLoading = false;
-    // Misc
     Context mContext;
     long mLastTime;
 
     ObjectListener objectListener;
 
     ViewCompute viewCompute;
+
+    GLSquare glSquare;
 
     GLSetting glSetting;
     GLAbout glAbout;
@@ -60,8 +60,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLCharacter glCharacter;
     GLMessage glMessage;
     ActivityListener activityListener;
-
-    //DialogFragment dialog;
 
     public InterviewRenderer(Context context, ObjectListener objectListener, ActivityListener activityListener) {
         mContext = context;
@@ -76,7 +74,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
         glSetting = new GLSetting(mContext, 31);
     }
 
@@ -114,6 +111,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
+        glSquare = new GLSquare(new RectF(0, 0, 200, 200), new float[] {1, 0.5f, 1, 1});
         glCharacter = new GLCharacter(mContext, this, objectListener);
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
@@ -137,10 +135,15 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
+        if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_IDLE)
+            glCharacter.computeSprite(GLCharacter.CHARACTER_IDLE);
+
         if(jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch || glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP) {
 
             if(isTouch && glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
                 glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
+
+            //Log.d("lef", glCharacter.getCharacterState() + "");
 
             glCharacter.computeSprite(glCharacter.getCharacterState());
             computeRect();
@@ -155,7 +158,11 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glMessage.draw(mMVPMatrix);
 
         glCharacter.draw(mMVPMatrix);
+
+        glSquare.draw(mMVPMatrix);
     }
+
+    PointF pointF = new PointF(0, 0);
 
     public void onTouchEvent(MotionEvent event) {
 
@@ -165,10 +172,17 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
+                pointF.set(event.getX(), event.getY());
+
                 if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
                 isTouch = true;
+
+            } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
+
+                //if(Math.abs(pointF.y - event.getY()) > 500)
+                    //glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
 
             } else if(event.getAction() == MotionEvent.ACTION_UP) {
 
@@ -200,7 +214,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 && glCharacter.getDirection() == 1
                 && glCharacter.getDstRect().left < glAbout.getDstRect().right) {
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+
             viewCompute.setFloorHeight((GLSkill.PLANT_FLOOR_SIZE - 1) * viewCompute.getPlantSize());
 
             needInvalidate = true;
@@ -209,7 +225,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 && glCharacter.getDirection() == -1
                 && glCharacter.getDstRect().right > glAbout.getDstRect().right) {
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+
             viewCompute.setFloorHeight(0);
 
             needInvalidate = true;
@@ -226,7 +244,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 && glCharacter.getDirection() == 1
                 && glCharacter.getDstRect().left < glSkill.getDstRect().right) {
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+
             viewCompute.setFloorHeight(0);
 
             needInvalidate = true;
@@ -235,34 +255,15 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 && glCharacter.getDirection() == -1
                 && glCharacter.getDstRect().right > glSkill.getDstRect().right) {
 
-            glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+
             viewCompute.setFloorHeight((GLSkill.PLANT_FLOOR_SIZE - 1) * viewCompute.getPlantSize());
 
             needInvalidate = true;
         }
 
         return needInvalidate;
-    }
-
-    private void computeCurrentRect() {
-
-        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
-        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
-
-        float totalWidth = 0;
-        float maxHeight = 0;
-
-        int count = 0;
-        for(float f : widths) {
-            totalWidth += f;
-            maxHeight = Math.max(maxHeight, heights[count]);
-            count++;
-        }
-
-        if(viewCompute.getCacheRect() != null)
-            viewCompute.setCurRect(viewCompute.getCacheRect());
-        else
-            viewCompute.setCurRect(new RectF(0, mScreenHeight - maxHeight, totalWidth, mScreenHeight));
     }
 
     private void computeRect() {
@@ -296,6 +297,27 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSkill.computeRect();
         glExperience.computeRect();
         glMessage.computeRect();
+    }
+
+    private void computeCurrentRect() {
+
+        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
+        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
+
+        float totalWidth = 0;
+        float maxHeight = 0;
+
+        int count = 0;
+        for(float f : widths) {
+            totalWidth += f;
+            maxHeight = Math.max(maxHeight, heights[count]);
+            count++;
+        }
+
+        if(viewCompute.getCacheRect() != null)
+            viewCompute.setCurRect(viewCompute.getCacheRect());
+        else
+            viewCompute.setCurRect(new RectF(0, mScreenHeight - maxHeight, totalWidth, mScreenHeight));
     }
 
     private void computeScaling() {

@@ -2,10 +2,8 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.kuo.kuoresume.animation.SampleAnimation;
-import com.kuo.kuoresume.animation.SpriteAnimation;
 import com.kuo.kuoresume.animation.SpriteController;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
@@ -16,6 +14,7 @@ import com.kuo.kuoresume.object.Image;
  */
 public class GLCharacter extends ComputeRect{
 
+    private static final float CHARACTER_IDLE_UV_BOX_WIDTH = 0.333f;
     private static final float CHARACTER_RUN_UV_BOX_WIDTH = 0.167f;
     private static final float CHARACTER_JUMP_UV_BOX_WIDTH = 0.25f;
 
@@ -30,10 +29,12 @@ public class GLCharacter extends ComputeRect{
     private float CHARACTER_BOAT_WIDTH = 142;
     private float CHARACTER_BOAT_HEIGHT = 142;
 
+    private float CHARACTER_JUMP_HEIGHT;
+
     public int CHARACTER_STATE;
 
-    private SampleAnimation moveAnimation;
-    private SpriteController characterRunController, characterJumpController;
+    private SampleAnimation moveAnimation, jumpAnimation;
+    private SpriteController characterIdleController, characterRunController, characterJumpController;
 
     private int moveSpeed = 50;
     private int direction = 1, airDirection = 1;
@@ -48,6 +49,8 @@ public class GLCharacter extends ComputeRect{
 
         CHARACTER_BOAT_WIDTH = CHARACTER_BOAT_WIDTH * viewComputeListener.getScaling();
         CHARACTER_BOAT_HEIGHT = CHARACTER_BOAT_HEIGHT * viewComputeListener.getScaling();
+
+        CHARACTER_JUMP_HEIGHT = viewComputeListener.getViewCompute().getPlantSize() * 3;
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
@@ -64,8 +67,17 @@ public class GLCharacter extends ComputeRect{
         characterJumpController = new SpriteController(200, 0, 0, 4);
         characterJumpController.setOnUpdateListener(characterJumpListener);
 
+        characterIdleController = new SpriteController(200, 0, 0, 3);
+        characterIdleController.setOnUpdateListener(characterIdleListener);
+
         characterRun = new Image(dstRect);
         characterRun.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
+        characterRun.setUVS(new float[] {
+                0, 0,
+                0, 1,
+                CHARACTER_RUN_UV_BOX_WIDTH, 1,
+                CHARACTER_RUN_UV_BOX_WIDTH, 0
+        });
 
         characterIdle = new Image(dstRect);
         characterIdle.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
@@ -85,18 +97,35 @@ public class GLCharacter extends ComputeRect{
         moveAnimation = new SampleAnimation(20);
         moveAnimation.setOnUpdateListener(moveAnimationListener);
 
+        jumpAnimation = new SampleAnimation(20);
+        jumpAnimation.setOnUpdateListener(jumpAnimationListener);
+
         CHARACTER_STATE = CHARACTER_IDLE;
+    }
+
+    private void createRunController() {
+
     }
 
     public void computeSprite(int CHARACTER_STATE) {
 
-        moveAnimation.start();
+        if(CHARACTER_STATE != CHARACTER_JUMP && characterJumpController.isEnd() && !characterJumpController.isKeep())
+            if(CHARACTER_STATE == CHARACTER_RUN) {
+                moveAnimation.start();
+                characterRunController.start();
+            } else
+                characterIdleController.start();
+        else {
 
-        if(CHARACTER_STATE != CHARACTER_JUMP && characterJumpController.isEnd())
-            characterRunController.start();
-        else
-            characterJumpController.start();
+            if(!characterJumpController.isKeep()) {
+                characterJumpController.start();
+                moveAnimation.start();
+            } else {
+                characterJumpController.keepHorizontalFrame(3);
+            }
 
+            jumpAnimation.start();
+        }
     }
 
     private SampleAnimation.OnUpdateListener moveAnimationListener = new SampleAnimation.OnUpdateListener() {
@@ -131,6 +160,85 @@ public class GLCharacter extends ComputeRect{
             } else {
                 characterMove();
             }
+
+        }
+    };
+
+    private SampleAnimation.OnUpdateListener jumpAnimationListener = new SampleAnimation.OnUpdateListener() {
+        @Override
+        public void onUpdate() {
+
+            RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
+            RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+
+            if (characterJumpController.getCurrentHorizontalFrame() > 2 || characterJumpController.isKeep())
+                airDirection = -1;
+            else
+                airDirection = 1;
+
+            float height = currentRect.height();
+            float width = currentRect.width();
+
+            float left = currentRect.left;
+            float right = left + width;
+            float top = currentRect.top + moveSpeed * 0.5f * airDirection;
+            float bottom = top + height;
+
+            if (left > contentRect.left) {
+                left = contentRect.left;
+                right = left + width;
+            } else if (right < contentRect.right) {
+                right = contentRect.right;
+                left = right - width;
+            }
+
+            if (top > contentRect.top + CHARACTER_JUMP_HEIGHT) {
+                top = contentRect.top + CHARACTER_JUMP_HEIGHT;
+                bottom = top + height;
+
+            } else if (contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() > bottom && airDirection == -1) {
+                bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();
+                top = bottom - height;
+
+                characterJumpController.setEnd(true);
+                characterJumpController.setKeep(false);
+                CHARACTER_STATE = CHARACTER_IDLE;
+            }
+
+            currentRect.left = left;
+            currentRect.top = top;
+            currentRect.right = right;
+            currentRect.bottom = bottom;
+        }
+    };
+
+    private SpriteController.OnUpdateListener characterIdleListener = new SpriteController.OnUpdateListener() {
+        @Override
+        public void onUpdate(int currentHorizontalFrame) {
+            float left = currentHorizontalFrame * CHARACTER_IDLE_UV_BOX_WIDTH;
+            float right = left + CHARACTER_IDLE_UV_BOX_WIDTH;
+            float top = 0;
+            float bottom = 1;
+
+            if(direction == 1) {
+                characterIdle.setUVS(new float[] {
+                        left, top,
+                        left, bottom,
+                        right, bottom,
+                        right, top
+                });
+            } else if(direction == -1) {
+                characterIdle.setUVS(new float[] {
+                        right, top,
+                        right, bottom,
+                        left, bottom,
+                        left, top,
+                });
+            }
+        }
+
+        @Override
+        public void onEnd() {
 
         }
     };
@@ -172,67 +280,30 @@ public class GLCharacter extends ComputeRect{
         @Override
         public void onUpdate(int currentHorizontalFrame) {
 
-            if(!characterJumpController.isEnd()) {
+            float left = currentHorizontalFrame * CHARACTER_JUMP_UV_BOX_WIDTH;
+            float right = left + CHARACTER_JUMP_UV_BOX_WIDTH;
+            float top = 0;
+            float bottom = 1;
 
-                RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
-                RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
-
-                if(currentHorizontalFrame > 2)
-                    airDirection = -1;
-                else
-                    airDirection = 1;
-
-                float height = currentRect.height();
-                float width = currentRect.width();
-
-                float left = currentRect.left;
-                float right = left + width;
-                float top = currentRect.top + moveSpeed * 0.5f * airDirection;
-                float bottom = top + height;
-
-                if(left > contentRect.left) {
-                    left = contentRect.left;
-                    right = left + width;
-                } else if(right < contentRect.right) {
-                    right = contentRect.right;
-                    left = right - width;
-                }
-
-                if(top > contentRect.top + moveSpeed) {
-                    top = contentRect.top + moveSpeed;
-                    bottom = top + height;
-                } else if(contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() > bottom) {
-                    bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();
-                    top = bottom - height;
-                }
-
-                currentRect.left = left;
-                currentRect.top = top;
-                currentRect.right = right;
-                currentRect.bottom = bottom;
-
-                left = currentHorizontalFrame * CHARACTER_JUMP_UV_BOX_WIDTH;
-                right = left + CHARACTER_JUMP_UV_BOX_WIDTH;
-                top = 0;
-                bottom = 1;
-
-                if(direction == 1) {
-                    characterJump.setUVS(new float[] {
-                            left, top,
-                            left, bottom,
-                            right, bottom,
-                            right, top
-                    });
-                } else if(direction == -1) {
-                    characterJump.setUVS(new float[] {
-                            right, top,
-                            right, bottom,
-                            left, bottom,
-                            left, top,
-                    });
-                }
+            if(direction == 1) {
+                characterJump.setUVS(new float[] {
+                        left, top,
+                        left, bottom,
+                        right, bottom,
+                        right, top
+                });
+            } else if(direction == -1) {
+                characterJump.setUVS(new float[] {
+                        right, top,
+                        right, bottom,
+                        left, bottom,
+                        left, top,
+                });
             }
 
+            //Log.d("end", characterJumpController.isEnd() + "");
+            //Log.d("keep", characterJumpController.isKeep()  + "");
+            //Log.d("frame", characterJumpController.getCurrentHorizontalFrame() + "");
         }
 
         @Override
@@ -241,14 +312,11 @@ public class GLCharacter extends ComputeRect{
             RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
             RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-            float height = currentRect.height();
+            if(contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() != currentRect.bottom)
+                characterJumpController.keepHorizontalFrame(3);
+             else
+                CHARACTER_STATE = CHARACTER_IDLE;
 
-            if(contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() != currentRect.bottom) {
-                currentRect.bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();
-                currentRect.top = currentRect.bottom - height;
-            }
-
-            CHARACTER_STATE = CHARACTER_IDLE;
         }
     };
 
@@ -340,4 +408,5 @@ public class GLCharacter extends ComputeRect{
     public int getCharacterState() {
         return CHARACTER_STATE;
     }
+
 }
