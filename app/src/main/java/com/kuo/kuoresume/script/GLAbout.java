@@ -111,7 +111,7 @@ public class GLAbout extends ComputeRect{
         //signWood.draw(mvpMatrix, 6);
         //aboutText.draw(mvpMatrix);
 
-        ticketStation.draw(mvpMatrix, 5);
+        //ticketStation.draw(mvpMatrix, 5);
 
         build85.draw(mvpMatrix, 8);
         buddha.draw(mvpMatrix, 16);

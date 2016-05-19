@@ -6,6 +6,7 @@ import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.compute.ImageDefaultSize;
@@ -57,7 +58,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     Image bg;
 
-    GLBackground glBackground;
+    GLBackground glBackground, glBackground_1;
     GLSetting glSetting;
     GLAbout glAbout;
     GLSkill glSkill;
@@ -120,7 +121,10 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         bg.setDstRect(0, 0, mScreenWidth, mScreenHeight);
 
         glBackground = new GLBackground(mContext, this, objectListener);
-        glSquare = new GLSquare(new RectF(0, 0, 200, 200), new float[] {1, 0.5f, 1, 1});
+        glBackground_1 = new GLBackground(mContext, this, objectListener);
+
+        glSquare = new GLSquare(new RectF(0, 500, 200, 700), new float[] {1, 0.5f, 1, 1});
+
         glCharacter = new GLCharacter(mContext, this, objectListener);
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
@@ -152,14 +156,13 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             if(isTouch && glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
                 glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
-            //Log.d("lef", glCharacter.getCharacterState() + "");
-
             glCharacter.computeSprite(glCharacter.getCharacterState());
             computeRect();
         }
 
-        //bg.draw(mMVPMatrix, 5);
         glBackground.draw(mMVPMatrix);
+
+        glBackground_1.draw(mMVPMatrix);
 
         glAbout.draw(mMVPMatrix);
 
@@ -171,7 +174,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         glCharacter.draw(mMVPMatrix);
 
-        glSquare.draw(mMVPMatrix);
+        //glSquare.draw(mMVPMatrix);
     }
 
     PointF pointF = new PointF(0, 0);
@@ -305,9 +308,20 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 glMessage.setDstRect(left, top, right, bottom);
         }
 
-        glBackground.setDstRect(glAbout.getDstRect());
+        glBackground.setDstRect(currentRect.left,
+                currentRect.top,
+                currentRect.left + glBackground.getWidth(),
+                currentRect.bottom);
 
         glBackground.computeRect();
+
+        glBackground_1.setDstRect(glBackground.getDstRect().right,
+                currentRect.top,
+                glBackground.getDstRect().right + glBackground_1.getWidth(),
+                currentRect.bottom);
+
+        glBackground_1.computeRect();
+
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();
@@ -375,4 +389,5 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         /* Do stuff to resume the renderer */
         mLastTime = System.currentTimeMillis();
     }
+
 }

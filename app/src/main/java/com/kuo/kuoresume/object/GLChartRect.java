@@ -16,6 +16,8 @@ public class GLChartRect {
 
     public static final float WEIGTHED = 0.1f;
 
+    public float LINE_SIZE = 5;
+
     public int IMAGE_SIZE = 70;
 
     public static final int MAX_X = 5;
@@ -27,6 +29,10 @@ public class GLChartRect {
     private ArrayList<Image> images = new ArrayList<>();
 
     private ArrayList<GLImageText> glImageTexts = new ArrayList<>();
+
+    private GLImageText expertText, masterText;
+
+    private GLSquare expertLine, masterLine;
 
     private float maxTextHeight = 0, maxTextWidth = 0, x = 0, y = 0, rawX = 0, rawY = 0;
 
@@ -47,6 +53,8 @@ public class GLChartRect {
         this.viewComputeListener = viewComputeListener;
 
         IMAGE_SIZE = IMAGE_SIZE * (int) viewComputeListener.getScaling();
+
+        LINE_SIZE = LINE_SIZE * viewComputeListener.getScaling();
 
         createGLImageTexts();
         createImage();
@@ -76,6 +84,19 @@ public class GLChartRect {
         }
 
         width = (int) (maxTextWidth + maxTextWidth * WEIGTHED + IMAGE_SIZE * maxValue);
+
+        expertLine = new GLSquare(new RectF(maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 1,
+                0,
+                maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 1 + LINE_SIZE,
+                height), new float[] {1, 0.5f, 1, 1});
+
+        masterLine = new GLSquare(new RectF(maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 4,
+                0,
+                maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 4 + LINE_SIZE,
+                height), new float[] {1, 0.5f, 1, 1});
+
+        expertText = new GLImageText(context, "EXPERT", 0, 0);
+        masterText = new GLImageText(context, "MASTER", 0, 0);
     }
 
     private void createGLImageTexts() {
@@ -96,6 +117,12 @@ public class GLChartRect {
 
         drawGLImageText(m);
         drawImage(m);
+
+        expertLine.draw(m);
+        expertText.draw(m);
+
+        masterLine.draw(m);
+        masterText.draw(m);
 
     }
 
@@ -118,6 +145,18 @@ public class GLChartRect {
 
         computeImageRect();
         computeGLImageTexts();
+        computeSignRect();
+    }
+
+    private void computeSignRect() {
+
+        expertText.setLocation(rawX + maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 1, rawY);
+        masterText.setLocation(rawX + maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 4, rawY);
+
+        expertLine.setDstRect(expertText.getDstRect().left, expertText.getDstRect().top,
+                expertText.getDstRect().left + expertLine.getSrcRect().width(), expertText.getDstRect().top + height);
+        masterLine.setDstRect(masterText.getDstRect().left, masterText.getDstRect().top,
+                masterText.getDstRect().left + masterLine.getSrcRect().width(), masterText.getDstRect().top + height);
 
     }
 
@@ -127,7 +166,7 @@ public class GLChartRect {
         for(Image image : images) {
 
             float left = rawX + image.getSrcRect().left;
-            float top = rawY + image.getSrcRect().top;
+            float top = rawY + masterText.getSrcRect().height() + image.getSrcRect().top;
             float right = left + IMAGE_SIZE;
             float bottom = top + IMAGE_SIZE;
 
@@ -145,7 +184,7 @@ public class GLChartRect {
 
             float x = rawX + maxTextWidth - glImageText.getSrcRect().width();
             //float y = rawY + IMAGE_SIZE / 4 + (maxTextHeight + IMAGE_SIZE / 2) * count;
-            float y = rawY + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * count + IMAGE_SIZE / 2 - glImageText.getSrcRect().height() / 2;
+            float y = rawY + glImageText.getSrcRect().height() + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * count + IMAGE_SIZE / 2 - glImageText.getSrcRect().height() / 2;
 
             glImageText.setLocation(x, y);
 

@@ -32,6 +32,9 @@ public class GLSkill extends ComputeRect{
     public float OFFICE_DOOR_WIDTH = 106;
     public float OFFICE_DOOR_HEIGHT = 200;
 
+    private float OFFICE_WIDTH = 400;
+    private float OFFICE_HEIGHT = 300;
+
     public float SKILL_TEXT_SIZE = 150;
 
     private ArrayList<Image> grounds = new ArrayList<>();
@@ -39,7 +42,7 @@ public class GLSkill extends ComputeRect{
 
     private ArrayList<GLSquare> backgroundSquares = new ArrayList<>();
 
-    private Image levelSign, signWood, officeComputer, leftDoor, rightDoor;
+    private Image levelSign, signWood, officeComputer, softwareComputer, languageComputer;
 
     private GLText signText, skillText;
 
@@ -64,6 +67,9 @@ public class GLSkill extends ComputeRect{
 
         OFFICE_DOOR_WIDTH = OFFICE_DOOR_WIDTH * viewComputeListener.getScaling();
         OFFICE_DOOR_HEIGHT = OFFICE_DOOR_HEIGHT * viewComputeListener.getScaling();
+
+        OFFICE_WIDTH = OFFICE_WIDTH * viewComputeListener.getScaling();
+        OFFICE_HEIGHT = OFFICE_HEIGHT * viewComputeListener.getScaling();
 
         SKILL_TEXT_SIZE = SKILL_TEXT_SIZE * viewComputeListener.getScaling();
 
@@ -142,9 +148,6 @@ public class GLSkill extends ComputeRect{
 
         float scaling = viewComputeListener.getScaling();
 
-        leftDoor = new Image(new RectF(0, plantHeight - OFFICE_DOOR_HEIGHT,
-                OFFICE_DOOR_WIDTH, plantHeight));
-
         skillText = new GLText("Skill", (int) SKILL_TEXT_SIZE, 0, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
 
         levelSign = new Image(new RectF(0,
@@ -187,12 +190,16 @@ public class GLSkill extends ComputeRect{
         }
 
         glChartRect = new GLChartRect(context, 0, 0, softwareChartData, viewComputeListener);
-        glChartRect.setPosition(plantSize * 8, plantHeight - glChartRect.getHeight());
+        glChartRect.setPosition(plantSize * 9, glChartRect.getHeight() * 0.1f);
 
         glImageText1 = new GLImageText(context, "SoftWare", plantSize * 8, plantHeight / 6);
 
+        softwareComputer = new Image(new RectF(plantSize * 8, 0, plantSize * 8 + glChartRect.getWidth() * 1.2f, plantHeight));
+
         languageChart = new GLChartRect(context, 0, 0, languageChartData, viewComputeListener);
-        languageChart.setPosition(plantSize * 10 + glChartRect.getWidth(), plantHeight - languageChart.getHeight());
+        languageChart.setPosition(softwareComputer.getSrcRect().right + plantSize * 1.5f, languageChart.getHeight() * 0.1f);
+
+        languageComputer = new Image(new RectF(softwareComputer.getSrcRect().right + plantSize, 0, softwareComputer.getSrcRect().right + plantSize + languageChart.getWidth() * 1.2f, plantHeight));
 
         glImageText2= new GLImageText(context, "Language", plantSize * 8, plantHeight / 6);
 
@@ -204,8 +211,6 @@ public class GLSkill extends ComputeRect{
     }
 
     public void computeRect() {
-        //computeGrounds();
-        //computeBackgroundSquares();
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
 
@@ -214,15 +219,15 @@ public class GLSkill extends ComputeRect{
         bg_yellow_square.computeDstRect(dstRect);
         bg_coffee_square.computeDstRect(dstRect);
 
-        leftDoor.computeDstRect(dstRect);
         skillText.setLocation(dstRect.left, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
 
         computeSquares();
         computeLevelSign();
-        //computeSkill();
         computeSoftwareRect();
         computeLanguageRect();
 
+        softwareComputer.computeDstRect(dstRect);
+        languageComputer.computeDstRect(dstRect);
         officeComputer.computeDstRect(dstRect);
     }
 
@@ -232,15 +237,6 @@ public class GLSkill extends ComputeRect{
 
         signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
                 levelSign.getDstRect().top + signText.getHeight());
-    }
-
-    private void computeSkill() {
-
-        signWood.computeDstRect(dstRect);
-
-        skillText.setLocation(signWood.getDstRect().centerX() - skillText.getWidth() / 2,
-                signWood.getDstRect().top + skillText.getHeight() / 2);
-
     }
 
     private void computeSoftwareRect() {
@@ -277,91 +273,6 @@ public class GLSkill extends ComputeRect{
 
     }
 
-    private void computeBackgroundSquares() {
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        int count = 0;
-        for(int j = 0 ; j < BACKGROUND_FLOOR_SIZE ; j++) {
-            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
-
-                float left = dstRect.left + plantSize * i;
-                float top = dstRect.bottom - plantSize * PLANT_FLOOR_SIZE - plantSize * j - plantSize;
-                float right = left + plantSize;
-                float bottom = top + plantSize;
-
-                if(count == backgroundSquares.size())
-                    continue;
-
-                backgroundSquares.get(count).setDstRect(left, top, right, bottom);
-                count ++;
-            }
-        }
-
-    }
-
-    private void computeGrounds() {
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        int count = 0;
-        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
-            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
-
-                float left = dstRect.left + plantSize * i;
-                float top = dstRect.bottom - plantSize - plantSize * j;
-                float right = left + plantSize;
-                float bottom = top + plantSize;
-
-                if(count == grounds.size())
-                    continue;
-
-                grounds.get(count).setDstRect(left, top, right, bottom);
-                count ++;
-            }
-        }
-
-    }
-
-    private void drawGrounds(float[] mvpMatrix) {
-
-        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
-
-        int count = 0;
-        for(Image image : grounds) {
-
-            RectF rectF = image.getDstRect();
-
-            int row = count / PLANT_RANGE_SIZE;
-
-            if(contentRect.contains(rectF.left, rectF.top)
-                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
-                if (row == PLANT_FLOOR_SIZE - 1)
-                    image.draw(mvpMatrix, 2);
-                else
-                    image.draw(mvpMatrix, 12);
-            }
-            count++;
-        }
-    }
-
-    private void drawBackgroundSquares(float[] mvpMatrix) {
-
-        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
-
-        int count = 0;
-        for(GLSquare glSquare : backgroundSquares) {
-
-            RectF rectF = glSquare.getDstRect();
-
-            if(contentRect.contains(rectF.left, rectF.top)
-                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
-                glSquare.draw(mvpMatrix);
-            }
-            count++;
-        }
-    }
-
     private void drawSquares(float[] mvpMatrix) {
 
         for(GLSquare glSquare : squares) {
@@ -380,31 +291,19 @@ public class GLSkill extends ComputeRect{
                 || dstRect.contains(contentRect.right, contentRect.top)
                 || dstRect.contains(contentRect.right, contentRect.bottom)) {
 
-            // Draw Background Square
-            bg_yellow_square.draw(mvpMatrix);
-            bg_coffee_square.draw(mvpMatrix);
-
-            //drawGrounds(mvpMatrix);
             drawSquares(mvpMatrix);
-
-            leftDoor.draw(mvpMatrix, 12);
 
             skillText.draw(mvpMatrix);
 
             officeComputer.draw(mvpMatrix, 10);
 
-            //drawBackgroundSquares(mvpMatrix);
-
-            //levelSign.draw(mvpMatrix, 3);
-            //signText.draw(mvpMatrix);
-
-            //signWood.draw(mvpMatrix, 6);
-
+            softwareComputer.draw(mvpMatrix, 28);
             glChartRect.draw(mvpMatrix);
-            glImageText1.draw(mvpMatrix);
+            //glImageText1.draw(mvpMatrix);
 
+            languageComputer.draw(mvpMatrix, 28);
             languageChart.draw(mvpMatrix);
-            glImageText2.draw(mvpMatrix);
+            //glImageText2.draw(mvpMatrix);
         }
 
     }

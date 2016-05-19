@@ -35,7 +35,7 @@ public class ImageDefaultSize {
     public static final int SIGN_TEXT_SIZE = 70;
     public static final int SIGN_WOOD_TEXT_SIZE = 40;
 
-    public static final int PLANT_SIZE = 70;
+    public static final int PLANT_SIZE = 50;
 
     public static final int GLABOUT_WIDTH = 400;
     public static final int GLABOUT_HEIGHT = 150;
