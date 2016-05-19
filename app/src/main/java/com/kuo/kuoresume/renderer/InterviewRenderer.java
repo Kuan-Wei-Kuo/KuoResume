@@ -14,7 +14,9 @@ import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLSquare;
+import com.kuo.kuoresume.object.Image;
 import com.kuo.kuoresume.script.GLAbout;
+import com.kuo.kuoresume.script.GLBackground;
 import com.kuo.kuoresume.script.GLCharacter;
 import com.kuo.kuoresume.script.GLExperience;
 import com.kuo.kuoresume.script.GLMessage;
@@ -53,6 +55,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     GLSquare glSquare;
 
+    Image bg;
+
+    GLBackground glBackground;
     GLSetting glSetting;
     GLAbout glAbout;
     GLSkill glSkill;
@@ -111,6 +116,10 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
+        bg = new Image(new RectF(0, 0, mScreenWidth, mScreenHeight));
+        bg.setDstRect(0, 0, mScreenWidth, mScreenHeight);
+
+        glBackground = new GLBackground(mContext, this, objectListener);
         glSquare = new GLSquare(new RectF(0, 0, 200, 200), new float[] {1, 0.5f, 1, 1});
         glCharacter = new GLCharacter(mContext, this, objectListener);
         glAbout = new GLAbout(mContext, this, objectListener);
@@ -148,6 +157,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             glCharacter.computeSprite(glCharacter.getCharacterState());
             computeRect();
         }
+
+        //bg.draw(mMVPMatrix, 5);
+        glBackground.draw(mMVPMatrix);
 
         glAbout.draw(mMVPMatrix);
 
@@ -293,6 +305,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 glMessage.setDstRect(left, top, right, bottom);
         }
 
+        glBackground.setDstRect(glAbout.getDstRect());
+
+        glBackground.computeRect();
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();

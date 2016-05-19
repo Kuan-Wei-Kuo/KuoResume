@@ -99,17 +99,17 @@ public class GLAbout extends ComputeRect{
 
         ownMusicSpriteController.start();
 
-        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-        drawClouds(mvpMatrix);
+        //glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
+        //drawClouds(mvpMatrix);
         //drawPlants(mvpMatrix);
 
         drawSuares(mvpMatrix);
 
-        levelSign.draw(mvpMatrix, 3);
-        signText.draw(mvpMatrix);
+        //levelSign.draw(mvpMatrix, 3);
+        //signText.draw(mvpMatrix);
 
-        signWood.draw(mvpMatrix, 6);
-        aboutText.draw(mvpMatrix);
+        //signWood.draw(mvpMatrix, 6);
+        //aboutText.draw(mvpMatrix);
 
         ticketStation.draw(mvpMatrix, 5);
 

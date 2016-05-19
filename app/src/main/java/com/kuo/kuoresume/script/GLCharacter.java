@@ -59,9 +59,7 @@ public class GLCharacter extends ComputeRect{
                 contentRect.centerX() + CHARACTER_RUN_WIDTH / 2,
                 contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize());
 
-        characterRunController = new SpriteController(100,
-                objectListener.getHolderBitmap().deadPool_run.getWidth() / 2,
-                objectListener.getHolderBitmap().deadPool_run.getHeight(), 6);
+        characterRunController = new SpriteController(100, 0, 0, 6);
         characterRunController.setOnUpdateListener(deadPoolRunListener);
 
         characterJumpController = new SpriteController(200, 0, 0, 4);
