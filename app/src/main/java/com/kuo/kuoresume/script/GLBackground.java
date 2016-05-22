@@ -52,7 +52,7 @@ public class GLBackground extends ComputeRect {
     }
 
     public void draw(float[] m) {
-        bg_1.draw(m, 5);
+        //bg_1.draw(m, 5);
         officeComputer.draw(m, 12);
         officeDoor.draw(m, 6);
     }

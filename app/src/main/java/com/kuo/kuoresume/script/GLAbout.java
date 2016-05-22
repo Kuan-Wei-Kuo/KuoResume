@@ -11,13 +11,14 @@ import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.GLTrees;
 import com.kuo.kuoresume.object.Image;
+import com.kuo.kuoresume.object.RectCollider;
 
 import java.util.ArrayList;
 
 /**
  * Created by Kuo on 2016/5/5.
  */
-public class GLAbout extends ComputeRect{
+public class GLAbout extends ComputeRect {
 
     private static final float BUILD_IMAGE_UV_BOX_WIDTH = 0.5f;
 
@@ -65,6 +66,7 @@ public class GLAbout extends ComputeRect{
         createImages();
 
         setDstRect(0, 0, width, height);
+
     }
 
     private SpriteController.OnUpdateListener onUpdateListener = new SpriteController.OnUpdateListener() {
@@ -182,6 +184,9 @@ public class GLAbout extends ComputeRect{
                 plantSize * 22 + plantSize * OBSTACLE_WIDTH,
                 plantHeight), new float[] {0, 0, 0, 1});
 
+        obstacle_1.setColliderListener(viewComputeListener.getGLCharacter().getColliderListener());
+        obstacle_2.setColliderListener(viewComputeListener.getGLCharacter().getColliderListener());
+
         glImageText1 = new GLImageText(context, "Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
 
         characterMusic = new Image(new RectF(plantSize * 29, plantHeight - CHARACTER_MUSIC_HEIGHT,
@@ -207,11 +212,19 @@ public class GLAbout extends ComputeRect{
     }
 
     public void computeRect() {
+
         glTrees.computeTrees(dstRect);
+
         buddha.computeDstRect(dstRect);
+
         aboutCoffee.computeDstRect(dstRect);
+
         obstacle_1.computeDstRect(dstRect);
         obstacle_2.computeDstRect(dstRect);
+
+        obstacle_1.startCollider(viewComputeListener.getGLCharacter().getDstRect());
+        obstacle_2.startCollider(viewComputeListener.getGLCharacter().getDstRect());
+
         computeSquare();
         computeBuild85();
         computeOwnMusic();

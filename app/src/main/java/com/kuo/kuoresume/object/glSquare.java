@@ -13,7 +13,7 @@ import java.nio.ShortBuffer;
 /**
  * Created by Kuo on 2016/5/4.
  */
-public class GLSquare {
+public class GLSquare extends RectCollider{
 
     // Use to access and set the view transformation
     private int mMVPMatrixHandle;
@@ -160,7 +160,6 @@ public class GLSquare {
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(squareCoords);
         vertexBuffer.position(0);
-
     }
 
     public void computeDstRect(RectF rawDstRect) {
@@ -180,4 +179,14 @@ public class GLSquare {
     public RectF getDstRect() {
         return dstRect;
     }
+
+    public void startCollider(RectF otherRect) {
+        start(otherRect, dstRect);
+    }
+
+    @Override
+    public void setColliderListener(ColliderListener colliderListener) {
+        super.setColliderListener(colliderListener);
+    }
+
 }

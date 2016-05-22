@@ -36,7 +36,9 @@ public class GLChartRect {
 
     private float maxTextHeight = 0, maxTextWidth = 0, x = 0, y = 0, rawX = 0, rawY = 0;
 
-    private int width, height, maxValue;
+    private float width, height;
+
+    private int maxValue;
 
     private Context context;
 
@@ -83,7 +85,9 @@ public class GLChartRect {
             count++;
         }
 
-        width = (int) (maxTextWidth + maxTextWidth * WEIGTHED + IMAGE_SIZE * maxValue);
+        width = maxTextWidth + maxTextWidth * WEIGTHED + IMAGE_SIZE * maxValue + maxTextWidth - IMAGE_SIZE;
+
+        height += maxTextHeight;
 
         expertLine = new GLSquare(new RectF(maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 1,
                 0,
@@ -111,6 +115,14 @@ public class GLChartRect {
             maxTextHeight = Math.max(maxTextHeight, glImageText.getSrcRect().height());
         }
 
+        int count = 0;
+        for(GLImageText glImageText : glImageTexts) {
+
+            glImageText.setPosition(maxTextWidth - glImageText.getSrcRect().width(),
+                    rawY + glImageText.getSrcRect().height() + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * count + IMAGE_SIZE / 2 - glImageText.getSrcRect().height() / 2);
+
+            count++;
+        }
     }
 
     public void draw(float[] m) {
@@ -153,10 +165,10 @@ public class GLChartRect {
         expertText.setLocation(rawX + maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 1, rawY);
         masterText.setLocation(rawX + maxTextWidth + maxTextWidth * WEIGTHED + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * 4, rawY);
 
-        expertLine.setDstRect(expertText.getDstRect().left, expertText.getDstRect().top,
-                expertText.getDstRect().left + expertLine.getSrcRect().width(), expertText.getDstRect().top + height);
-        masterLine.setDstRect(masterText.getDstRect().left, masterText.getDstRect().top,
-                masterText.getDstRect().left + masterLine.getSrcRect().width(), masterText.getDstRect().top + height);
+        expertLine.setDstRect(expertText.getDstRect().left, expertText.getDstRect().top + expertText.getSrcRect().height(),
+                expertText.getDstRect().left + expertLine.getSrcRect().width(), expertText.getDstRect().top + expertText.getSrcRect().height() + height);
+        masterLine.setDstRect(masterText.getDstRect().left, masterText.getDstRect().top +  + expertText.getSrcRect().height(),
+                masterText.getDstRect().left + masterLine.getSrcRect().width(), masterText.getDstRect().top + expertText.getSrcRect().height() + height);
 
     }
 
@@ -182,11 +194,7 @@ public class GLChartRect {
         int count = 0;
         for(GLImageText glImageText : glImageTexts) {
 
-            float x = rawX + maxTextWidth - glImageText.getSrcRect().width();
-            //float y = rawY + IMAGE_SIZE / 4 + (maxTextHeight + IMAGE_SIZE / 2) * count;
-            float y = rawY + glImageText.getSrcRect().height() + (IMAGE_SIZE + IMAGE_SIZE * WEIGTHED) * count + IMAGE_SIZE / 2 - glImageText.getSrcRect().height() / 2;
-
-            glImageText.setLocation(x, y);
+            glImageText.setLocation(rawX, rawY);
 
             count++;
         }
@@ -221,11 +229,11 @@ public class GLChartRect {
         return y + height / 2;
     }
 
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 }

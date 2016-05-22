@@ -1,6 +1,7 @@
 package com.kuo.kuoresume.object;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.kuo.kuoresume.until.Until;
@@ -10,25 +11,30 @@ import com.kuo.kuoresume.until.Until;
  */
 public class GLImageText {
 
-    public static final float WEIDTHED = 0.1f;
+    public static final float WEIGHTED = 0.1f;
 
     private Image image;
+
     private GLText glText;
+
+    private RectF srcRect, dstRect;
 
     private float x, y, rawX, rawY;
 
     public GLImageText(Context context, String text, float x, float y) {
 
-        glText = new GLText(text, Until.dp2px(context.getResources().getDisplayMetrics().density, 20),
-                x, y);
+        this.srcRect = srcRect;
+        this.dstRect = srcRect;
 
-        float tX = x + glText.getWidth() * WEIDTHED;
-        float tY = y + glText.getHeight() * WEIDTHED;
+        glText = new GLText(text, Until.dp2px(context.getResources().getDisplayMetrics().density, 20), x, y);
+
+        float tX = x + glText.getWidth() * WEIGHTED;
+        float tY = y + glText.getHeight() * WEIGHTED;
 
         glText.setLocation(tX, tY);
 
-        float right = tX + glText.getWidth() + glText.getWidth() * WEIDTHED;
-        float bottom = tY + glText.getHeight() + glText.getHeight() * WEIDTHED;
+        float right = tX + glText.getWidth() + glText.getWidth() * WEIGHTED;
+        float bottom = tY + glText.getHeight() + glText.getHeight() * WEIGHTED;
 
         image = new Image(new RectF(x, y, right, bottom));
     }
@@ -45,14 +51,14 @@ public class GLImageText {
         this.y = y;
     }
 
-    public void setLocation(float x, float y) {
+    public void setLocation(float dstX, float dstY) {
 
-        this.rawX = x;
-        this.rawY = y;
+        this.rawX = dstX + x;
+        this.rawY = dstY + y;
 
-        image.setDstRect(x, y, x + image.getSrcRect().width(), y + image.getSrcRect().height());
+        image.setDstRect(rawX, rawY, rawX + image.getSrcRect().width(), rawY + image.getSrcRect().height());
 
-        glText.setLocation(x + glText.getWidth() * WEIDTHED, y + glText.getHeight() * WEIDTHED);
+        glText.setLocation(rawX + glText.getWidth() * WEIGHTED, rawY + glText.getHeight() * WEIGHTED);
 
     }
 

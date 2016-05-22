@@ -151,14 +151,19 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_IDLE)
             glCharacter.computeSprite(GLCharacter.CHARACTER_IDLE);
 
-        if(jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch || glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP) {
+        if(jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch
+                || glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP
+                || glCharacter.getCharacterState() == GLCharacter.CHARACTER_DOWN) {
 
-            if(isTouch && glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+            if(isTouch && glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP
+                    && glCharacter.getCharacterState() != GLCharacter.CHARACTER_DOWN)
                 glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
             glCharacter.computeSprite(glCharacter.getCharacterState());
             computeRect();
         }
+
+        bg.draw(mMVPMatrix, 5);
 
         glBackground.draw(mMVPMatrix);
 
@@ -189,7 +194,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
                 pointF.set(event.getX(), event.getY());
 
-                if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
+                if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP
+                        && glCharacter.getCharacterState() != GLCharacter.CHARACTER_DOWN)
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_RUN);
 
                 isTouch = true;
@@ -205,6 +211,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_BOAT);
                 else if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP)
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
+                else if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_DOWN)
+                    glCharacter.setCharacterState(GLCharacter.CHARACTER_DOWN);
                 else
                     glCharacter.setCharacterState(GLCharacter.CHARACTER_IDLE);
 

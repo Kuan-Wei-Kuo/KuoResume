@@ -23,6 +23,10 @@ import java.util.ArrayList;
  */
 public class GLSkill extends ComputeRect{
 
+    private static final float OBJECT_384PX_UV_BOX_WIDTH = 0.25f;
+
+    private static final float OBJECT_384PX_SIZE = 384;
+
     public static final int PLANT_FLOOR_SIZE = 3;
     public static final int BACKGROUND_FLOOR_SIZE = 5;
 
@@ -42,7 +46,7 @@ public class GLSkill extends ComputeRect{
 
     private ArrayList<GLSquare> backgroundSquares = new ArrayList<>();
 
-    private Image levelSign, signWood, officeComputer, softwareComputer, languageComputer;
+    private Image levelSign, signWood, officeComputer, softwareComputer, languageComputer, skillPhone;
 
     private GLText signText, skillText;
 
@@ -55,7 +59,7 @@ public class GLSkill extends ComputeRect{
     public GLSkill(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
-        PLANT_RANGE_SIZE = 30;
+        PLANT_RANGE_SIZE = 40;
 
         width = PLANT_RANGE_SIZE * viewComputeListener.getViewCompute().getPlantSize();
 
@@ -150,6 +154,16 @@ public class GLSkill extends ComputeRect{
 
         skillText = new GLText("Skill", (int) SKILL_TEXT_SIZE, 0, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
 
+        skillPhone = new Image(new RectF(0, plantHeight - OBJECT_384PX_SIZE * scaling,
+                OBJECT_384PX_SIZE * scaling, plantHeight));
+
+        skillPhone.setUVS(new float[] {
+                1 - OBJECT_384PX_UV_BOX_WIDTH, 0,
+                1 - OBJECT_384PX_UV_BOX_WIDTH, 1,
+                1, 1,
+                1, 0
+        });
+
         levelSign = new Image(new RectF(0,
                 plantHeight - ImageDefaultSize.SIGN_HEIGHT * scaling,
                 ImageDefaultSize.SIGN_WIDTH * scaling,
@@ -194,12 +208,12 @@ public class GLSkill extends ComputeRect{
 
         glImageText1 = new GLImageText(context, "SoftWare", plantSize * 8, plantHeight / 6);
 
-        softwareComputer = new Image(new RectF(plantSize * 8, 0, plantSize * 8 + glChartRect.getWidth() * 1.2f, plantHeight));
+        softwareComputer = new Image(new RectF(plantSize * 8, 0, plantSize * 8 + glChartRect.getWidth() + plantSize, plantHeight));
 
         languageChart = new GLChartRect(context, 0, 0, languageChartData, viewComputeListener);
         languageChart.setPosition(softwareComputer.getSrcRect().right + plantSize * 1.5f, languageChart.getHeight() * 0.1f);
 
-        languageComputer = new Image(new RectF(softwareComputer.getSrcRect().right + plantSize, 0, softwareComputer.getSrcRect().right + plantSize + languageChart.getWidth() * 1.2f, plantHeight));
+        languageComputer = new Image(new RectF(softwareComputer.getSrcRect().right + plantSize, 0, softwareComputer.getSrcRect().right + plantSize + languageChart.getWidth() + plantSize, plantHeight));
 
         glImageText2= new GLImageText(context, "Language", plantSize * 8, plantHeight / 6);
 
@@ -226,6 +240,7 @@ public class GLSkill extends ComputeRect{
         computeSoftwareRect();
         computeLanguageRect();
 
+        skillPhone.computeDstRect(dstRect);
         softwareComputer.computeDstRect(dstRect);
         languageComputer.computeDstRect(dstRect);
         officeComputer.computeDstRect(dstRect);
@@ -293,7 +308,7 @@ public class GLSkill extends ComputeRect{
 
             drawSquares(mvpMatrix);
 
-            skillText.draw(mvpMatrix);
+            skillPhone.draw(mvpMatrix, 16);
 
             officeComputer.draw(mvpMatrix, 10);
 

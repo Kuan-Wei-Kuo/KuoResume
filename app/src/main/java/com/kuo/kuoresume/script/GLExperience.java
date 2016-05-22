@@ -9,6 +9,7 @@ import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLClouds;
 import com.kuo.kuoresume.object.GLImageText;
+import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.GLText;
 import com.kuo.kuoresume.object.GLTrees;
 import com.kuo.kuoresume.object.Image;
@@ -21,217 +22,153 @@ import java.util.ArrayList;
  */
 public class GLExperience extends ComputeRect {
 
-    private static final int VIDEO_TAPES_SIZE = 550;
+    private static final int PLANT_FLOOR_SIZE = 1;
 
-    private ArrayList<Image> plants = new ArrayList<>();
+    private static final float PRODUCT_NAME_UV_BOX_WIDTH = 0.25f;
 
-    private Image levelSign, signWood;
+    private float PRODUCT_ICON_SIZE = 200;
 
-    private GLText signText, experience;
+    private float PRODUCT_NAME_WIDTH = 150;
+    private float PRODUCT_NAME_HEIGHT = 39;
 
-    private GLClouds glClouds;
+    private ArrayList<GLSquare> squares = new ArrayList<>();
 
-    private GLTrees glTrees;
-
-    private ArrayList<Image> videoTapes = new ArrayList<>();
     private ArrayList<Image> images = new ArrayList<>();
+    private ArrayList<Image> productNames = new ArrayList<>();
+
     private ArrayList<GLImageText> glImageTexts = new ArrayList<>();
 
     private String[] texts = {"MyChart Lib", "FirstAid Sprite", "Basketball Board", "Ur Coco", "My Blog"};
 
+    private float EXPERIENCE_ICON_SIZE = 384;
+
+    private Image experienceIcon;
+
     public GLExperience(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
-        PLANT_RANGE_SIZE = 30;
+        PLANT_RANGE_SIZE = 35;
 
-        width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
+        PRODUCT_ICON_SIZE = PRODUCT_ICON_SIZE * viewComputeListener.getScaling();
+
+        EXPERIENCE_ICON_SIZE = EXPERIENCE_ICON_SIZE * viewComputeListener.getScaling();
+
+        PRODUCT_NAME_WIDTH = PRODUCT_NAME_WIDTH * viewComputeListener.getScaling();
+        PRODUCT_NAME_HEIGHT = PRODUCT_NAME_HEIGHT * viewComputeListener.getScaling();
+
+        width = PLANT_RANGE_SIZE * viewComputeListener.getViewCompute().getPlantSize();
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
 
-        createPlants();
-        createImage();
-        createVideoTapes();
+        experienceIcon = new Image(new RectF(0,
+                height - viewComputeListener.getViewCompute().getPlantSize() - EXPERIENCE_ICON_SIZE,
+                EXPERIENCE_ICON_SIZE, height - viewComputeListener.getViewCompute().getPlantSize()));
+
+        createSquares();
+        createProductIconAndName();
         computeRect();
     }
 
-    private void createImage() {
+    private void createSquares() {
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
 
-        float plantHeight = height - plantSize;
+        float[] color = new float[] {0, 0, 0, 1f};
 
-        float scaling = viewComputeListener.getScaling();
+        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
 
-        levelSign = new Image(new RectF(0,
-                plantHeight - ImageDefaultSize.SIGN_HEIGHT * scaling,
-                ImageDefaultSize.SIGN_WIDTH * scaling,
-                plantHeight));
+            float left = 0;
+            float top = height - plantSize - plantSize * j;
+            float right = left + width;
+            float bottom = top + plantSize;
 
-        String signString = "Level 3";
-        signText = new GLText(signString, (int) (ImageDefaultSize.SIGN_TEXT_SIZE * scaling),
-                0, plantHeight - plantSize * 4);
+            squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
+        }
 
-        signWood = new Image(new RectF(plantSize * 4,
-                plantHeight - ImageDefaultSize.SIGN_WOOD_HEIGHT * scaling,
-                plantSize * 4 + ImageDefaultSize.SIGN_WOOD_WIDTH * scaling,
-                plantHeight));
-
-        experience = new GLText("experience",(int) (ImageDefaultSize.SIGN_WOOD_TEXT_SIZE * scaling),
-                0, 0);
-
-        glClouds = new GLClouds(7, width, height);
-
-        glTrees = new GLTrees(6, viewComputeListener.getScaling(), width, (int) (plantHeight + plantSize));
     }
 
-    private void createVideoTapes() {
+    private void createProductIconAndName() {
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        float plantHeight = height - plantSize;
-
-        float scaling = viewComputeListener.getScaling();
-
-        float left, top, right = 0, bottom, margin = 0, lastRight = 0, x, y;
 
         for(int i = 0 ; i < texts.length ; i++) {
 
-            GLImageText glImageText = new GLImageText(context, texts[i], 0, 0);
+            float left = plantSize * 8 + PRODUCT_ICON_SIZE * i;
+            float top = height / 2 - PRODUCT_ICON_SIZE / 2;
+            float right = left + PRODUCT_ICON_SIZE;
+            float bottom = top + PRODUCT_ICON_SIZE;
 
-            x = i > 0 ? lastRight + glImageText.getSrcRect().width() * 0.1f : plantSize * 10;
-            y = plantHeight / 2 + ImageDefaultSize.ICON_HEIGHT * scaling / 2 + glImageText.getSrcRect().height();
+            images.add(new Image(new RectF(left, top, right, bottom)));
 
-            glImageText.setPosition(x, y);
-            lastRight = glImageText.getX() + glImageText.getSrcRect().width();
+            Image productName = new Image(new RectF(left + ((right - left - PRODUCT_NAME_WIDTH) / 2), bottom,
+                        left + ((right - left - PRODUCT_NAME_WIDTH) / 2) + PRODUCT_NAME_WIDTH, bottom + PRODUCT_NAME_HEIGHT));
 
-            left = glImageText.getX() + glImageText.getSrcRect().width() / 2 - ImageDefaultSize.ICON_WIDTH * scaling / 2;
-            top = plantHeight / 2 - ImageDefaultSize.ICON_HEIGHT * scaling / 2;
-            right = left + ImageDefaultSize.ICON_WIDTH * scaling;
-            bottom = top + ImageDefaultSize.ICON_HEIGHT * scaling;
+            Log.d("w1", (right - left) + "");
+            Log.d("w2", PRODUCT_NAME_WIDTH + "");
 
-            Image taps = new Image(new RectF(left, top, right, bottom));
-            Image image = new Image(new RectF(left, top, right, bottom));
+            productName.setUVS(new float[]{PRODUCT_NAME_UV_BOX_WIDTH * i, 0,
+                    PRODUCT_NAME_UV_BOX_WIDTH * i, 1,
+                    PRODUCT_NAME_UV_BOX_WIDTH * i + PRODUCT_NAME_UV_BOX_WIDTH, 1,
+                    PRODUCT_NAME_UV_BOX_WIDTH * i + PRODUCT_NAME_UV_BOX_WIDTH, 0});
 
-            glImageTexts.add(glImageText);
+            productNames.add(productName);
 
-            images.add(image);
-            videoTapes.add(taps);
+
         }
     }
 
-    private void createPlants() {
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
-
-            float left = dstRect.left + plantSize * i;
-            float top = dstRect.bottom - plantSize;
-            float right = left + plantSize;
-            float bottom = top + plantSize;
-
-            plants.add(new Image(new RectF(left, top, right, bottom)));
-        }
-    }
 
     public void draw(float[] mvpMatrix) {
 
-        glClouds.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-        glTrees.draw(mvpMatrix, viewComputeListener.getViewCompute().getContentRect());
-
-        levelSign.draw(mvpMatrix, 3);
-        signText.draw(mvpMatrix);
-
-        signWood.draw(mvpMatrix, 6);
-        experience.draw(mvpMatrix);
-
-        //drawVideoTapes(mvpMatrix);
+        experienceIcon.draw(mvpMatrix, 3);
+        drawSquares(mvpMatrix);
         drawImages(mvpMatrix);
         drawGLImageTexts(mvpMatrix);
 
-        drawPlants(mvpMatrix);
     }
 
     private void drawGLImageTexts(float[] mvpMatrix) {
 
-        int count = 0;
         for(GLImageText glImageText : glImageTexts) {
             glImageText.draw(mvpMatrix);
-            count++;
         }
     }
 
     private void drawImages(float[] mvpMatrix) {
-
 
         int count = 0;
         for(Image image : images) {
             image.draw(mvpMatrix, 18 + count);
             count++;
         }
+
+
+        for(Image image : productNames)
+            image.draw(mvpMatrix, 11);
+
+
     }
 
-    private void drawVideoTapes(float[] mvpMatrix) {
+    private void computeSquares() {
 
-        for(Image image : videoTapes) {
-            image.draw(mvpMatrix, 10);
-        }
+        for (GLSquare glSquare : squares)
+            glSquare.computeDstRect(dstRect);
+
     }
 
-    private void drawPlants(float[] mvpMatrix) {
+    private void drawSquares(float[] mvpMatrix) {
 
-        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
+        for(GLSquare glSquare : squares)
+            glSquare.draw(mvpMatrix);
 
-        for(Image image : plants) {
-
-            RectF rectF = image.getDstRect();
-
-            if(contentRect.contains(rectF.left, rectF.top)
-                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
-                image.draw(mvpMatrix, 2);
-        }
     }
 
     public void computeRect() {
-        glClouds.computeClouds(dstRect);
-        glTrees.computeTrees(dstRect);
-        computePlants();
-        computeLevelSign();
-        computeExperience();
-        computeVideoTapes();
+        experienceIcon.computeDstRect(dstRect);
+        computeSquares();
         computeImages();
         computeGLImageTexts();
 
-    }
-
-    private void computeLevelSign() {
-
-        levelSign.computeDstRect(dstRect);
-
-        signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
-                levelSign.getDstRect().top + signText.getHeight());
-    }
-
-    private void computeExperience() {
-
-        signWood.computeDstRect(dstRect);
-
-        experience.setLocation(signWood.getDstRect().centerX() - experience.getWidth() / 2,
-                signWood.getDstRect().top + experience.getHeight() / 2);
-
-    }
-
-    private void computeVideoTapes() {
-
-        for(Image image : videoTapes) {
-
-            float left = dstRect.left + image.getSrcRect().left;
-            float top = dstRect.top + image.getSrcRect().top;
-            float right = left + VIDEO_TAPES_SIZE;
-            float bottom = top + VIDEO_TAPES_SIZE;
-
-            image.setDstRect(left, top, right, bottom);
-        }
     }
 
     private void computeGLImageTexts() {
@@ -248,36 +185,11 @@ public class GLExperience extends ComputeRect {
 
     private void computeImages() {
 
-        float scaling = viewComputeListener.getScaling();
+        for(Image image : images)
+            image.computeDstRect(dstRect);
 
-        for(Image image : images) {
-
-            float left = dstRect.left + image.getSrcRect().left;
-            float top = dstRect.top + image.getSrcRect().top;
-            float right = left + ImageDefaultSize.ICON_WIDTH * scaling;
-            float bottom = top + ImageDefaultSize.ICON_HEIGHT * scaling;
-
-            image.setDstRect(left, top, right, bottom);
-
-        }
-    }
-
-    private void computePlants() {
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        int count = 0;
-        for(Image image : plants) {
-
-            float left = dstRect.left + plantSize * count;
-            float top = dstRect.bottom - plantSize;
-            float right = left + plantSize;
-            float bottom = top + plantSize;
-
-            image.setDstRect(left, top, right, bottom);
-
-            count++;
-        }
+        for(Image image : productNames)
+            image.computeDstRect(dstRect);
     }
 
 }
