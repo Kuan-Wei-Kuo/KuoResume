@@ -24,11 +24,14 @@ public class GLMessage extends ComputeRect {
 
     private float FLICKER_LIGHT_UV_BOX_WIDTH = 0.333f;
 
+    public float PAPER_AIR_PLANT_WIDTH = 384;
+    public float PAPER_AIR_PLANT_HEIGHT = 136;
+
     public static final int PLANT_FLOOR_SIZE = 1;
     public static final int MIN_NULL = 5;
     public static final int MAX_NULL = 12;
 
-    private Image shareImage, contactImage, githubImage, goldBoxImage, flickerLight, bgBuild;
+    private Image shareImage, contactImage, githubImage, goldBoxImage, flickerLight, bgBuild, paperAirPlant;
 
     private GLSquare jumpSquare;
 
@@ -49,6 +52,9 @@ public class GLMessage extends ComputeRect {
 
         FLICKER_LIGHT_WIDTH = FLICKER_LIGHT_WIDTH * viewComputeListener.getScaling();
         FLICKER_LIGHT_HEIGHT = FLICKER_LIGHT_HEIGHT * viewComputeListener.getScaling();
+
+        PAPER_AIR_PLANT_WIDTH = PAPER_AIR_PLANT_WIDTH * viewComputeListener.getScaling();
+        PAPER_AIR_PLANT_HEIGHT = PAPER_AIR_PLANT_HEIGHT * viewComputeListener.getScaling();
 
         bgBuild = new Image(new RectF(0, 0, width, height));
 
@@ -78,7 +84,11 @@ public class GLMessage extends ComputeRect {
         jumpSquare = new GLSquare(new RectF(MIN_NULL * plantSize, height,
                 width, height), color);
 
-        jumpSquare.setColliderListener(viewComputeListener.getGLCharacter().getJumpMessage());
+        paperAirPlant = new Image(new RectF(MIN_NULL * plantSize - PAPER_AIR_PLANT_WIDTH,
+                height - plantSize - PAPER_AIR_PLANT_HEIGHT,
+                MIN_NULL * plantSize, height - plantSize));
+
+        //jumpSquare.setColliderListener(viewComputeListener.getGLCharacter().getJumpMessage());
     }
 
     private static final float IMAGE_SIZE = 110;
@@ -143,6 +153,7 @@ public class GLMessage extends ComputeRect {
 
     public void draw(float[] m) {
         bgBuild.draw(m, 20);
+        paperAirPlant.draw(m, 21);
         flickerLightSprite.start();
         contactImage.draw(m, 23);
         githubImage.draw(m, 25);
@@ -163,8 +174,9 @@ public class GLMessage extends ComputeRect {
         computeSquares();
 
         jumpSquare.startCollider(viewComputeListener.getGLCharacter().getDstRect());
-
         jumpSquare.computeDstRect(dstRect);
+
+        paperAirPlant.computeDstRect(dstRect);
         bgBuild.setDstRect(dstRect.left, 0, dstRect.right, height);
         contactImage.computeDstRect(dstRect);
         githubImage.computeDstRect(dstRect);
