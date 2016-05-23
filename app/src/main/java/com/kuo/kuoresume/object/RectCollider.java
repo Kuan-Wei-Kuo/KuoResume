@@ -50,6 +50,21 @@ public class RectCollider {
 
     }
 
+    public void updateListener(RectF dstRect) {
+
+        if(isCollid) {
+
+            isCollid = false;
+
+            colliderListener.end(dstRect);
+        } else {
+
+            isCollid = true;
+
+            colliderListener.start(dstRect);
+        }
+    }
+
     public void setColliderListener(ColliderListener colliderListener) {
         this.colliderListener = colliderListener;
     }

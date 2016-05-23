@@ -185,6 +185,11 @@ public class GLSquare extends RectCollider{
     }
 
     @Override
+    public void updateListener(RectF dstRect) {
+        super.updateListener(dstRect);
+    }
+
+    @Override
     public void setColliderListener(ColliderListener colliderListener) {
         super.setColliderListener(colliderListener);
     }

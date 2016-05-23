@@ -2,7 +2,6 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.kuo.kuoresume.animation.SampleAnimation;
 import com.kuo.kuoresume.animation.SpriteController;
@@ -39,7 +38,7 @@ public class GLCharacter extends ComputeRect {
     private SampleAnimation moveAnimation, jumpAnimation, downAnimation;
     private SpriteController characterIdleController, characterRunController, characterJumpController;
 
-    private int moveSpeed = 50;
+    private float moveSpeed = 30;
     private int direction = 1, airDirection = 1;
 
     private Image characterRun, characterIdle, characterBoat, characterJump;
@@ -54,6 +53,8 @@ public class GLCharacter extends ComputeRect {
         CHARACTER_BOAT_HEIGHT = CHARACTER_BOAT_HEIGHT * viewComputeListener.getScaling();
 
         CHARACTER_JUMP_HEIGHT = viewComputeListener.getViewCompute().getPlantSize();
+
+        moveSpeed = moveSpeed * viewComputeListener.getScaling();
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
@@ -192,6 +193,24 @@ public class GLCharacter extends ComputeRect {
 
             viewComputeListener.getViewCompute().setFloorHeight(0);
 
+        }
+    };
+
+    private RectCollider.ColliderListener jumpMessage = new RectCollider.ColliderListener() {
+        @Override
+        public void start(RectF dstRect) {
+
+            viewComputeListener.getViewCompute().setFloorHeight(dstRect.height());
+            setCharacterState(CHARACTER_JUMP);
+        }
+
+        @Override
+        public void end(RectF dstRect) {
+
+            if(CHARACTER_STATE != CHARACTER_JUMP)
+                setCharacterState(CHARACTER_JUMP);
+
+            viewComputeListener.getViewCompute().setFloorHeight(0);
         }
     };
 
@@ -402,9 +421,6 @@ public class GLCharacter extends ComputeRect {
                 });
             }
 
-            //Log.d("end", characterJumpController.isEnd() + "");
-            //Log.d("keep", characterJumpController.isKeep()  + "");
-            //Log.d("frame", characterJumpController.getCurrentHorizontalFrame() + "");
         }
 
         @Override
@@ -478,4 +494,9 @@ public class GLCharacter extends ComputeRect {
     public RectCollider.ColliderListener getColliderListener() {
         return colliderListener;
     }
+
+    public RectCollider.ColliderListener getJumpMessage() {
+        return jumpMessage;
+    }
+
 }

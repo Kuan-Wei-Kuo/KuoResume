@@ -8,6 +8,7 @@ import com.kuo.kuoresume.animation.SpriteController;
 import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
+import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.Image;
 
 import java.util.ArrayList;
@@ -20,51 +21,64 @@ public class GLMessage extends ComputeRect {
     private float FLICKER_LIGHT_WIDTH = 156;
     private float FLICKER_LIGHT_HEIGHT = 156;
 
+
     private float FLICKER_LIGHT_UV_BOX_WIDTH = 0.333f;
 
-    public static final int MIN_SEA = 1;
-    public static final int MAX_SEA = 12;
+    public static final int PLANT_FLOOR_SIZE = 1;
+    public static final int MIN_NULL = 5;
+    public static final int MAX_NULL = 12;
 
-    private Image shareImage, contactImage, githubImage, goldBoxImage, flickerLight;
+    private Image shareImage, contactImage, githubImage, goldBoxImage, flickerLight, bgBuild;
+
+    private GLSquare jumpSquare;
 
     private SpriteController flickerLightSprite;
 
     private ActivityListener activityListener;
 
-    private ArrayList<Image> plants = new ArrayList<>();
+    private ArrayList<GLSquare> squares = new ArrayList<>();
 
     public GLMessage(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener, ActivityListener activityListener) {
         super(context, viewComputeListener, objectListener);
 
         PLANT_RANGE_SIZE = 20;
 
-        width = PLANT_RANGE_SIZE * (int) viewComputeListener.getViewCompute().getPlantSize();
+        width = PLANT_RANGE_SIZE * viewComputeListener.getViewCompute().getPlantSize();
 
-        height = (int) viewComputeListener.getViewCompute().getContentRect().height();
+        height = viewComputeListener.getViewCompute().getContentRect().height();
 
         FLICKER_LIGHT_WIDTH = FLICKER_LIGHT_WIDTH * viewComputeListener.getScaling();
         FLICKER_LIGHT_HEIGHT = FLICKER_LIGHT_HEIGHT * viewComputeListener.getScaling();
 
-        createPlants();
+        bgBuild = new Image(new RectF(0, 0, width, height));
+
+        createSquares();
         createImage();
         computeRect();
 
         this.activityListener = activityListener;
     }
 
-    private void createPlants() {
+    private void createSquares() {
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
 
-        for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
+        float[] color = new float[] {0, 0, 0, 1f};
 
-            float left = dstRect.left + plantSize * i;
-            float top = dstRect.bottom - plantSize;
-            float right = left + plantSize;
-            float bottom = top + plantSize;
+        for(int j = 0 ; j < 2 ; j++) {
 
-            plants.add(new Image(new RectF(left, top, right, bottom)));
+            float left = j == 0 ? 0 : MAX_NULL * plantSize;
+            float top = j == 0 ? height - plantSize : height - plantSize;
+            float right = j == 0 ? left + MIN_NULL * plantSize : width;
+            float bottom = j == 0 ? top + plantSize : height;
+
+            squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
         }
+
+        jumpSquare = new GLSquare(new RectF(MIN_NULL * plantSize, height,
+                width, height), color);
+
+        jumpSquare.setColliderListener(viewComputeListener.getGLCharacter().getJumpMessage());
     }
 
     private static final float IMAGE_SIZE = 110;
@@ -128,62 +142,52 @@ public class GLMessage extends ComputeRect {
     };
 
     public void draw(float[] m) {
+        bgBuild.draw(m, 20);
         flickerLightSprite.start();
         contactImage.draw(m, 23);
         githubImage.draw(m, 25);
         shareImage.draw(m, 24);
         flickerLight.draw(m, 29);
         goldBoxImage.draw(m, 30);
-        drawPlants(m);
+        drawSquares(m);
 
     }
 
-    private void drawPlants(float[] mvpMatrix) {
+    private void drawSquares(float[] mvpMatrix) {
 
-        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
-
-        int count = 0;
-        for(Image image : plants) {
-
-            RectF rectF = image.getDstRect();
-
-            if(contentRect.contains(rectF.left, rectF.top)
-                    || contentRect.contains(rectF.right  - 1, rectF.bottom - 1)) {
-                if(count >= MIN_SEA && count <= MAX_SEA)
-                    image.draw(mvpMatrix, 9);
-                else
-                    image.draw(mvpMatrix, 2);
-
-            }
-            count++;
-        }
+        for(GLSquare glSquare : squares)
+            glSquare.draw(mvpMatrix);
     }
 
     public void computeRect() {
-        computePlants();
+        computeSquares();
+
+        jumpSquare.startCollider(viewComputeListener.getGLCharacter().getDstRect());
+
+        jumpSquare.computeDstRect(dstRect);
+        bgBuild.setDstRect(dstRect.left, 0, dstRect.right, height);
         contactImage.computeDstRect(dstRect);
         githubImage.computeDstRect(dstRect);
         shareImage.computeDstRect(dstRect);
         goldBoxImage.computeDstRect(dstRect);
         flickerLight.computeDstRect(dstRect);
+
+        RectF characterRect = viewComputeListener.getGLCharacter().getDstRect();
+
+        if(viewComputeListener.getGLCharacter().getDirection() == -1
+                && characterRect.left < dstRect.left + MAX_NULL * viewComputeListener.getViewCompute().getPlantSize()
+                && characterRect.right > dstRect.left + MAX_NULL * viewComputeListener.getViewCompute().getPlantSize()) {
+
+            jumpSquare.updateListener(squares.get(0).getDstRect());
+
+        }
     }
 
-    private void computePlants() {
+    private void computeSquares() {
 
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
+        for (GLSquare glSquare : squares)
+            glSquare.computeDstRect(dstRect);
 
-        int count = 0;
-        for(Image image : plants) {
-
-            float left = dstRect.left + plantSize * count;
-            float top = dstRect.bottom - plantSize;
-            float right = left + plantSize;
-            float bottom = top + plantSize;
-
-            image.setDstRect(left, top, right, bottom);
-
-            count++;
-        }
     }
 
     boolean isTactFocus = false;
