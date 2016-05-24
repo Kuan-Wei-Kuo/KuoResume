@@ -6,7 +6,6 @@ import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kuo.kuoresume.compute.ImageDefaultSize;
@@ -15,7 +14,7 @@ import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLSquare;
-import com.kuo.kuoresume.object.Image;
+import com.kuo.kuoresume.object.GLImage;
 import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLBackground;
 import com.kuo.kuoresume.script.GLCharacter;
@@ -56,7 +55,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     GLSquare glSquare;
 
-    Image bg;
+    GLImage bg;
 
     GLBackground glBackground, glBackground_1;
     GLSetting glSetting;
@@ -117,7 +116,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        bg = new Image(new RectF(0, 0, mScreenWidth, mScreenHeight));
+        bg = new GLImage(new RectF(0, 0, mScreenWidth, mScreenHeight));
         bg.setDstRect(0, 0, mScreenWidth, mScreenHeight);
 
         glBackground = new GLBackground(mContext, this, objectListener);
@@ -132,12 +131,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glMessage = new GLMessage(mContext, this, objectListener, activityListener);
 
         computeCurrentRect();
-
-        glAbout.setSrcRect(0, viewCompute.getCurRect().height() - glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight());
-        glSkill.setSrcRect(0, 0, glSkill.getWidth(), glSkill.getHeight());
-        glExperience.setSrcRect(0, viewCompute.getCurRect().height() - glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight());
-        glMessage.setSrcRect(0, viewCompute.getCurRect().height() - glMessage.getHeight(), glMessage.getWidth(), glMessage.getHeight());
-
         computeRect();
 
         activityListener.dismissProgrees();
@@ -355,6 +348,12 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             viewCompute.setCurRect(viewCompute.getCacheRect());
         else
             viewCompute.setCurRect(new RectF(0, mScreenHeight - maxHeight, totalWidth, mScreenHeight));
+
+        glAbout.setSrcRect(0, viewCompute.getCurRect().height() - glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight());
+        glSkill.setSrcRect(0, viewCompute.getCurRect().height() - glSkill.getHeight(), glSkill.getWidth(), glSkill.getHeight());
+        glExperience.setSrcRect(0, viewCompute.getCurRect().height() - glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight());
+        glMessage.setSrcRect(0, viewCompute.getCurRect().height() - glMessage.getHeight(), glMessage.getWidth(), glMessage.getHeight());
+
     }
 
     private void computeScaling() {

@@ -7,7 +7,7 @@ import com.kuo.kuoresume.animation.SampleAnimation;
 import com.kuo.kuoresume.animation.SpriteController;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
-import com.kuo.kuoresume.object.Image;
+import com.kuo.kuoresume.object.GLImage;
 import com.kuo.kuoresume.object.RectCollider;
 
 /**
@@ -24,6 +24,7 @@ public class GLCharacter extends ComputeRect {
     public static final int CHARACTER_JUMP = 2;
     public static final int CHARACTER_DOWN = 4;
     public static final int CHARACTER_BOAT = 3;
+    public static final int CHARACTER_VEHICLE = 5;
 
     private float CHARACTER_RUN_WIDTH = 101;
     private float CHARACTER_RUN_HEIGHT = 139;
@@ -41,7 +42,7 @@ public class GLCharacter extends ComputeRect {
     private float moveSpeed = 30;
     private int direction = 1, airDirection = 1;
 
-    private Image characterRun, characterIdle, characterBoat, characterJump;
+    private GLImage characterRun, characterIdle, characterBoat, characterJump;
 
     public GLCharacter(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
@@ -63,6 +64,8 @@ public class GLCharacter extends ComputeRect {
                 contentRect.centerX() + CHARACTER_RUN_WIDTH / 2,
                 contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize());
 
+        srcRect.set(dstRect);
+
         characterRunController = new SpriteController(100, 0, 0, 6);
         characterRunController.setOnUpdateListener(deadPoolRunListener);
 
@@ -72,19 +75,13 @@ public class GLCharacter extends ComputeRect {
         characterIdleController = new SpriteController(200, 0, 0, 3);
         characterIdleController.setOnUpdateListener(characterIdleListener);
 
-        characterRun = new Image(dstRect);
+        characterRun = new GLImage(dstRect);
         characterRun.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
-        characterRun.setUVS(new float[] {
-                0, 0,
-                0, 1,
-                CHARACTER_RUN_UV_BOX_WIDTH, 1,
-                CHARACTER_RUN_UV_BOX_WIDTH, 0
-        });
 
-        characterIdle = new Image(dstRect);
+        characterIdle = new GLImage(dstRect);
         characterIdle.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
 
-        characterBoat = new Image(new RectF(contentRect.centerX() - CHARACTER_BOAT_WIDTH / 2,
+        characterBoat = new GLImage(new RectF(contentRect.centerX() - CHARACTER_BOAT_WIDTH / 2,
                 contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize() - CHARACTER_BOAT_HEIGHT,
                 contentRect.centerX() + CHARACTER_BOAT_WIDTH / 2,
                 contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize()));
@@ -93,7 +90,7 @@ public class GLCharacter extends ComputeRect {
                 contentRect.centerX() + CHARACTER_BOAT_WIDTH / 2,
                 contentRect.bottom - viewComputeListener.getViewCompute().getPlantSize());
 
-        characterJump = new Image(dstRect);
+        characterJump = new GLImage(dstRect);
         characterJump.setDstRect(dstRect.left, dstRect.top, dstRect.right, dstRect.bottom);
 
         moveAnimation = new SampleAnimation(20);
@@ -113,11 +110,9 @@ public class GLCharacter extends ComputeRect {
         switch (CHARACTER_STATE) {
             case CHARACTER_IDLE:
                 characterIdle.draw(mvpMatrix, 26);
-                setDstRect(characterIdle.getDstRect());
                 break;
             case CHARACTER_RUN:
                 characterRun.draw(mvpMatrix, 0);
-                setDstRect(characterRun.getDstRect());
                 break;
             case CHARACTER_BOAT:
                 if(direction == 1)
@@ -135,13 +130,15 @@ public class GLCharacter extends ComputeRect {
                             0.0f, 0.0f,
                     });
                 characterBoat.draw(mvpMatrix, 29);
-                setDstRect(characterBoat.getDstRect());
                 break;
             case CHARACTER_JUMP:
                 characterJump.draw(mvpMatrix, 4);
                 break;
             case CHARACTER_DOWN:
                 characterJump.draw(mvpMatrix, 4);
+                break;
+            case CHARACTER_VEHICLE:
+                characterIdle.draw(mvpMatrix, 26);
                 break;
         }
 
@@ -441,8 +438,8 @@ public class GLCharacter extends ComputeRect {
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-        float[] widths = {characterIdle.getSrcRect().width(), characterRun.getSrcRect().width(), characterBoat.getSrcRect().width()};
-        float[] lefts = {characterIdle.getDstRect().left, characterRun.getDstRect().left, characterBoat.getDstRect().left};
+        float[] widths = {characterIdle.getSrcRect().width(), characterRun.getSrcRect().width()};
+        float[] lefts = {characterIdle.getDstRect().left, characterRun.getDstRect().left};
 
         for(int i = 0 ; i < widths.length ; i++) {
 
@@ -465,14 +462,24 @@ public class GLCharacter extends ComputeRect {
                 right = left +  widths[i];
             }
 
-            if (i == 0)
+            if (i == 0) {
                 characterIdle.setDstRect(left, characterIdle.getSrcRect().top, right, characterRun.getSrcRect().bottom);
-            else if(i == 1) {
+                setDstRect(left, srcRect.top, right, srcRect.bottom);
+            } else if(i == 1) {
                 characterRun.setDstRect(left, characterRun.getSrcRect().top, right, characterRun.getSrcRect().bottom);
                 characterJump.setDstRect(left, characterRun.getSrcRect().top, right, characterRun.getSrcRect().bottom);
-            } else if(i == 2)
-                characterBoat.setDstRect(left, characterBoat.getSrcRect().top, right, characterBoat.getSrcRect().bottom);
+            }
         }
+    }
+
+    @Override
+    public void setDstRect(float left, float top, float right, float bottom) {
+        super.setDstRect(left, top, right, bottom);
+
+        characterIdle.setDstRect(left, top, right, bottom);
+        characterRun.setDstRect(left, top, right, bottom);
+        characterJump.setDstRect(left, top, right, bottom);
+
     }
 
     public void setDirection(int direction) {

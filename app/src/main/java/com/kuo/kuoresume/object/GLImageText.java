@@ -1,7 +1,6 @@
 package com.kuo.kuoresume.object;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.kuo.kuoresume.until.Until;
@@ -13,7 +12,7 @@ public class GLImageText {
 
     public static final float WEIGHTED = 0.1f;
 
-    private Image image;
+    private GLImage GLImage;
 
     private GLText glText;
 
@@ -36,12 +35,12 @@ public class GLImageText {
         float right = tX + glText.getWidth() + glText.getWidth() * WEIGHTED;
         float bottom = tY + glText.getHeight() + glText.getHeight() * WEIGHTED;
 
-        image = new Image(new RectF(x, y, right, bottom));
+        GLImage = new GLImage(new RectF(x, y, right, bottom));
     }
 
     public void draw(float[] m) {
 
-        image.draw(m, 7);
+        GLImage.draw(m, 7);
         glText.draw(m);
 
     }
@@ -56,7 +55,7 @@ public class GLImageText {
         this.rawX = dstX + x;
         this.rawY = dstY + y;
 
-        image.setDstRect(rawX, rawY, rawX + image.getSrcRect().width(), rawY + image.getSrcRect().height());
+        GLImage.setDstRect(rawX, rawY, rawX + GLImage.getSrcRect().width(), rawY + GLImage.getSrcRect().height());
 
         glText.setLocation(rawX + glText.getWidth() * WEIGHTED, rawY + glText.getHeight() * WEIGHTED);
 
@@ -71,10 +70,10 @@ public class GLImageText {
     }
 
     public RectF getSrcRect() {
-        return image.getSrcRect();
+        return GLImage.getSrcRect();
     }
 
     public RectF getDstRect() {
-        return image.getDstRect();
+        return GLImage.getDstRect();
     }
 }

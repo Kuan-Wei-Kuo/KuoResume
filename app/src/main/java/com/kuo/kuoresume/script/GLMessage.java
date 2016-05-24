@@ -8,8 +8,8 @@ import com.kuo.kuoresume.animation.SpriteController;
 import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
+import com.kuo.kuoresume.object.GLImage;
 import com.kuo.kuoresume.object.GLSquare;
-import com.kuo.kuoresume.object.Image;
 
 import java.util.ArrayList;
 
@@ -24,14 +24,16 @@ public class GLMessage extends ComputeRect {
 
     private float FLICKER_LIGHT_UV_BOX_WIDTH = 0.333f;
 
-    public float PAPER_AIR_PLANT_WIDTH = 384;
-    public float PAPER_AIR_PLANT_HEIGHT = 136;
+    public float PAPER_AIR_PLANT_WIDTH = 384 * 0.5f;
+    public float PAPER_AIR_PLANT_HEIGHT = 136 * 0.5f;
 
-    public static final int PLANT_FLOOR_SIZE = 1;
+    public static final int PLANT_FLOOR_SIZE = 10;
     public static final int MIN_NULL = 5;
-    public static final int MAX_NULL = 12;
+    public static final int MAX_NULL = 30;
 
-    private Image shareImage, contactImage, githubImage, goldBoxImage, flickerLight, bgBuild, paperAirPlant;
+    private GLImage shareGLImage, contactGLImage, githubGLImage, goldBoxGLImage, flickerLight, bgBuild;
+
+    private GLAirPlane glAirPlane;
 
     private GLSquare jumpSquare;
 
@@ -44,11 +46,11 @@ public class GLMessage extends ComputeRect {
     public GLMessage(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener, ActivityListener activityListener) {
         super(context, viewComputeListener, objectListener);
 
-        PLANT_RANGE_SIZE = 20;
+        PLANT_RANGE_SIZE = 40;
 
         width = PLANT_RANGE_SIZE * viewComputeListener.getViewCompute().getPlantSize();
 
-        height = viewComputeListener.getViewCompute().getContentRect().height();
+        height = (PLANT_FLOOR_SIZE - 1) * viewComputeListener.getViewCompute().getPlantSize() + viewComputeListener.getViewCompute().getContentRect().height();
 
         FLICKER_LIGHT_WIDTH = FLICKER_LIGHT_WIDTH * viewComputeListener.getScaling();
         FLICKER_LIGHT_HEIGHT = FLICKER_LIGHT_HEIGHT * viewComputeListener.getScaling();
@@ -56,7 +58,7 @@ public class GLMessage extends ComputeRect {
         PAPER_AIR_PLANT_WIDTH = PAPER_AIR_PLANT_WIDTH * viewComputeListener.getScaling();
         PAPER_AIR_PLANT_HEIGHT = PAPER_AIR_PLANT_HEIGHT * viewComputeListener.getScaling();
 
-        bgBuild = new Image(new RectF(0, 0, width, height));
+        bgBuild = new GLImage(new RectF(0, 0, width, height));
 
         createSquares();
         createImage();
@@ -71,12 +73,12 @@ public class GLMessage extends ComputeRect {
 
         float[] color = new float[] {0, 0, 0, 1f};
 
-        for(int j = 0 ; j < 2 ; j++) {
+        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
 
-            float left = j == 0 ? 0 : MAX_NULL * plantSize;
-            float top = j == 0 ? height - plantSize : height - plantSize;
-            float right = j == 0 ? left + MIN_NULL * plantSize : width;
-            float bottom = j == 0 ? top + plantSize : height;
+            float left = MAX_NULL * plantSize;
+            float top = height - plantSize - plantSize * j;
+            float right = left + width;
+            float bottom = top + plantSize;
 
             squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
         }
@@ -84,10 +86,14 @@ public class GLMessage extends ComputeRect {
         jumpSquare = new GLSquare(new RectF(MIN_NULL * plantSize, height,
                 width, height), color);
 
-        paperAirPlant = new Image(new RectF(MIN_NULL * plantSize - PAPER_AIR_PLANT_WIDTH,
-                height - plantSize - PAPER_AIR_PLANT_HEIGHT,
-                MIN_NULL * plantSize, height - plantSize));
+        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
+        glAirPlane = new GLAirPlane(context, viewComputeListener, objectListener);
+        glAirPlane.setSrcRect(MIN_NULL * plantSize - PAPER_AIR_PLANT_WIDTH,
+                contentRect.bottom - plantSize - PAPER_AIR_PLANT_HEIGHT ,
+                MIN_NULL * plantSize, contentRect.bottom - plantSize );
+
+        glAirPlane.setDstRect(dstRect.left, 0, 0, 0);
         //jumpSquare.setColliderListener(viewComputeListener.getGLCharacter().getJumpMessage());
     }
 
@@ -107,22 +113,22 @@ public class GLMessage extends ComputeRect {
             right = left + imageSize;
 
             if (i == 0)
-                shareImage = new Image(new RectF(left, top, right, bottom));
+                shareGLImage = new GLImage(new RectF(left, top, right, bottom));
             else if (i == 1)
-                githubImage = new Image(new RectF(left, top, right, bottom));
+                githubGLImage = new GLImage(new RectF(left, top, right, bottom));
             else if (i == 2)
-                contactImage = new Image(new RectF(left, top, right, bottom));
+                contactGLImage = new GLImage(new RectF(left, top, right, bottom));
         }
 
-        goldBoxImage = new Image(new RectF(width - plantSize * 2 - imageSize,
+        goldBoxGLImage = new GLImage(new RectF(width - plantSize * 2 - imageSize,
                 height - plantSize - imageSize,
                 width - plantSize * 2,
                 height - plantSize));
 
-        flickerLight = new Image(new RectF(goldBoxImage.getSrcRect().centerX() - FLICKER_LIGHT_WIDTH / 2,
-                goldBoxImage.getSrcRect().top - FLICKER_LIGHT_HEIGHT,
-                goldBoxImage.getSrcRect().centerX() + FLICKER_LIGHT_WIDTH / 2,
-                goldBoxImage.getSrcRect().top));
+        flickerLight = new GLImage(new RectF(goldBoxGLImage.getSrcRect().centerX() - FLICKER_LIGHT_WIDTH / 2,
+                goldBoxGLImage.getSrcRect().top - FLICKER_LIGHT_HEIGHT,
+                goldBoxGLImage.getSrcRect().centerX() + FLICKER_LIGHT_WIDTH / 2,
+                goldBoxGLImage.getSrcRect().top));
 
         flickerLightSprite = new SpriteController(350, 0, 0, 3);
         flickerLightSprite.setOnUpdateListener(flickerLightSpriteListener);
@@ -153,13 +159,13 @@ public class GLMessage extends ComputeRect {
 
     public void draw(float[] m) {
         bgBuild.draw(m, 20);
-        paperAirPlant.draw(m, 21);
+        glAirPlane.draw(m);
         flickerLightSprite.start();
-        contactImage.draw(m, 23);
-        githubImage.draw(m, 25);
-        shareImage.draw(m, 24);
+        contactGLImage.draw(m, 23);
+        githubGLImage.draw(m, 25);
+        shareGLImage.draw(m, 24);
         flickerLight.draw(m, 29);
-        goldBoxImage.draw(m, 30);
+        goldBoxGLImage.draw(m, 30);
         drawSquares(m);
 
     }
@@ -176,22 +182,42 @@ public class GLMessage extends ComputeRect {
         jumpSquare.startCollider(viewComputeListener.getGLCharacter().getDstRect());
         jumpSquare.computeDstRect(dstRect);
 
-        paperAirPlant.computeDstRect(dstRect);
         bgBuild.setDstRect(dstRect.left, 0, dstRect.right, height);
-        contactImage.computeDstRect(dstRect);
-        githubImage.computeDstRect(dstRect);
-        shareImage.computeDstRect(dstRect);
-        goldBoxImage.computeDstRect(dstRect);
+        contactGLImage.computeDstRect(dstRect);
+        githubGLImage.computeDstRect(dstRect);
+        shareGLImage.computeDstRect(dstRect);
+        goldBoxGLImage.computeDstRect(dstRect);
         flickerLight.computeDstRect(dstRect);
 
         RectF characterRect = viewComputeListener.getGLCharacter().getDstRect();
 
-        if(viewComputeListener.getGLCharacter().getDirection() == -1
-                && characterRect.left < dstRect.left + MAX_NULL * viewComputeListener.getViewCompute().getPlantSize()
-                && characterRect.right > dstRect.left + MAX_NULL * viewComputeListener.getViewCompute().getPlantSize()) {
+        if(characterRect.right > dstRect.left + 0 * viewComputeListener.getViewCompute().getPlantSize()
+                && characterRect.right < dstRect.left + MAX_NULL * viewComputeListener.getViewCompute().getPlantSize()) {
 
-            jumpSquare.updateListener(squares.get(0).getDstRect());
+            glAirPlane.start();
+            glAirPlane.setDstRect(characterRect.centerX() - PAPER_AIR_PLANT_WIDTH / 2, 0, 0, 0);
 
+            float height =  characterRect.height();
+
+            viewComputeListener.getGLCharacter().setDstRect(
+                    characterRect.left,
+                    glAirPlane.getSrcRect().top - height,
+                    characterRect.right,
+                    glAirPlane.getSrcRect().top);
+
+            viewComputeListener.getGLCharacter().setCharacterState(GLCharacter.CHARACTER_IDLE);
+
+        } else if(characterRect.left < dstRect.left
+                && characterRect.right < dstRect.left) {
+
+            viewComputeListener.getGLCharacter().setDstRect(
+                    characterRect.left,
+                    viewComputeListener.getGLCharacter().getSrcRect().top,
+                    characterRect.right,
+                    viewComputeListener.getGLCharacter().getSrcRect().bottom);
+
+            glAirPlane.end();
+            glAirPlane.setDstRect(dstRect.left, 0, 0, 0);
         }
     }
 
@@ -210,11 +236,11 @@ public class GLMessage extends ComputeRect {
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if(contactImage.getDstRect().contains(e.getX(), e.getY()))
+                if(contactGLImage.getDstRect().contains(e.getX(), e.getY()))
                     isTactFocus = true;
                 break;
             case MotionEvent.ACTION_UP:
-                if(isTactFocus && contactImage.getDstRect().contains(e.getX(), e.getY())) {
+                if(isTactFocus && contactGLImage.getDstRect().contains(e.getX(), e.getY())) {
                     isClick = true;
                     activityListener.showDialogContact();
                 }
@@ -235,12 +261,12 @@ public class GLMessage extends ComputeRect {
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if(shareImage.getDstRect().contains(e.getX(), e.getY()))
+                if(shareGLImage.getDstRect().contains(e.getX(), e.getY()))
                     isShareFocus = true;
                 break;
             case MotionEvent.ACTION_UP:
 
-                if(isShareFocus  && shareImage.getDstRect().contains(e.getX(), e.getY())) {
+                if(isShareFocus  && shareGLImage.getDstRect().contains(e.getX(), e.getY())) {
                     isClick = true;
                     activityListener.showDialogShare();
                 }
@@ -261,12 +287,12 @@ public class GLMessage extends ComputeRect {
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if(githubImage.getDstRect().contains(e.getX(), e.getY()))
+                if(githubGLImage.getDstRect().contains(e.getX(), e.getY()))
                     isGithubFocus = true;
                 break;
             case MotionEvent.ACTION_UP:
 
-                if(isGithubFocus  && githubImage.getDstRect().contains(e.getX(), e.getY())) {
+                if(isGithubFocus  && githubGLImage.getDstRect().contains(e.getX(), e.getY())) {
                     isClick = true;
                     activityListener.showGitHubBrowser();
                 }

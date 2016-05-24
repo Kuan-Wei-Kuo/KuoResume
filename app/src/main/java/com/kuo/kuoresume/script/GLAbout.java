@@ -10,8 +10,7 @@ import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.GLTrees;
-import com.kuo.kuoresume.object.Image;
-import com.kuo.kuoresume.object.RectCollider;
+import com.kuo.kuoresume.object.GLImage;
 
 import java.util.ArrayList;
 
@@ -39,7 +38,7 @@ public class GLAbout extends ComputeRect {
 
     private SpriteController ownMusicSpriteController;
 
-    private Image build85, buddha, characterMusic, aboutCoffee;
+    private GLImage build85, buddha, characterMusic, aboutCoffee;
 
     private GLImageText glImageText1, glImageText2;
 
@@ -139,7 +138,7 @@ public class GLAbout extends ComputeRect {
 
         float scaling = viewComputeListener.getScaling();
 
-        aboutCoffee = new Image(new RectF(plantSize * 2,
+        aboutCoffee = new GLImage(new RectF(plantSize * 2,
                 plantHeight + COFFEE_HEIGHT * 0.1f - COFFEE_HEIGHT * scaling,
                 plantSize * 2 + COFFEE_WIDTH * scaling,
                 plantHeight + COFFEE_HEIGHT * 0.1f ));
@@ -156,7 +155,7 @@ public class GLAbout extends ComputeRect {
                 plantSize * 8 + plantSize * OBSTACLE_WIDTH,
                 plantHeight), new float[] {0, 0, 0, 1});
 
-        build85 = new Image(new RectF(plantSize * 14,
+        build85 = new GLImage(new RectF(plantSize * 14,
                 plantHeight - ImageDefaultSize.BUILD85_HEIGHT * scaling,
                 plantSize * 14 + ImageDefaultSize.BUILD85_WIDTH * scaling, plantHeight));
 
@@ -167,7 +166,7 @@ public class GLAbout extends ComputeRect {
                 BUILD_IMAGE_UV_BOX_WIDTH, 0
         });
 
-        buddha = new Image(new RectF(plantSize * 18,
+        buddha = new GLImage(new RectF(plantSize * 18,
                 plantHeight - ImageDefaultSize.BUILD85_HEIGHT * scaling,
                 plantSize * 18 + ImageDefaultSize.BUILD85_WIDTH * scaling,
                 plantHeight));
@@ -189,7 +188,7 @@ public class GLAbout extends ComputeRect {
 
         glImageText1 = new GLImageText(context, "Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
 
-        characterMusic = new Image(new RectF(plantSize * 29, plantHeight - CHARACTER_MUSIC_HEIGHT,
+        characterMusic = new GLImage(new RectF(plantSize * 29, plantHeight - CHARACTER_MUSIC_HEIGHT,
                 plantSize * 29 + CHARACTER_MUSIC_WIDTH, plantHeight));
 
         glImageText2 = new GLImageText(context, "My hobby", buddha.getSrcRect().right + plantSize * 4, plantHeight / 6);

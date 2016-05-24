@@ -22,7 +22,7 @@ public class GLTrees {
 
     private Random random = new Random();
 
-    private ArrayList<Image> trees = new ArrayList<>();
+    private ArrayList<GLImage> trees = new ArrayList<>();
 
     public GLTrees(int treeSize, float scaling, float width, float height) {
 
@@ -47,35 +47,35 @@ public class GLTrees {
             float right = left + TREE_WIDTH;
             float bottom = top + TREE_HEIGHT;
 
-            trees.add(new Image(new RectF(left, top, right, bottom)));
+            trees.add(new GLImage(new RectF(left, top, right, bottom)));
         }
     }
 
     public void draw(float[] m, RectF contentRect) {
 
-        for(Image image : trees) {
+        for(GLImage GLImage : trees) {
 
-            RectF rectF = image.getDstRect();
+            RectF rectF = GLImage.getDstRect();
 
             if(contentRect.contains(rectF.left, rectF.top)
                     || contentRect.contains(rectF.right  - 1, rectF.bottom - 1))
-                image.draw(m, 14);
+                GLImage.draw(m, 14);
 
         }
     }
 
     public void computeTrees(RectF dstRect) {
 
-        for(Image image : trees) {
+        for(GLImage GLImage : trees) {
 
-            RectF srcRect = image.getSrcRect();
+            RectF srcRect = GLImage.getSrcRect();
 
             float left = dstRect.left + srcRect.left;
             float top = dstRect.top + srcRect.top;
             float right = left + srcRect.width();
             float bottom = top + srcRect.height();
 
-            image.setDstRect(left, top, right, bottom);
+            GLImage.setDstRect(left, top, right, bottom);
 
         }
     }

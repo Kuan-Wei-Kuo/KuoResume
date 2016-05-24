@@ -18,7 +18,7 @@ public class GLProgress extends ComputeRect{
 
     private float[] mRotationMatrix = new float[16];
 
-    private Image image;
+    private GLImage GLImage;
 
     private GLImageText glText;
 
@@ -32,7 +32,7 @@ public class GLProgress extends ComputeRect{
     public GLProgress(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
 
-        image = new Image(new RectF(0, 0, 150, 150));
+        GLImage = new GLImage(new RectF(0, 0, 150, 150));
         glText = new GLImageText(context, "we love you just the way you are", 0, 0);
 
         width = (int) viewComputeListener.getViewCompute().getContentRect().width();
@@ -53,13 +53,13 @@ public class GLProgress extends ComputeRect{
             //Matrix.multiplyMM(m, 0, mRotationMatrix, 0, m, 0);
 
         }
-        image.draw(m, 5);
+        GLImage.draw(m, 5);
         glText.draw(m);
     }
 
     public void computeRect() {
 
-        RectF srcRect = image.getSrcRect();
+        RectF srcRect = GLImage.getSrcRect();
 
         float left = srcRect.left;
         float top = srcRect.top;
@@ -68,7 +68,7 @@ public class GLProgress extends ComputeRect{
 
         Log.d("left", left + "");
 
-        image.setDstRect(left, top, right, bottom);
+        GLImage.setDstRect(left, top, right, bottom);
     }
 
 }

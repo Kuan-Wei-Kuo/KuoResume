@@ -2,19 +2,16 @@ package com.kuo.kuoresume.script;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.data.ChartData;
 import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLChartRect;
-import com.kuo.kuoresume.object.GLClouds;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.GLText;
-import com.kuo.kuoresume.object.GLTrees;
-import com.kuo.kuoresume.object.Image;
+import com.kuo.kuoresume.object.GLImage;
 
 import java.util.ArrayList;
 
@@ -41,12 +38,12 @@ public class GLSkill extends ComputeRect{
 
     public float SKILL_TEXT_SIZE = 150;
 
-    private ArrayList<Image> grounds = new ArrayList<>();
+    private ArrayList<GLImage> grounds = new ArrayList<>();
     private ArrayList<GLSquare> squares = new ArrayList<>();
 
     private ArrayList<GLSquare> backgroundSquares = new ArrayList<>();
 
-    private Image levelSign, signWood, officeComputer, softwareComputer, languageComputer, skillPhone;
+    private GLImage levelSign, signWood, officeComputer, softwareComputer, languageComputer, skillPhone;
 
     private GLText signText, skillText;
 
@@ -139,7 +136,7 @@ public class GLSkill extends ComputeRect{
                 float right = left + plantSize;
                 float bottom = top + plantSize;
 
-                grounds.add(new Image(new RectF(left, top, right, bottom)));
+                grounds.add(new GLImage(new RectF(left, top, right, bottom)));
             }
         }
     }
@@ -154,7 +151,7 @@ public class GLSkill extends ComputeRect{
 
         skillText = new GLText("Skill", (int) SKILL_TEXT_SIZE, 0, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
 
-        skillPhone = new Image(new RectF(0, plantHeight - OBJECT_384PX_SIZE * scaling,
+        skillPhone = new GLImage(new RectF(0, plantHeight - OBJECT_384PX_SIZE * scaling,
                 OBJECT_384PX_SIZE * scaling, plantHeight));
 
         skillPhone.setUVS(new float[] {
@@ -164,7 +161,7 @@ public class GLSkill extends ComputeRect{
                 1, 0
         });
 
-        levelSign = new Image(new RectF(0,
+        levelSign = new GLImage(new RectF(0,
                 plantHeight - ImageDefaultSize.SIGN_HEIGHT * scaling,
                 ImageDefaultSize.SIGN_WIDTH * scaling,
                 plantHeight));
@@ -174,12 +171,12 @@ public class GLSkill extends ComputeRect{
         signText = new GLText(signString, (int) (ImageDefaultSize.SIGN_TEXT_SIZE * scaling),
                 0, plantHeight - plantSize * 4);
 
-        signWood = new Image(new RectF(plantSize * 4,
+        signWood = new GLImage(new RectF(plantSize * 4,
                 plantHeight - ImageDefaultSize.SIGN_WOOD_HEIGHT * scaling,
                 plantSize * 4 + ImageDefaultSize.SIGN_WOOD_WIDTH * scaling,
                 plantHeight));
 
-        officeComputer = new Image(new RectF(plantSize * 7,
+        officeComputer = new GLImage(new RectF(plantSize * 7,
                 plantHeight - OFFICE_COMPUTER_HEIGHT,
                 plantSize * 7 + OFFICE_COMPUTER_WIDTH,
                 plantHeight));
@@ -208,12 +205,12 @@ public class GLSkill extends ComputeRect{
 
         glImageText1 = new GLImageText(context, "SoftWare", plantSize * 8, plantHeight / 6);
 
-        softwareComputer = new Image(new RectF(plantSize * 8, 0, plantSize * 8 + glChartRect.getWidth() + plantSize, plantHeight));
+        softwareComputer = new GLImage(new RectF(plantSize * 8, 0, plantSize * 8 + glChartRect.getWidth() + plantSize, plantHeight));
 
         languageChart = new GLChartRect(context, 0, 0, languageChartData, viewComputeListener);
         languageChart.setPosition(softwareComputer.getSrcRect().right + plantSize * 1.5f, languageChart.getHeight() * 0.1f);
 
-        languageComputer = new Image(new RectF(softwareComputer.getSrcRect().right + plantSize, 0, softwareComputer.getSrcRect().right + plantSize + languageChart.getWidth() + plantSize, plantHeight));
+        languageComputer = new GLImage(new RectF(softwareComputer.getSrcRect().right + plantSize, 0, softwareComputer.getSrcRect().right + plantSize + languageChart.getWidth() + plantSize, plantHeight));
 
         glImageText2= new GLImageText(context, "Language", plantSize * 8, plantHeight / 6);
 

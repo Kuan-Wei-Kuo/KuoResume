@@ -3,7 +3,6 @@ package com.kuo.kuoresume.object;
 import android.content.Context;
 import android.graphics.RectF;
 
-import com.kuo.kuoresume.compute.ViewCompute;
 import com.kuo.kuoresume.data.ChartData;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 
@@ -26,7 +25,7 @@ public class GLChartRect {
 
     private ArrayList<ChartData> mChartData = new ArrayList<>();
 
-    private ArrayList<Image> images = new ArrayList<>();
+    private ArrayList<GLImage> GLImages = new ArrayList<>();
 
     private ArrayList<GLImageText> glImageTexts = new ArrayList<>();
 
@@ -74,9 +73,9 @@ public class GLChartRect {
                 float right = left + IMAGE_SIZE;
                 float bottom = top + IMAGE_SIZE;
 
-                Image image = new Image(new RectF(left, top, right, bottom));
+                GLImage GLImage = new GLImage(new RectF(left, top, right, bottom));
 
-                images.add(image);
+                GLImages.add(GLImage);
 
                 maxValue = Math.max(chartData.getValue(), maxValue);
 
@@ -146,9 +145,9 @@ public class GLChartRect {
 
     private void drawImage(float[] m) {
 
-        for(Image image : images) {
+        for(GLImage GLImage : GLImages) {
 
-            image.draw(m, 17);
+            GLImage.draw(m, 17);
 
         }
     }
@@ -175,14 +174,14 @@ public class GLChartRect {
     private void computeImageRect() {
 
         int count = 0;
-        for(Image image : images) {
+        for(GLImage GLImage : GLImages) {
 
-            float left = rawX + image.getSrcRect().left;
-            float top = rawY + masterText.getSrcRect().height() + image.getSrcRect().top;
+            float left = rawX + GLImage.getSrcRect().left;
+            float top = rawY + masterText.getSrcRect().height() + GLImage.getSrcRect().top;
             float right = left + IMAGE_SIZE;
             float bottom = top + IMAGE_SIZE;
 
-            image.setDstRect(left, top, right, bottom);
+            GLImage.setDstRect(left, top, right, bottom);
 
             count++;
         }

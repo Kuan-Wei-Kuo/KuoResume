@@ -13,7 +13,7 @@ import java.nio.ShortBuffer;
 /**
  * Created by Kuo on 2016/5/4.
  */
-public class Image {
+public class GLImage {
 
     // Use to access and set the view transformation
     private int mMVPMatrixHandle;
@@ -50,7 +50,7 @@ public class Image {
 
     private RectF srcRect = new RectF(0, 0, 0, 0);
 
-    public Image(RectF srcRect) {
+    public GLImage(RectF srcRect) {
 
         this.srcRect = srcRect;
 
@@ -127,6 +127,10 @@ public class Image {
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
         GLES20.glDisableVertexAttribArray(mTexCoordLoc);
+    }
+
+    public void setSrcRect(RectF srcRect) {
+        this.srcRect = srcRect;
     }
 
     public void setDstRect(float left, float top, float right, float bottom) {

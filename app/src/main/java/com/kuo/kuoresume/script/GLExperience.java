@@ -7,7 +7,7 @@ import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLSquare;
-import com.kuo.kuoresume.object.Image;
+import com.kuo.kuoresume.object.GLImage;
 
 import java.util.ArrayList;
 
@@ -41,16 +41,16 @@ public class GLExperience extends ComputeRect {
 
     private ArrayList<GLSquare> squares = new ArrayList<>();
 
-    private ArrayList<Image> images = new ArrayList<>();
-    private ArrayList<Image> productNames = new ArrayList<>();
-    private ArrayList<Image> productInterviews = new ArrayList<>();
-    private ArrayList<Image> productCards = new ArrayList<>();
+    private ArrayList<GLImage> GLImages = new ArrayList<>();
+    private ArrayList<GLImage> productNames = new ArrayList<>();
+    private ArrayList<GLImage> productInterviews = new ArrayList<>();
+    private ArrayList<GLImage> productCards = new ArrayList<>();
 
     private ArrayList<GLImageText> glImageTexts = new ArrayList<>();
 
     private String[] texts = {"MyChart Lib", "FirstAid Sprite", "Basketball Board", "Ur Coco"};
 
-    private Image experienceIcon;
+    private GLImage experienceIcon;
 
     public GLExperience(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
@@ -74,7 +74,7 @@ public class GLExperience extends ComputeRect {
 
         height = (int) viewComputeListener.getViewCompute().getContentRect().height();
 
-        experienceIcon = new Image(new RectF(0,
+        experienceIcon = new GLImage(new RectF(0,
                 height - viewComputeListener.getViewCompute().getPlantSize() - EXPERIENCE_ICON_SIZE,
                 EXPERIENCE_ICON_SIZE, height - viewComputeListener.getViewCompute().getPlantSize()));
 
@@ -111,7 +111,7 @@ public class GLExperience extends ComputeRect {
             float right = left + WHITE_CARD_WIDTH;
             float bottom = top + WHITE_CARD_HEIGHT;
 
-            Image productCard = new Image(new RectF(left, top, right, bottom));
+            GLImage productCard = new GLImage(new RectF(left, top, right, bottom));
 
             productCard.setUVS(new float[]{PRODUCT_384PX_UV_BOX_WIDTH * texts.length, 0,
                     PRODUCT_384PX_UV_BOX_WIDTH * texts.length, 1,
@@ -126,16 +126,16 @@ public class GLExperience extends ComputeRect {
             right = left + PRODUCT_ICON_SIZE;
             bottom = top + PRODUCT_ICON_SIZE;
 
-            Image image = new Image(new RectF(left, top, right, bottom));
+            GLImage GLImage = new GLImage(new RectF(left, top, right, bottom));
 
-            image.setUVS(new float[]{PRODUCT_384PX_UV_BOX_WIDTH * i, 0,
+            GLImage.setUVS(new float[]{PRODUCT_384PX_UV_BOX_WIDTH * i, 0,
                     PRODUCT_384PX_UV_BOX_WIDTH * i, 1,
                     PRODUCT_384PX_UV_BOX_WIDTH * i + PRODUCT_384PX_UV_BOX_WIDTH, 1,
                     PRODUCT_384PX_UV_BOX_WIDTH * i + PRODUCT_384PX_UV_BOX_WIDTH, 0});
 
-            images.add(image);
+            GLImages.add(GLImage);
 
-            Image productName = new Image(new RectF(right + PRODUCT_NAME_WIDTH * 0.2f, top,
+            GLImage productName = new GLImage(new RectF(right + PRODUCT_NAME_WIDTH * 0.2f, top,
                     right + PRODUCT_NAME_WIDTH * 0.2f + PRODUCT_NAME_WIDTH, top + PRODUCT_NAME_HEIGHT));
 
             productName.setUVS(new float[]{PRODUCT_NAME_UV_BOX_WIDTH * i, 0,
@@ -145,7 +145,7 @@ public class GLExperience extends ComputeRect {
 
             productNames.add(productName);
 
-            Image productInterview = new Image(new RectF(right + PRODUCT_NAME_WIDTH * 0.2f, top + PRODUCT_NAME_HEIGHT * 1.2f,
+            GLImage productInterview = new GLImage(new RectF(right + PRODUCT_NAME_WIDTH * 0.2f, top + PRODUCT_NAME_HEIGHT * 1.2f,
                     right + PRODUCT_NAME_WIDTH * 0.2f + PRODUCT_INTERVIEW_WIDTH, top + PRODUCT_NAME_HEIGHT * 1.2f + PRODUCT_INTERVIEW_HEIGHT));
 
             productInterview.setUVS(new float[]{PRODUCT_NAME_UV_BOX_WIDTH * i, 0,
@@ -176,17 +176,17 @@ public class GLExperience extends ComputeRect {
 
     private void drawImages(float[] mvpMatrix) {
 
-        for(Image image : productCards)
-            image.draw(mvpMatrix, 18);
+        for(GLImage GLImage : productCards)
+            GLImage.draw(mvpMatrix, 18);
 
-        for(Image image : images)
-            image.draw(mvpMatrix, 18);
+        for(GLImage GLImage : GLImages)
+            GLImage.draw(mvpMatrix, 18);
 
-        for(Image image : productNames)
-            image.draw(mvpMatrix, 11);
+        for(GLImage GLImage : productNames)
+            GLImage.draw(mvpMatrix, 11);
 
-        for(Image image : productInterviews)
-            image.draw(mvpMatrix, 19);
+        for(GLImage GLImage : productInterviews)
+            GLImage.draw(mvpMatrix, 19);
     }
 
     private void computeSquares() {
@@ -225,17 +225,17 @@ public class GLExperience extends ComputeRect {
 
     private void computeImages() {
 
-        for(Image image : images)
-            image.computeDstRect(dstRect);
+        for(GLImage GLImage : GLImages)
+            GLImage.computeDstRect(dstRect);
 
-        for(Image image : productNames)
-            image.computeDstRect(dstRect);
+        for(GLImage GLImage : productNames)
+            GLImage.computeDstRect(dstRect);
 
-        for(Image image : productCards)
-            image.computeDstRect(dstRect);
+        for(GLImage GLImage : productCards)
+            GLImage.computeDstRect(dstRect);
 
-        for(Image image : productInterviews)
-            image.computeDstRect(dstRect);
+        for(GLImage GLImage : productInterviews)
+            GLImage.computeDstRect(dstRect);
     }
 
 }
