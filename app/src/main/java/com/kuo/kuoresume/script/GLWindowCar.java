@@ -9,11 +9,11 @@ import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImage;
 
 /**
- * Created by Kuo on 2016/5/24.
+ * Created by Kuo on 2016/5/25.
  */
-public class GLAirPlane extends ComputeRect {
+public class GLWindowCar extends ComputeRect {
 
-    private GLImage airPlane;
+    private GLImage windowCar;
 
     private SampleAnimation upDownAnimation, moveAnimation;
 
@@ -21,11 +21,8 @@ public class GLAirPlane extends ComputeRect {
 
     private float speed = 30;
 
-    public GLAirPlane(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
+    public GLWindowCar(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
         super(context, viewComputeListener, objectListener);
-
-        airPlane = new GLImage(new RectF(srcRect));
-        airPlane.computeDstRect(dstRect);
 
         speed = speed * viewComputeListener.getScaling();
 
@@ -37,37 +34,39 @@ public class GLAirPlane extends ComputeRect {
     }
 
     public void draw(float[] m) {
-
         if(isStart) {
-            computeUVS();
             upDownAnimation.start();
-            moveAnimation.start();
-
             viewComputeListener.computeRect();
+
+            //Log.d("animation", "true");
         }
 
-        airPlane.draw(m, 21);
     }
 
     @Override
     public void setSrcRect(float left, float top, float right, float bottom) {
         super.setSrcRect(left, top, right, bottom);
 
-        airPlane.setSrcRect(srcRect);
+        windowCar = new GLImage(new RectF(left, top, right, bottom));
+        windowCar.computeDstRect(dstRect);
     }
 
     @Override
-    public void setDstRect(float left, float top, float right, float bottom) {
-        super.setDstRect(left, top, right, bottom);
+    public void setDstRect(RectF dstRect) {
+        super.setDstRect(dstRect);
 
-        airPlane.computeDstRect(dstRect);
+        windowCar.computeDstRect(dstRect);
     }
 
     @Override
     public void computeDstRect(RectF rawDstRect) {
         super.computeDstRect(rawDstRect);
 
-        airPlane.computeDstRect(dstRect);
+        windowCar.computeDstRect(dstRect);
+    }
+
+    public boolean isStart() {
+        return isStart;
     }
 
     public void start() {
@@ -76,27 +75,6 @@ public class GLAirPlane extends ComputeRect {
 
     public void end() {
         isStart = false;
-    }
-
-    private void computeUVS() {
-
-        int direction = viewComputeListener.getGLCharacter().getDirection();
-
-        if(direction == 1)
-            airPlane.setUVS(new float[] {
-                    0, 0,
-                    0, 1,
-                    1, 1,
-                    1, 0
-            });
-        else
-            airPlane.setUVS(new float[] {
-                    1, 0,
-                    1, 1,
-                    0, 1,
-                    0, 0
-            });
-
     }
 
     private SampleAnimation.OnUpdateListener onMoveListener = new SampleAnimation.OnUpdateListener() {
@@ -153,7 +131,5 @@ public class GLAirPlane extends ComputeRect {
             currentRect.bottom = bottom;
         }
     };
-
-
 
 }

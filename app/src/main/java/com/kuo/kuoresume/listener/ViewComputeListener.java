@@ -10,6 +10,8 @@ public interface ViewComputeListener {
 
     float getScaling();
 
+    void computeRect();
+
     ViewCompute getViewCompute();
 
     GLCharacter getGLCharacter();

@@ -282,7 +282,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         return needInvalidate;
     }
 
-    private void computeRect() {
+    @Override
+    public void computeRect() {
 
         RectF currentRect = viewCompute.getCurRect();
 

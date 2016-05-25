@@ -36,6 +36,8 @@ public class GLCharacter extends ComputeRect {
 
     public int CHARACTER_STATE;
 
+    private boolean motionEnable = true;
+
     private SampleAnimation moveAnimation, jumpAnimation, downAnimation;
     private SpriteController characterIdleController, characterRunController, characterJumpController;
 
@@ -148,26 +150,28 @@ public class GLCharacter extends ComputeRect {
 
     public void computeSprite(int CHARACTER_STATE) {
 
-        if(CHARACTER_STATE != CHARACTER_DOWN && CHARACTER_STATE != CHARACTER_JUMP && characterJumpController.isEnd() && !characterJumpController.isKeep())
-            if(CHARACTER_STATE == CHARACTER_RUN) {
-                moveAnimation.start();
-                characterRunController.start();
-            } else
-                characterIdleController.start();
-        else {
+        if(motionEnable) {
+            if(CHARACTER_STATE != CHARACTER_DOWN && CHARACTER_STATE != CHARACTER_JUMP && characterJumpController.isEnd() && !characterJumpController.isKeep())
+                if(CHARACTER_STATE == CHARACTER_RUN) {
+                    moveAnimation.start();
+                    characterRunController.start();
+                } else
+                    characterIdleController.start();
+            else {
 
-            if(!characterJumpController.isKeep()) {
-                characterJumpController.start();
-                moveAnimation.start();
-            } else {
-                characterJumpController.keepHorizontalFrame(3);
+                if(!characterJumpController.isKeep()) {
+                    characterJumpController.start();
+                    moveAnimation.start();
+                } else {
+                    characterJumpController.keepHorizontalFrame(3);
+                }
+
+                if(CHARACTER_STATE == CHARACTER_JUMP)
+                    jumpAnimation.start();
+
+                if(CHARACTER_STATE == CHARACTER_DOWN)
+                    downAnimation.start();
             }
-
-            if(CHARACTER_STATE == CHARACTER_JUMP)
-                jumpAnimation.start();
-
-            if(CHARACTER_STATE == CHARACTER_DOWN)
-                downAnimation.start();
         }
 
     }
@@ -218,7 +222,7 @@ public class GLCharacter extends ComputeRect {
             RectF curRect = viewComputeListener.getViewCompute().getCurRect();
             RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-            if(characterRun.getDstRect().centerX() == contentRect.centerX()) {
+            if(dstRect.centerX() == contentRect.centerX()) {
 
                 float width = curRect.width();
 
@@ -230,6 +234,7 @@ public class GLCharacter extends ComputeRect {
                     curRight = curLeft + width;
 
                     characterMove();
+
                 } else if(curRight < contentRect.right) {
                     curRight = contentRect.right;
                     curLeft = contentRect.right - width;
@@ -262,20 +267,10 @@ public class GLCharacter extends ComputeRect {
             float height = currentRect.height();
             float width = currentRect.width();
 
-            float left = currentRect.left;
-            float right = left + width;
-            float top = currentRect.top + moveSpeed * airDirection;
+            float top = srcRect.top + moveSpeed * airDirection;
             float bottom = top + height;
 
-            if (left > contentRect.left) {
-                left = contentRect.left;
-                right = left + width;
-            } else if (right < contentRect.right) {
-                right = contentRect.right;
-                left = right - width;
-            }
-
-            if (top > contentRect.top + CHARACTER_JUMP_HEIGHT) {
+            if (top > srcRect.top + CHARACTER_JUMP_HEIGHT) {
                 top = contentRect.top + CHARACTER_JUMP_HEIGHT;
                 bottom = top + height;
 
@@ -288,9 +283,7 @@ public class GLCharacter extends ComputeRect {
                 CHARACTER_STATE = CHARACTER_IDLE;
             }
 
-            currentRect.left = left;
             currentRect.top = top;
-            currentRect.right = right;
             currentRect.bottom = bottom;
         }
     };
@@ -453,21 +446,24 @@ public class GLCharacter extends ComputeRect {
                 right = contentRect.right;
                 left = contentRect.right - widths[i];
             } else if (left < contentRect.centerX() - widths[i] / 2
-                    && characterRun.getDstRect().centerX() > contentRect.centerX()) {
+                    && viewComputeListener.getViewCompute().getCurRect().left != contentRect.left
+                    && direction == -1) {
                 right = contentRect.centerX() + widths[i] / 2;
                 left = right - widths[i];
-            } else if(right > contentRect.centerX() + widths[i] / 2
-                    && characterRun.getDstRect().centerX() < contentRect.centerX()) {
+            } else if(right > contentRect.centerX() - widths[i] / 2
+                    && viewComputeListener.getViewCompute().getCurRect().right != contentRect.right
+                    && direction == 1) {
                 left = contentRect.centerX() - widths[i] / 2;
                 right = left +  widths[i];
             }
 
             if (i == 0) {
-                characterIdle.setDstRect(left, characterIdle.getSrcRect().top, right, characterRun.getSrcRect().bottom);
+                characterIdle.setDstRect(left, srcRect.top, right, srcRect.bottom);
                 setDstRect(left, srcRect.top, right, srcRect.bottom);
             } else if(i == 1) {
-                characterRun.setDstRect(left, characterRun.getSrcRect().top, right, characterRun.getSrcRect().bottom);
-                characterJump.setDstRect(left, characterRun.getSrcRect().top, right, characterRun.getSrcRect().bottom);
+                characterRun.setDstRect(left, srcRect.top, right, srcRect.bottom);
+                characterJump.setDstRect(left, srcRect.top, right, srcRect.bottom);
+                setDstRect(left, srcRect.top, right, srcRect.bottom);
             }
         }
     }
@@ -480,6 +476,10 @@ public class GLCharacter extends ComputeRect {
         characterRun.setDstRect(left, top, right, bottom);
         characterJump.setDstRect(left, top, right, bottom);
 
+    }
+
+    public void setMotionEnable(boolean motionEnable) {
+        this.motionEnable = motionEnable;
     }
 
     public void setDirection(int direction) {
