@@ -41,7 +41,7 @@ public class GLSkill extends ComputeRect{
     private ArrayList<GLImage> grounds = new ArrayList<>();
     private ArrayList<GLSquare> squares = new ArrayList<>();
 
-    private ArrayList<GLSquare> backgroundSquares = new ArrayList<>();
+    private GLSquare floorSquare;
 
     private GLImage levelSign, signWood, officeComputer, softwareComputer, languageComputer, skillPhone;
 
@@ -75,35 +75,9 @@ public class GLSkill extends ComputeRect{
         SKILL_TEXT_SIZE = SKILL_TEXT_SIZE * viewComputeListener.getScaling();
 
         createGrounds();
-        createBackgroundSquares();
         createSquares();
         createImage();
         computeRect();
-    }
-
-    private void createBackgroundSquares() {
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        float[] color_coffee = new float[] {0.521568f, 0.172549f, 0, 1f};
-        float[] color_yellow = new float[] {1f, 0.90588f, 0.439215f, 1f};
-
-        for(int j = 0 ; j < BACKGROUND_FLOOR_SIZE ; j++) {
-            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
-
-                float left = dstRect.left + plantSize * i;
-                float top = dstRect.bottom - plantSize * PLANT_FLOOR_SIZE + plantSize * j;
-                float right = left + plantSize;
-                float bottom = top + plantSize;
-
-                if(j < 2)
-                    backgroundSquares.add(new GLSquare(new RectF(left, top, right, bottom), color_coffee));
-                else
-                    backgroundSquares.add(new GLSquare(new RectF(left, top, right, bottom), color_yellow));
-
-            }
-        }
-
     }
 
     private void createSquares() {
@@ -121,6 +95,9 @@ public class GLSkill extends ComputeRect{
 
             squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
         }
+
+        floorSquare = new GLSquare(new RectF(0, height - plantSize * (PLANT_FLOOR_SIZE - 1), width, height), color);
+        floorSquare.setColliderListener(viewComputeListener.getGLCharacter().getCurrentJumpListener());
 
     }
 
@@ -231,6 +208,9 @@ public class GLSkill extends ComputeRect{
         bg_coffee_square.computeDstRect(dstRect);
 
         skillText.setLocation(dstRect.left, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
+
+        floorSquare.computeDstRect(dstRect);
+        floorSquare.startCollider(viewComputeListener.getGLCharacter().getDstRect());
 
         computeSquares();
         computeLevelSign();

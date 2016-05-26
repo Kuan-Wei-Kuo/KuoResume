@@ -144,8 +144,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         if(glCharacter.getCharacterState() == GLCharacter.CHARACTER_IDLE)
             glCharacter.computeSprite(GLCharacter.CHARACTER_IDLE);
 
-        if(jumpAndDownToSkill() || jumpAndDownToExperience() || isTouch
-                || glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP
+        if(isTouch || glCharacter.getCharacterState() == GLCharacter.CHARACTER_JUMP
                 || glCharacter.getCharacterState() == GLCharacter.CHARACTER_DOWN) {
 
             if(isTouch && glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP
@@ -220,66 +219,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         }
 
-    }
-
-    private boolean jumpAndDownToSkill() {
-
-        boolean needInvalidate = false;
-
-        if(glCharacter.getDstRect().right > glAbout.getDstRect().right
-                && glCharacter.getDirection() == 1
-                && glCharacter.getDstRect().left < glAbout.getDstRect().right) {
-
-            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
-                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-
-            viewCompute.setFloorHeight((GLSkill.PLANT_FLOOR_SIZE - 1) * viewCompute.getPlantSize());
-
-            needInvalidate = true;
-
-        } else if(glCharacter.getDstRect().left < glAbout.getDstRect().right
-                && glCharacter.getDirection() == -1
-                && glCharacter.getDstRect().right > glAbout.getDstRect().right) {
-
-            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
-                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-
-            viewCompute.setFloorHeight(0);
-
-            needInvalidate = true;
-        }
-
-        return needInvalidate;
-    }
-
-    private boolean jumpAndDownToExperience() {
-
-        boolean needInvalidate = false;
-
-        if(glCharacter.getDstRect().right > glSkill.getDstRect().right
-                && glCharacter.getDirection() == 1
-                && glCharacter.getDstRect().left < glSkill.getDstRect().right) {
-
-            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
-                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-
-            viewCompute.setFloorHeight(0);
-
-            needInvalidate = true;
-
-        } else if(glCharacter.getDstRect().left < glSkill.getDstRect().right
-                && glCharacter.getDirection() == -1
-                && glCharacter.getDstRect().right > glSkill.getDstRect().right) {
-
-            if(glCharacter.getCharacterState() != GLCharacter.CHARACTER_JUMP)
-                glCharacter.setCharacterState(GLCharacter.CHARACTER_JUMP);
-
-            viewCompute.setFloorHeight((GLSkill.PLANT_FLOOR_SIZE - 1) * viewCompute.getPlantSize());
-
-            needInvalidate = true;
-        }
-
-        return needInvalidate;
     }
 
     @Override

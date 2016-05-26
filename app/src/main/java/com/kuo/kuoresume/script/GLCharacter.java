@@ -42,7 +42,12 @@ public class GLCharacter extends ComputeRect {
     private SpriteController characterIdleController, characterRunController, characterJumpController;
 
     private float moveSpeed = 30;
+    private float jumpSpeed = 30;
+    private float speed;
     private int direction = 1, airDirection = 1;
+
+    private boolean isCurrentJump = false;
+    private boolean isCharacterJump = false;
 
     private GLImage characterRun, characterIdle, characterBoat, characterJump;
 
@@ -55,9 +60,10 @@ public class GLCharacter extends ComputeRect {
         CHARACTER_BOAT_WIDTH = CHARACTER_BOAT_WIDTH * viewComputeListener.getScaling();
         CHARACTER_BOAT_HEIGHT = CHARACTER_BOAT_HEIGHT * viewComputeListener.getScaling();
 
-        CHARACTER_JUMP_HEIGHT = viewComputeListener.getViewCompute().getPlantSize();
+        CHARACTER_JUMP_HEIGHT = viewComputeListener.getViewCompute().getPlantSize() * 3;
 
         moveSpeed = moveSpeed * viewComputeListener.getScaling();
+        jumpSpeed = jumpSpeed * viewComputeListener.getScaling();
 
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
@@ -146,18 +152,19 @@ public class GLCharacter extends ComputeRect {
 
     }
 
-
-
     public void computeSprite(int CHARACTER_STATE) {
 
         if(motionEnable) {
             if(CHARACTER_STATE != CHARACTER_DOWN && CHARACTER_STATE != CHARACTER_JUMP && characterJumpController.isEnd() && !characterJumpController.isKeep())
                 if(CHARACTER_STATE == CHARACTER_RUN) {
+                    speed = moveSpeed;
                     moveAnimation.start();
                     characterRunController.start();
                 } else
                     characterIdleController.start();
             else {
+
+                speed = moveSpeed * 0.7f;
 
                 if(!characterJumpController.isKeep()) {
                     characterJumpController.start();
@@ -176,10 +183,33 @@ public class GLCharacter extends ComputeRect {
 
     }
 
+    private RectCollider.ColliderListener currentJumpListener = new RectCollider.ColliderListener() {
+        @Override
+        public void start(RectF dstRect) {
+
+            isCurrentJump = true;
+
+            viewComputeListener.getViewCompute().setFloorHeight(dstRect.height());
+            setCharacterState(CHARACTER_JUMP);
+        }
+
+        @Override
+        public void end(RectF dstRect) {
+
+            isCurrentJump = true;
+
+            if(CHARACTER_STATE != CHARACTER_JUMP)
+                setCharacterState(CHARACTER_DOWN);
+
+            viewComputeListener.getViewCompute().setFloorHeight(0);
+        }
+    };
 
     private RectCollider.ColliderListener colliderListener = new RectCollider.ColliderListener() {
         @Override
         public void start(RectF dstRect) {
+
+            isCharacterJump = true;
 
             viewComputeListener.getViewCompute().setFloorHeight(dstRect.height());
             setCharacterState(CHARACTER_JUMP);
@@ -188,30 +218,14 @@ public class GLCharacter extends ComputeRect {
 
         @Override
         public void end(RectF dstRect) {
+
+            isCharacterJump = true;
 
             if(CHARACTER_STATE != CHARACTER_JUMP)
                 setCharacterState(CHARACTER_DOWN);
 
             viewComputeListener.getViewCompute().setFloorHeight(0);
 
-        }
-    };
-
-    private RectCollider.ColliderListener jumpMessage = new RectCollider.ColliderListener() {
-        @Override
-        public void start(RectF dstRect) {
-
-            viewComputeListener.getViewCompute().setFloorHeight(dstRect.height());
-            setCharacterState(CHARACTER_JUMP);
-        }
-
-        @Override
-        public void end(RectF dstRect) {
-
-            if(CHARACTER_STATE != CHARACTER_JUMP)
-                setCharacterState(CHARACTER_JUMP);
-
-            viewComputeListener.getViewCompute().setFloorHeight(0);
         }
     };
 
@@ -226,7 +240,7 @@ public class GLCharacter extends ComputeRect {
 
                 float width = curRect.width();
 
-                float curLeft = curRect.left - moveSpeed * direction;
+                float curLeft = curRect.left - speed * direction;
                 float curRight = curLeft + width;
 
                 if(curLeft > contentRect.left) {
@@ -259,32 +273,68 @@ public class GLCharacter extends ComputeRect {
             RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
             RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-            if (characterJumpController.getCurrentHorizontalFrame() > 2 || characterJumpController.isKeep())
-                airDirection = -1;
-            else
-                airDirection = 1;
+            if(isCurrentJump) {
 
-            float height = currentRect.height();
-            float width = currentRect.width();
+                if (characterJumpController.getCurrentHorizontalFrame() > 2 || characterJumpController.isKeep())
+                    airDirection = -1;
+                else
+                    airDirection = 1;
 
-            float top = srcRect.top + moveSpeed * airDirection;
-            float bottom = top + height;
+                float height = currentRect.height();
 
-            if (top > srcRect.top + CHARACTER_JUMP_HEIGHT) {
-                top = contentRect.top + CHARACTER_JUMP_HEIGHT;
-                bottom = top + height;
+                float top = currentRect.top + moveSpeed * airDirection;
+                float bottom = top + height;
 
-            } else if (contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() > bottom && airDirection == -1) {
-                bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();
-                top = bottom - height;
+                if (top > contentRect.top + CHARACTER_JUMP_HEIGHT) {
+                    top = contentRect.top + CHARACTER_JUMP_HEIGHT;
+                    bottom = top + height;
 
-                characterJumpController.setEnd(true);
-                characterJumpController.setKeep(false);
-                CHARACTER_STATE = CHARACTER_IDLE;
+                } else if (contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() > bottom && airDirection == -1) {
+
+                    bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();
+                    top = bottom - height;
+
+                    characterJumpController.setEnd(true);
+                    characterJumpController.setKeep(false);
+                    isCurrentJump = false;
+                    CHARACTER_STATE = CHARACTER_IDLE;
+                }
+
+                currentRect.top = top;
+                currentRect.bottom = bottom;
+
+            } else if(isCharacterJump) {
+
+                if (characterJumpController.getCurrentHorizontalFrame() > 2 || characterJumpController.isKeep())
+                    airDirection = 1;
+                else
+                    airDirection = -1;
+
+                float height = dstRect.height();
+
+                float top = dstRect.top + jumpSpeed * airDirection;
+                float bottom = top + height;
+
+                if (top < srcRect.top - CHARACTER_JUMP_HEIGHT) {
+
+                    top = srcRect.top - CHARACTER_JUMP_HEIGHT;
+                    bottom = top + height;
+
+                } else if (srcRect.bottom -  viewComputeListener.getViewCompute().getFloorHeight() < bottom
+                        && airDirection == 1) {
+
+                    bottom = srcRect.bottom - viewComputeListener.getViewCompute().getFloorHeight();
+                    top = bottom - height;
+
+                    characterJumpController.setEnd(true);
+                    characterJumpController.setKeep(false);
+                    isCharacterJump = false;
+                    CHARACTER_STATE = CHARACTER_IDLE;
+                }
+
+                setDstRect(dstRect.left, top, dstRect.right, bottom);
             }
 
-            currentRect.top = top;
-            currentRect.bottom = bottom;
         }
     };
 
@@ -295,29 +345,48 @@ public class GLCharacter extends ComputeRect {
             RectF currentRect = viewComputeListener.getViewCompute().getCurRect();
             RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
-            float height = currentRect.height();
-            float width = currentRect.width();
+            if(isCharacterJump) {
+                float height = dstRect.height();
 
-            float left = currentRect.left;
-            float right = left + width;
-            float top = currentRect.top + moveSpeed * -1;
-            float bottom = top + height;
+                float top = dstRect.top + jumpSpeed;
+                float bottom = top + height;
 
-            if (contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() > bottom) {
+                if (srcRect.bottom -  viewComputeListener.getViewCompute().getFloorHeight() < bottom) {
 
-                bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();
-                top = bottom - height;
+                    bottom = srcRect.bottom - viewComputeListener.getViewCompute().getFloorHeight();
+                    top = bottom - height;
 
-                characterJumpController.setEnd(true);
-                characterJumpController.setKeep(false);
-                CHARACTER_STATE = CHARACTER_IDLE;
+                    characterJumpController.setEnd(true);
+                    characterJumpController.setKeep(false);
+                    isCharacterJump = false;
+                    CHARACTER_STATE = CHARACTER_IDLE;
+                }
 
+                setDstRect(dstRect.left, top, dstRect.right, bottom);
+
+            } else if(isCurrentJump) {
+
+                float height = currentRect.height();
+
+                float top = currentRect.top + speed * -1;
+                float bottom = top + height;
+
+                if (contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() > bottom) {
+
+                    bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();
+                    top = bottom - height;
+
+                    characterJumpController.setEnd(true);
+                    characterJumpController.setKeep(false);
+                    isCurrentJump = false;
+                    CHARACTER_STATE = CHARACTER_IDLE;
+
+                }
+
+                currentRect.top = top;
+                currentRect.bottom = bottom;
             }
 
-            currentRect.left = left;
-            currentRect.top = top;
-            currentRect.right = right;
-            currentRect.bottom = bottom;
         }
     };
 
@@ -421,7 +490,9 @@ public class GLCharacter extends ComputeRect {
 
             if(contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() != currentRect.bottom)
                 characterJumpController.keepHorizontalFrame(3);
-             else
+            else if(srcRect.bottom != dstRect.bottom) {
+                characterJumpController.keepHorizontalFrame(3);
+            } else
                 CHARACTER_STATE = CHARACTER_IDLE;
 
         }
@@ -502,8 +573,7 @@ public class GLCharacter extends ComputeRect {
         return colliderListener;
     }
 
-    public RectCollider.ColliderListener getJumpMessage() {
-        return jumpMessage;
+    public RectCollider.ColliderListener getCurrentJumpListener() {
+        return currentJumpListener;
     }
-
 }
