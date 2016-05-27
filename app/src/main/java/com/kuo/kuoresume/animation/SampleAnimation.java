@@ -32,6 +32,7 @@ public class SampleAnimation {
 
     public interface OnUpdateListener {
         void onUpdate();
+        //void onSpecialUpdate();
     }
 
     public void setOnUpdateListener(OnUpdateListener onUpdateListener) {

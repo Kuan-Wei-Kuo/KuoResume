@@ -22,7 +22,7 @@ public class GLSetting {
         //GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, textureNames, 0);
         GLES20.glGenTextures(textureSize, textureNames, 0);
 
-        GLES20.glClearColor(0.7f, 0.7f, 0.9f, 1.0f);
+        GLES20.glClearColor(0f, 0f, 0f, 1.0f);
 
         // Set wrapping mode
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
@@ -43,8 +43,8 @@ public class GLSetting {
                 R.mipmap.bg_1, R.mipmap.office_door, R.mipmap.tag_2, R.mipmap.build_image, R.mipmap.sea, R.mipmap.office,
                 R.mipmap.product_name, R.mipmap.office_computer, R.mipmap.tree_1, R.mipmap.tree_2, R.mipmap.tree_3, R.mipmap.object_384px,
                 R.mipmap.circle_orange, R.mipmap.product_384px, R.mipmap.product_interview, R.mipmap.bg_build,
-                R.mipmap.paper_airplan, R.mipmap.logdown_main, R.mipmap.logo_gmail_128px, R.mipmap.share_icon,
-                R.mipmap.github_logo, R.mipmap.stickman_idle, R.mipmap.own_music, R.mipmap.computer_screen, R.mipmap.flicker_light, R.mipmap.gold_box};
+                R.mipmap.paper_airplan, R.mipmap.music_icon, R.mipmap.logo_gmail_128px, R.mipmap.share_icon,
+                R.mipmap.github_logo, R.mipmap.stickman_idle, R.mipmap.stickman_music, R.mipmap.computer_screen, R.mipmap.flicker_light, R.mipmap.gold_box};
 
         for(int i = 0 ; i < resId.length ; i++) {
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId[i]);

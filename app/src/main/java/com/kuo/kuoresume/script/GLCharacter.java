@@ -285,10 +285,9 @@ public class GLCharacter extends ComputeRect {
                 float top = currentRect.top + moveSpeed * airDirection;
                 float bottom = top + height;
 
-                if (top > contentRect.top + CHARACTER_JUMP_HEIGHT) {
-                    top = contentRect.top + CHARACTER_JUMP_HEIGHT;
+                if (top > contentRect.top) {
+                    top = contentRect.top;
                     bottom = top + height;
-
                 } else if (contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight() > bottom && airDirection == -1) {
 
                     bottom = contentRect.bottom + viewComputeListener.getViewCompute().getFloorHeight();

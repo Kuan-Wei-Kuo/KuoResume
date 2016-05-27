@@ -116,9 +116,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        bg = new GLImage(new RectF(0, 0, mScreenWidth, mScreenHeight));
-        bg.setDstRect(0, 0, mScreenWidth, mScreenHeight);
-
         glBackground = new GLBackground(mContext, this, objectListener);
         glBackground_1 = new GLBackground(mContext, this, objectListener);
 
@@ -157,9 +154,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         bg.draw(mMVPMatrix, 5);
 
-        glBackground.draw(mMVPMatrix);
+        //glBackground.draw(mMVPMatrix);
 
-        glBackground_1.draw(mMVPMatrix);
+        //glBackground_1.draw(mMVPMatrix);
 
         glAbout.draw(mMVPMatrix);
 
@@ -249,6 +246,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 glMessage.setDstRect(left, top, right, bottom);
         }
 
+        bg.computeDstRect(currentRect);
+
         glBackground.setDstRect(currentRect.left,
                 currentRect.top,
                 currentRect.left + glBackground.getWidth(),
@@ -294,6 +293,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glExperience.setSrcRect(0, viewCompute.getCurRect().height() - glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight());
         glMessage.setSrcRect(0, viewCompute.getCurRect().height() - glMessage.getHeight(), glMessage.getWidth(), glMessage.getHeight());
 
+        bg = new GLImage(new RectF(0, 0, viewCompute.getCurRect().width(), viewCompute.getCurRect().height()));
+        bg.computeDstRect(viewCompute.getCurRect());
     }
 
     private void computeScaling() {

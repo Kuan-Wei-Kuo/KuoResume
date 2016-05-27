@@ -54,7 +54,7 @@ public class SpriteController {
             }
         }
 
-        if(onUpdateListener != null && !isEnd && !isKeep)
+        if(onUpdateListener != null && !isKeep)
             onUpdateListener.onUpdate(currentHorizontalFrame);
 
     }

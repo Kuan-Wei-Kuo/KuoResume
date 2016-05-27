@@ -133,6 +133,10 @@ public class GLImage {
         this.srcRect = srcRect;
     }
 
+    public void setSrcRect(float left, float top, float right, float bottom) {
+        srcRect.set(left, top, right, bottom);
+    }
+
     public void setDstRect(float left, float top, float right, float bottom) {
 
         dstRect.set(left, top, right, bottom);

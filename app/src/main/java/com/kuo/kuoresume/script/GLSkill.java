@@ -275,7 +275,6 @@ public class GLSkill extends ComputeRect{
 
     public void draw(float[] mvpMatrix) {
 
-
         RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
 
         if(dstRect.contains(contentRect.left, contentRect.top)
@@ -286,8 +285,6 @@ public class GLSkill extends ComputeRect{
             drawSquares(mvpMatrix);
 
             skillPhone.draw(mvpMatrix, 16);
-
-            officeComputer.draw(mvpMatrix, 10);
 
             softwareComputer.draw(mvpMatrix, 28);
             glChartRect.draw(mvpMatrix);
