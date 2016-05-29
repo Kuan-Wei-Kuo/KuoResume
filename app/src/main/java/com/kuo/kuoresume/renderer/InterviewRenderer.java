@@ -19,6 +19,7 @@ import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLBackground;
 import com.kuo.kuoresume.script.GLCharacter;
 import com.kuo.kuoresume.script.GLExperience;
+import com.kuo.kuoresume.script.GLInterview;
 import com.kuo.kuoresume.script.GLMessage;
 import com.kuo.kuoresume.script.GLSetting;
 import com.kuo.kuoresume.script.GLSkill;
@@ -59,6 +60,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     GLBackground glBackground, glBackground_1;
     GLSetting glSetting;
+    GLInterview glInterview;
     GLAbout glAbout;
     GLSkill glSkill;
     GLExperience glExperience;
@@ -122,6 +124,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glSquare = new GLSquare(new RectF(0, 500, 200, 700), new float[] {1, 0.5f, 1, 1});
 
         glCharacter = new GLCharacter(mContext, this, objectListener);
+        glInterview = new GLInterview(mContext, this, objectListener);
         glAbout = new GLAbout(mContext, this, objectListener);
         glSkill = new GLSkill(mContext, this, objectListener);
         glExperience = new GLExperience(mContext, this, objectListener);
@@ -157,6 +160,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         //glBackground.draw(mMVPMatrix);
 
         //glBackground_1.draw(mMVPMatrix);
+
+        glInterview.draw(mMVPMatrix);
 
         glAbout.draw(mMVPMatrix);
 
@@ -223,9 +228,9 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         RectF currentRect = viewCompute.getCurRect();
 
-        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
-        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
-        float[] tops = {glAbout.getSrcRect().top, glSkill.getSrcRect().top, glExperience.getSrcRect().top, glMessage.getSrcRect().top};
+        float[] widths = {glInterview.getWidth(), glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
+        float[] heights = {glInterview.getHeight(), glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
+        float[] tops = {glInterview.getSrcRect().top, glAbout.getSrcRect().top, glSkill.getSrcRect().top, glExperience.getSrcRect().top, glMessage.getSrcRect().top};
 
         float left, top, right = 0, bottom;
 
@@ -237,12 +242,14 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
             bottom = top + heights[i];
 
             if (i == 0)
+                glInterview.setDstRect(left, top, right, bottom);
+            else if (i == 1)
                 glAbout.setDstRect(left, top, right, bottom);
-            else if(i == 1)
-                glSkill.setDstRect(left, top, right, bottom);
             else if(i == 2)
-                glExperience.setDstRect(left, top, right, bottom);
+                glSkill.setDstRect(left, top, right, bottom);
             else if(i == 3)
+                glExperience.setDstRect(left, top, right, bottom);
+            else if(i == 4)
                 glMessage.setDstRect(left, top, right, bottom);
         }
 
@@ -261,7 +268,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
                 currentRect.bottom);
 
         glBackground_1.computeRect();
-
+        glInterview.computeRect();
         glAbout.computeRect();
         glSkill.computeRect();
         glExperience.computeRect();
@@ -270,8 +277,8 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     private void computeCurrentRect() {
 
-        float[] widths = {glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
-        float[] heights = {glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
+        float[] widths = {glInterview.getWidth(), glAbout.getWidth(), glSkill.getWidth(), glExperience.getWidth(), glMessage.getWidth()};
+        float[] heights = {glInterview.getHeight(), glAbout.getHeight(), glSkill.getHeight(), glExperience.getHeight(), glMessage.getHeight()};
 
         float totalWidth = 0;
         float maxHeight = 0;
@@ -288,6 +295,7 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         else
             viewCompute.setCurRect(new RectF(0, mScreenHeight - maxHeight, totalWidth, mScreenHeight));
 
+        glInterview.setSrcRect(0, viewCompute.getCurRect().height() - glInterview.getHeight(), glInterview.getWidth(), glInterview.getHeight());
         glAbout.setSrcRect(0, viewCompute.getCurRect().height() - glAbout.getHeight(), glAbout.getWidth(), glAbout.getHeight());
         glSkill.setSrcRect(0, viewCompute.getCurRect().height() - glSkill.getHeight(), glSkill.getWidth(), glSkill.getHeight());
         glExperience.setSrcRect(0, viewCompute.getCurRect().height() - glExperience.getHeight(), glExperience.getWidth(), glExperience.getHeight());

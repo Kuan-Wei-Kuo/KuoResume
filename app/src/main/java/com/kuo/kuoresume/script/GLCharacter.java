@@ -247,7 +247,7 @@ public class GLCharacter extends ComputeRect {
                     curLeft = contentRect.left;
                     curRight = curLeft + width;
 
-                    characterMove();
+                    //characterMove();
 
                 } else if(curRight < contentRect.right) {
                     curRight = contentRect.right;
@@ -528,12 +528,12 @@ public class GLCharacter extends ComputeRect {
             }
 
             if (i == 0) {
-                characterIdle.setDstRect(left, srcRect.top, right, srcRect.bottom);
-                setDstRect(left, srcRect.top, right, srcRect.bottom);
+                characterIdle.setDstRect(left, dstRect.top, right, dstRect.bottom);
+                setDstRect(left, dstRect.top, right, dstRect.bottom);
             } else if(i == 1) {
-                characterRun.setDstRect(left, srcRect.top, right, srcRect.bottom);
-                characterJump.setDstRect(left, srcRect.top, right, srcRect.bottom);
-                setDstRect(left, srcRect.top, right, srcRect.bottom);
+                characterRun.setDstRect(left, dstRect.top, right, dstRect.bottom);
+                characterJump.setDstRect(left, dstRect.top, right, dstRect.bottom);
+                setDstRect(left, dstRect.top, right, dstRect.bottom);
             }
         }
     }

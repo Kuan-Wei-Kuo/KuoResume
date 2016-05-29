@@ -26,11 +26,11 @@ public class GLExperience extends ComputeRect {
 
     private float PRODUCT_ICON_SIZE = 160;
 
-    private float WHITE_CARD_WIDTH = 650;
-    private float WHITE_CARD_HEIGHT = 300;
+    private float WHITE_CARD_WIDTH = 550;
+    private float WHITE_CARD_HEIGHT = 250;
 
-    private float PRODUCT_INTERVIEW_WIDTH = 384;
-    private float PRODUCT_INTERVIEW_HEIGHT = 100;
+    private float PRODUCT_INTERVIEW_WIDTH = 300;
+    private float PRODUCT_INTERVIEW_HEIGHT = 90;
 
     private float PRODUCT_384px_SIZE = 200;
 

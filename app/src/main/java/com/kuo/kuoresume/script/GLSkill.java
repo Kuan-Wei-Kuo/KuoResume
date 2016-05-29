@@ -24,28 +24,25 @@ public class GLSkill extends ComputeRect{
 
     private static final float OBJECT_384PX_SIZE = 384;
 
-    public static final int PLANT_FLOOR_SIZE = 3;
-    public static final int BACKGROUND_FLOOR_SIZE = 5;
+    private static final int PLANT_FLOOR_SIZE = 3;
+    private static final int BACKGROUND_FLOOR_SIZE = 5;
 
-    public float OFFICE_COMPUTER_WIDTH = 192;
-    public float OFFICE_COMPUTER_HEIGHT = 137;
+    private float OFFICE_COMPUTER_WIDTH = 192;
+    private float OFFICE_COMPUTER_HEIGHT = 137;
 
-    public float OFFICE_DOOR_WIDTH = 106;
-    public float OFFICE_DOOR_HEIGHT = 200;
+    private float OFFICE_DOOR_WIDTH = 106;
+    private float OFFICE_DOOR_HEIGHT = 200;
 
     private float OFFICE_WIDTH = 400;
     private float OFFICE_HEIGHT = 300;
 
     public float SKILL_TEXT_SIZE = 150;
 
-    private ArrayList<GLImage> grounds = new ArrayList<>();
     private ArrayList<GLSquare> squares = new ArrayList<>();
 
     private GLSquare floorSquare;
 
-    private GLImage levelSign, signWood, officeComputer, softwareComputer, languageComputer, skillPhone;
-
-    private GLText signText, skillText;
+    private GLImage officeComputer, softwareComputer, languageComputer, skillPhone;
 
     private GLChartRect glChartRect, languageChart;
 
@@ -74,7 +71,6 @@ public class GLSkill extends ComputeRect{
 
         SKILL_TEXT_SIZE = SKILL_TEXT_SIZE * viewComputeListener.getScaling();
 
-        createGrounds();
         createSquares();
         createImage();
         computeRect();
@@ -101,23 +97,6 @@ public class GLSkill extends ComputeRect{
 
     }
 
-    private void createGrounds() {
-
-        float plantSize = viewComputeListener.getViewCompute().getPlantSize();
-
-        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
-            for(int i = 0 ; i < PLANT_RANGE_SIZE ; i++) {
-
-                float left = dstRect.left + plantSize * i;
-                float top = dstRect.bottom + plantSize * j;
-                float right = left + plantSize;
-                float bottom = top + plantSize;
-
-                grounds.add(new GLImage(new RectF(left, top, right, bottom)));
-            }
-        }
-    }
-
     private void createImage() {
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
@@ -125,8 +104,6 @@ public class GLSkill extends ComputeRect{
         float plantHeight = height - plantSize * PLANT_FLOOR_SIZE;
 
         float scaling = viewComputeListener.getScaling();
-
-        skillText = new GLText("Skill", (int) SKILL_TEXT_SIZE, 0, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
 
         skillPhone = new GLImage(new RectF(0, plantHeight - OBJECT_384PX_SIZE * scaling,
                 OBJECT_384PX_SIZE * scaling, plantHeight));
@@ -137,21 +114,6 @@ public class GLSkill extends ComputeRect{
                 1, 1,
                 1, 0
         });
-
-        levelSign = new GLImage(new RectF(0,
-                plantHeight - ImageDefaultSize.SIGN_HEIGHT * scaling,
-                ImageDefaultSize.SIGN_WIDTH * scaling,
-                plantHeight));
-
-        String signString = "Level 2" +
-                "";
-        signText = new GLText(signString, (int) (ImageDefaultSize.SIGN_TEXT_SIZE * scaling),
-                0, plantHeight - plantSize * 4);
-
-        signWood = new GLImage(new RectF(plantSize * 4,
-                plantHeight - ImageDefaultSize.SIGN_WOOD_HEIGHT * scaling,
-                plantSize * 4 + ImageDefaultSize.SIGN_WOOD_WIDTH * scaling,
-                plantHeight));
 
         officeComputer = new GLImage(new RectF(plantSize * 7,
                 plantHeight - OFFICE_COMPUTER_HEIGHT,
@@ -207,13 +169,10 @@ public class GLSkill extends ComputeRect{
         bg_yellow_square.computeDstRect(dstRect);
         bg_coffee_square.computeDstRect(dstRect);
 
-        skillText.setLocation(dstRect.left, plantHeight - OFFICE_DOOR_HEIGHT * 1.2f);
-
         floorSquare.computeDstRect(dstRect);
         floorSquare.startCollider(viewComputeListener.getGLCharacter().getDstRect());
 
         computeSquares();
-        computeLevelSign();
         computeSoftwareRect();
         computeLanguageRect();
 
@@ -221,14 +180,6 @@ public class GLSkill extends ComputeRect{
         softwareComputer.computeDstRect(dstRect);
         languageComputer.computeDstRect(dstRect);
         officeComputer.computeDstRect(dstRect);
-    }
-
-    private void computeLevelSign() {
-
-        levelSign.computeDstRect(dstRect);
-
-        signText.setLocation(levelSign.getDstRect().centerX() - signText.getWidth() / 2,
-                levelSign.getDstRect().top + signText.getHeight());
     }
 
     private void computeSoftwareRect() {

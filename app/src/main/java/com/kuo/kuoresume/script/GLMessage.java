@@ -27,23 +27,17 @@ public class GLMessage extends ComputeRect {
     public float PAPER_AIR_PLANT_WIDTH = 384 * 0.5f;
     public float PAPER_AIR_PLANT_HEIGHT = 136 * 0.5f;
 
-    public static final int PLANT_FLOOR_SIZE = 10;
+    public static final int PLANT_FLOOR_SIZE = 1;
     public static final int MIN_NULL = 5;
-    public static final int MAX_NULL = 15;
+    public static final int MAX_NULL = 10;
 
     private GLImage shareGLImage, contactGLImage, githubGLImage, goldBoxGLImage, flickerLight, bgBuild;
 
-    private GLAirPlane glAirPlane;
-
-    private GLWindowCar glWindowCar;
-
-    private GLSquare jumpSquare;
+    private GLSquare jumpSquare, ground;
 
     private SpriteController flickerLightSprite;
 
     private ActivityListener activityListener;
-
-    private ArrayList<GLSquare> squares = new ArrayList<>();
 
     public GLMessage(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener, ActivityListener activityListener) {
         super(context, viewComputeListener, objectListener);
@@ -75,44 +69,28 @@ public class GLMessage extends ComputeRect {
 
         float[] color = new float[] {0, 0, 0, 1f};
 
-        for(int j = 0 ; j < PLANT_FLOOR_SIZE ; j++) {
+        ground = new GLSquare(new RectF(0, height - plantSize, width, height), color);
 
-            float left = MAX_NULL * plantSize;
-            float top = height - plantSize - plantSize * j;
-            float right = left + width;
-            float bottom = top + plantSize;
+        jumpSquare = new GLSquare(new RectF(0, height - plantSize * 3,
+                MAX_NULL * plantSize, height - plantSize), color);
 
-            squares.add(new GLSquare(new RectF(left, top, right, bottom), color));
-        }
+        jumpSquare.setColliderListener(viewComputeListener.getGLCharacter().getColliderListener());
 
-        jumpSquare = new GLSquare(new RectF(MIN_NULL * plantSize, height,
-                width, height), color);
-
-        RectF contentRect = viewComputeListener.getViewCompute().getContentRect();
-
-        glAirPlane = new GLAirPlane(context, viewComputeListener, objectListener);
-        glAirPlane.setSrcRect(MIN_NULL * plantSize - PAPER_AIR_PLANT_WIDTH,
-                contentRect.bottom - plantSize - PAPER_AIR_PLANT_HEIGHT ,
-                MIN_NULL * plantSize, contentRect.bottom - plantSize );
-
-        glAirPlane.setDstRect(dstRect.left, 0, 0, 0);
-
-        glWindowCar = new GLWindowCar(context, viewComputeListener, objectListener);
-        glWindowCar.setSrcRect(MIN_NULL * plantSize - PAPER_AIR_PLANT_WIDTH,
-                contentRect.bottom - plantSize - PAPER_AIR_PLANT_HEIGHT ,
-                MIN_NULL * plantSize, contentRect.bottom - plantSize );
-
-        glWindowCar.setDstRect(dstRect.left, 0, 0, 0);
-        //jumpSquare.setColliderListener(viewComputeListener.getGLCharacter().getJumpMessage());
     }
 
-    private static final float IMAGE_SIZE = 110;
+    private static final float IMAGE_SIZE = 100;
+
+    private float GOLD_BOX_WIDTH = 250;
+    private float GOLD_BOX_HEIGHT = 250;
 
     private void createImage() {
 
         float plantSize = viewComputeListener.getViewCompute().getPlantSize();
 
         float imageSize = IMAGE_SIZE * viewComputeListener.getScaling();
+
+        GOLD_BOX_WIDTH = GOLD_BOX_WIDTH * viewComputeListener.getScaling();
+        GOLD_BOX_HEIGHT = GOLD_BOX_HEIGHT * viewComputeListener.getScaling();
 
         float left = 0, right = 0, top = 0, bottom = imageSize;
 
@@ -129,8 +107,8 @@ public class GLMessage extends ComputeRect {
                 contactGLImage = new GLImage(new RectF(left, top, right, bottom));
         }
 
-        goldBoxGLImage = new GLImage(new RectF(width - plantSize * 2 - imageSize,
-                height - plantSize - imageSize,
+        goldBoxGLImage = new GLImage(new RectF(width - plantSize * 2 - GOLD_BOX_WIDTH,
+                height - plantSize - GOLD_BOX_HEIGHT,
                 width - plantSize * 2,
                 height - plantSize));
 
@@ -167,29 +145,24 @@ public class GLMessage extends ComputeRect {
     };
 
     public void draw(float[] m) {
-        bgBuild.draw(m, 20);
-        glWindowCar.draw(m);
-        flickerLightSprite.start();
+
+        ground.draw(m);
+        jumpSquare.draw(m);
+        //flickerLightSprite.start();
         contactGLImage.draw(m, 23);
         githubGLImage.draw(m, 25);
         shareGLImage.draw(m, 24);
-        flickerLight.draw(m, 29);
+        //flickerLight.draw(m, 29);
         goldBoxGLImage.draw(m, 30);
-        drawSquares(m);
 
-    }
-
-    private void drawSquares(float[] mvpMatrix) {
-
-        for(GLSquare glSquare : squares)
-            glSquare.draw(mvpMatrix);
     }
 
     public void computeRect() {
-        computeSquares();
 
         jumpSquare.startCollider(viewComputeListener.getGLCharacter().getDstRect());
         jumpSquare.computeDstRect(dstRect);
+
+        ground.computeDstRect(dstRect);
 
         bgBuild.setDstRect(dstRect.left, 0, dstRect.right, height);
         contactGLImage.computeDstRect(dstRect);
@@ -197,40 +170,6 @@ public class GLMessage extends ComputeRect {
         shareGLImage.computeDstRect(dstRect);
         goldBoxGLImage.computeDstRect(dstRect);
         flickerLight.computeDstRect(dstRect);
-
-        RectF characterRect = viewComputeListener.getGLCharacter().getDstRect();
-
-        if(characterRect.right > dstRect.left
-                && characterRect.left < dstRect.left) {
-
-            if(viewComputeListener.getViewCompute().getCurRect().top == viewComputeListener.getViewCompute().getContentRect().top
-                    && glWindowCar.isStart()
-                    || viewComputeListener.getViewCompute().getCurRect().bottom == viewComputeListener.getViewCompute().getContentRect().bottom
-                    && glWindowCar.isStart()) {
-
-                glWindowCar.end();
-                viewComputeListener.getGLCharacter().setMotionEnable(true);
-
-            } else if(viewComputeListener.getViewCompute().getCurRect().top == viewComputeListener.getViewCompute().getContentRect().top
-                    && !glWindowCar.isStart()
-                    || viewComputeListener.getViewCompute().getCurRect().bottom == viewComputeListener.getViewCompute().getContentRect().bottom
-                    && !glWindowCar.isStart()) {
-
-                glWindowCar.start();
-                glWindowCar.setDstRect(characterRect.centerX() - PAPER_AIR_PLANT_WIDTH / 2, 0, 0, 0);
-
-                viewComputeListener.getGLCharacter().setCharacterState(GLCharacter.CHARACTER_IDLE);
-
-                viewComputeListener.getGLCharacter().setMotionEnable(false);
-            }
-        }
-
-    }
-
-    private void computeSquares() {
-
-        for (GLSquare glSquare : squares)
-            glSquare.computeDstRect(dstRect);
 
     }
 
