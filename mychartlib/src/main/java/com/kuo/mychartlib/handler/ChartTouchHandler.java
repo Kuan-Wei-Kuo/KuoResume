@@ -5,6 +5,7 @@ import android.support.v4.view.ViewCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.ViewParent;
 
 import com.kuo.mychartlib.listener.ChartListener;
 import com.kuo.mychartlib.model.SelectData;
@@ -39,6 +40,8 @@ public class ChartTouchHandler {
 
     protected boolean enable = true;
 
+    protected ViewParent viewParent;
+
     public ChartTouchHandler(Context context, ChartListener chartListener) {
 
         this.chartListener = chartListener;
@@ -64,9 +67,13 @@ public class ChartTouchHandler {
         this.enable = enable;
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event, ViewParent viewParent) {
 
         if(enable) {
+
+            this.viewParent = viewParent;
+
+            disallowParentInterceptTouchEvent();
 
             boolean isInvalidate = scaleGestureDetector.onTouchEvent(event) && gestureDetector.onTouchEvent(event);
 
@@ -79,6 +86,23 @@ public class ChartTouchHandler {
         }
 
         return false;
+    }
+
+    private void disallowParentInterceptTouchEvent() {
+        if (null != viewParent)
+            viewParent.requestDisallowInterceptTouchEvent(true);
+    }
+
+    private void allowParentInterceptTouchEvent() {
+        if (null != viewParent) {
+            if (!computeScroll.isCanScrollX()
+                    && !scaleGestureDetector.isInProgress()) {
+                viewParent.requestDisallowInterceptTouchEvent(false);
+            } else if (!computeScroll.isCanScrollY()
+                    && !scaleGestureDetector.isInProgress()) {
+                viewParent.requestDisallowInterceptTouchEvent(false);
+            }
+        }
     }
 
     public boolean isEnable() {
@@ -108,6 +132,9 @@ public class ChartTouchHandler {
                     break;
 
             }
+
+            allowParentInterceptTouchEvent();
+
             return true;
         }
     }
@@ -126,6 +153,7 @@ public class ChartTouchHandler {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 
             computeScroll.startScroll(distanceX, distanceY, chartCompute);
+            allowParentInterceptTouchEvent();
 
             return true;
         }

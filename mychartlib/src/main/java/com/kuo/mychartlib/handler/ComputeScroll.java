@@ -13,6 +13,8 @@ public class ComputeScroll {
 
     private Scroller mScroller;
 
+    private boolean canScrollX, canScrollY;
+
     public ComputeScroll(Context context) {
         mScroller = new Scroller(context);
     }
@@ -34,17 +36,25 @@ public class ComputeScroll {
         boolean enableX = false;
         boolean enableY = false;
 
+        canScrollX = false;
+        canScrollY = false;
+
         if(curViewport.left < minViewport.left && distanceX <= 0) {
+            canScrollX = true;
             enableX = true;
         } else if(curViewport.right > minViewport.right && distanceX >= 0) {
+            canScrollX = true;
             enableX = true;
         }
 
         if(curViewport.top < minViewport.top && distanceY <= 0) {
+            canScrollY = true;
             enableY = true;
         } else if(curViewport.bottom > minViewport.bottom && distanceY >= 0) {
+            canScrollY = true;
             enableY = true;
         }
+
 
         if(enableX || enableY)
             chartCompute.containsCurrentViewport(left, top, right, bottom);
@@ -87,6 +97,14 @@ public class ComputeScroll {
         }
 
         return false;
+    }
+
+    public boolean isCanScrollX() {
+        return canScrollX;
+    }
+
+    public boolean isCanScrollY() {
+        return canScrollY;
     }
 
     protected void stopAnimation() {
