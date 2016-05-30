@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/KuoResume.iml" filepath="$PROJECT_DIR$/KuoResume.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mychartlib/mychartlib.iml" filepath="$PROJECT_DIR$/mychartlib/mychartlib.iml" />
     </modules>
   </component>
 </project>

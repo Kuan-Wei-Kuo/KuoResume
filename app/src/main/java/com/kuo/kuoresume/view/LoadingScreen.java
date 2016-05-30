@@ -7,11 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.kuo.kuoresume.R;
 import com.kuo.kuoresume.until.Until;
@@ -41,12 +39,14 @@ public class LoadingScreen extends View {
 
     private Random random;
 
-    private String[] loadingTexts = {"Why don't you order a sandwich ?",
-            "Follow the white rabbit",
-            "We love you just the way you are",
-            "You're not in Kansas any more",
-            "We're testing your patience",
-            "Loading humorous message"};
+    private boolean isFirstDraw = true, isRun = true;
+
+    private String[] loadingTexts = {"你怎麼不去點的三明治?",
+            "正在加快載入中...",
+            "玩家等到不開心囉!",
+            "不小心切斷電源了...",
+            "將重新啟動...",
+            "這是一則載入的訊息..."};
 
     private String loadingText;
 
@@ -73,34 +73,38 @@ public class LoadingScreen extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        long time  = System.currentTimeMillis();
+        if(isRun) {
 
-        if (time > lastFrameChangeTime + frameLengthInMilliseconds) {
+            long time  = System.currentTimeMillis();
 
-            lastFrameChangeTime = time;
+            if (time > lastFrameChangeTime + frameLengthInMilliseconds) {
 
-            angles += 20;
+                lastFrameChangeTime = time;
 
-            if (angles >= 360)
-                angles = 0;
+                angles += 30;
 
-            matrix.reset();
-            matrix.postRotate(angles, srcRect.centerX(), srcRect.centerY());
-            matrix.postTranslate(getWidth() / 2, getHeight() / 2);
+                if (angles >= 360)
+                    angles = 0;
+
+                matrix.reset();
+                matrix.postRotate(angles, srcRect.centerX(), srcRect.centerY());
+                matrix.postTranslate(getWidth() / 2 - srcRect.width() / 2, getHeight() / 2 - srcRect.height() / 2);
+            }
+
+            if(time > textLastFrameChangeTime + textFrameLengthInMilliseconds) {
+
+                textLastFrameChangeTime = time;
+
+                loadingText = loadingTexts[random.nextInt(loadingTexts.length)];
+            }
+
+            canvas.drawColor(Color.WHITE);
+            canvas.drawBitmap(loadingBitmap, matrix, null);
+            canvas.drawText(loadingText, getWidth() / 2, getHeight() / 1.5f , paint);
+
+            postInvalidate();
+
         }
-
-        if(time > textLastFrameChangeTime + textFrameLengthInMilliseconds) {
-
-            textLastFrameChangeTime = time;
-
-            loadingText = loadingTexts[random.nextInt(loadingTexts.length)];
-        }
-
-        canvas.drawColor(Color.WHITE);
-        canvas.drawBitmap(loadingBitmap, matrix, null);
-        canvas.drawText(loadingText, getWidth() / 2, getHeight() / 1.5f , paint);
-
-        postInvalidate();
     }
 
     private void createLoadingBitmap() {
@@ -121,4 +125,15 @@ public class LoadingScreen extends View {
         loadingText = loadingTexts[random.nextInt(loadingTexts.length)];
     }
 
+    public boolean isFirstDraw() {
+        return isFirstDraw;
+    }
+
+    public void setFirstDraw(boolean firstDraw) {
+        isFirstDraw = firstDraw;
+    }
+
+    public void setRun(boolean run) {
+        isRun = run;
+    }
 }

@@ -1,6 +1,6 @@
 package com.kuo.kuoresume.listener;
 
-import com.kuo.kuoresume.compute.ViewCompute;
+import com.kuo.kuoresume.presents.ViewCompute;
 import com.kuo.kuoresume.script.GLCharacter;
 
 /**

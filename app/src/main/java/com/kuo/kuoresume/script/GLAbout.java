@@ -5,13 +5,11 @@ import android.graphics.RectF;
 
 import com.kuo.kuoresume.animation.SampleAnimation;
 import com.kuo.kuoresume.animation.SpriteController;
-import com.kuo.kuoresume.compute.ImageDefaultSize;
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImage;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLSquare;
-import com.kuo.kuoresume.object.GLTrees;
+import com.kuo.kuoresume.presents.ImageDefaultSize;
 
 import java.util.ArrayList;
 
@@ -56,12 +54,10 @@ public class GLAbout extends ComputeRect {
 
     private GLSquare obstacle_1, obstacle_2;
 
-    private GLTrees glTrees;
-
     private int musicAnimationCount = 0;
 
-    public GLAbout(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
-        super(context, viewComputeListener, objectListener);
+    public GLAbout(Context context, ViewComputeListener viewComputeListener) {
+        super(context, viewComputeListener);
 
         PLANT_RANGE_SIZE = 45;
 
@@ -193,7 +189,6 @@ public class GLAbout extends ComputeRect {
 
         glImageText1 = new GLImageText(context, "Live in Kaohsiung City", plantSize * 14, plantHeight / 6);
 
-        glTrees = new GLTrees(6, scaling, width, height);
     }
 
     private void createSquare() {
@@ -276,8 +271,6 @@ public class GLAbout extends ComputeRect {
     }
 
     public void computeRect() {
-
-        glTrees.computeTrees(dstRect);
 
         buddha.computeDstRect(dstRect);
 

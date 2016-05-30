@@ -3,7 +3,6 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImage;
 
@@ -19,8 +18,8 @@ public class GLBackground extends ComputeRect {
 
     private GLImage bg_1, officeComputer, officeDoor;
 
-    public GLBackground(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
-        super(context, viewComputeListener, objectListener);
+    public GLBackground(Context context, ViewComputeListener viewComputeListener) {
+        super(context, viewComputeListener);
 
         BACKGROUND_WIDTH = BACKGROUND_WIDTH * viewComputeListener.getScaling();
         BACKGROUND_HEIGHT = BACKGROUND_HEIGHT * viewComputeListener.getScaling();

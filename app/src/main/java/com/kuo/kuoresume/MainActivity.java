@@ -1,31 +1,23 @@
 package com.kuo.kuoresume;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.ViewGroup;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
 
-import com.kuo.kuoresume.dialog.DialogContact;
-import com.kuo.kuoresume.dialog.DialogProgress;
 import com.kuo.kuoresume.listener.ActivityListener;
 import com.kuo.kuoresume.view.GLResumeView;
 import com.kuo.kuoresume.view.LoadingScreen;
 
 public class MainActivity extends AppCompatActivity implements ActivityListener {
 
-    private ProgressDialog progressDialog;
     private GLResumeView glResumeView;
-
-    private Dialog dialog;
 
     private LoadingScreen loadingScreen;
 
@@ -38,22 +30,25 @@ public class MainActivity extends AppCompatActivity implements ActivityListener 
 
         glResumeView = (GLResumeView) findViewById(R.id.glResumeView);
         glResumeView.setGLRenderer(this, this);
+        glResumeView.setOnGLViewListener(onGLViewListener);
 
-        Log.d("onCreate", "true");
+        loadingScreen = (LoadingScreen) findViewById(R.id.loadingScreen);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         glResumeView.onPause();
-        Log.d("onPause", "true");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         glResumeView.onResume();
-        Log.d("onResume", "true");
+
+        loadingScreen.setRun(true);
+        loadingScreen.postInvalidate();
+        loadingScreen.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -62,19 +57,14 @@ public class MainActivity extends AppCompatActivity implements ActivityListener 
     }
 
     @Override
-    public ProgressDialog getProgressDialog() {
-        return progressDialog;
-    }
-
-    @Override
-    public AppCompatActivity getActivity() {
-        return this;
-    }
-
-    @Override
     public void showDialogContact() {
-        DialogContact dialogContact = new DialogContact();
-        dialogContact.show(getSupportFragmentManager(), "contact");
+        //DialogContact dialogContact = new DialogContact();
+        //dialogContact.show(getSupportFragmentManager(), "contact");
+
+        Intent intent = new Intent();
+        intent.setClass(this, ResumeActivity.class);
+        startActivity(intent);
+
     }
 
     @Override
@@ -91,17 +81,26 @@ public class MainActivity extends AppCompatActivity implements ActivityListener 
         startActivity(browserIntent);
     }
 
-    DialogProgress dialogProgress = new DialogProgress();
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
 
-    @Override
-    public void showProgress() {
-        dialogProgress.show(getSupportFragmentManager(), "dialog");
-    }
+            if(msg.what == 0) {
+                loadingScreen.setRun(false);
+                loadingScreen.setVisibility(View.GONE);
+            }
+        }
+    };
 
-    @Override
-    public void dismissProgrees() {
-        dialogProgress.dismiss();
-    }
+    private GLResumeView.OnGLViewListener onGLViewListener = new GLResumeView.OnGLViewListener() {
+        @Override
+        public void onFirstDraw() {
 
+            Message message = handler.obtainMessage();
+            message.what = 0;
+            handler.sendMessage(message);
+        }
+    };
 
 }

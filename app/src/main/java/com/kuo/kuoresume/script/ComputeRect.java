@@ -3,7 +3,6 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 
 /**
@@ -21,17 +20,13 @@ public class ComputeRect {
 
     protected ViewComputeListener viewComputeListener;
 
-    protected ObjectListener objectListener;
-
     protected Context context;
 
-    public ComputeRect(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
+    public ComputeRect(Context context, ViewComputeListener viewComputeListener) {
 
         this.context = context;
 
         this.viewComputeListener = viewComputeListener;
-
-        this.objectListener = objectListener;
     }
 
     public void setSrcRect(float left, float top, float right, float bottom) {

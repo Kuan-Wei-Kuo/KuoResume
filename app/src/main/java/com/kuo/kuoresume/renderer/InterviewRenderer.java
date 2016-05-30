@@ -6,15 +6,15 @@ import android.graphics.RectF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
+import android.util.Log;
 import android.view.MotionEvent;
 
-import com.kuo.kuoresume.compute.ImageDefaultSize;
-import com.kuo.kuoresume.compute.ViewCompute;
 import com.kuo.kuoresume.listener.ActivityListener;
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
-import com.kuo.kuoresume.object.GLSquare;
 import com.kuo.kuoresume.object.GLImage;
+import com.kuo.kuoresume.object.GLSquare;
+import com.kuo.kuoresume.presents.ImageDefaultSize;
+import com.kuo.kuoresume.presents.ViewCompute;
 import com.kuo.kuoresume.script.GLAbout;
 import com.kuo.kuoresume.script.GLBackground;
 import com.kuo.kuoresume.script.GLCharacter;
@@ -50,8 +50,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     Context mContext;
     long mLastTime;
 
-    ObjectListener objectListener;
-
     ViewCompute viewCompute;
 
     GLSquare glSquare;
@@ -68,20 +66,23 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
     GLMessage glMessage;
     ActivityListener activityListener;
 
-    public InterviewRenderer(Context context, ObjectListener objectListener, ActivityListener activityListener) {
+    boolean isFirstDraw = true;
+
+    public InterviewRenderer(Context context, ActivityListener activityListener) {
         mContext = context;
         mLastTime = System.currentTimeMillis() + 100;
-        this.objectListener = objectListener;
         this.activityListener = activityListener;
 
         viewCompute = new ViewCompute();
 
-        activityListener.showProgress();
+        //activityListener.showProgress();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         glSetting = new GLSetting(mContext, 31);
+
+        Log.d("isFirst", isFirstDraw + "");
     }
 
     @Override
@@ -118,26 +119,31 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        glBackground = new GLBackground(mContext, this, objectListener);
-        glBackground_1 = new GLBackground(mContext, this, objectListener);
+        glBackground = new GLBackground(mContext, this);
+        glBackground_1 = new GLBackground(mContext, this);
 
         glSquare = new GLSquare(new RectF(0, 500, 200, 700), new float[] {1, 0.5f, 1, 1});
 
-        glCharacter = new GLCharacter(mContext, this, objectListener);
-        glInterview = new GLInterview(mContext, this, objectListener);
-        glAbout = new GLAbout(mContext, this, objectListener);
-        glSkill = new GLSkill(mContext, this, objectListener);
-        glExperience = new GLExperience(mContext, this, objectListener);
-        glMessage = new GLMessage(mContext, this, objectListener, activityListener);
+        glCharacter = new GLCharacter(mContext, this);
+        glInterview = new GLInterview(mContext, this);
+        glAbout = new GLAbout(mContext, this);
+        glSkill = new GLSkill(mContext, this);
+        glExperience = new GLExperience(mContext, this);
+        glMessage = new GLMessage(mContext, this, activityListener);
 
         computeCurrentRect();
         computeRect();
 
-        activityListener.dismissProgrees();
+        //activityListener.dismissProgrees();
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
+
+        if(isFirstDraw) {
+            isFirstDraw = false;
+            onRendererListener.onFirstDraw();
+        }
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -157,10 +163,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
         bg.draw(mMVPMatrix, 5);
 
-        //glBackground.draw(mMVPMatrix);
-
-        //glBackground_1.draw(mMVPMatrix);
-
         glInterview.draw(mMVPMatrix);
 
         glAbout.draw(mMVPMatrix);
@@ -172,8 +174,6 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
         glMessage.draw(mMVPMatrix);
 
         glCharacter.draw(mMVPMatrix);
-
-        //glSquare.draw(mMVPMatrix);
     }
 
     PointF pointF = new PointF(0, 0);
@@ -343,7 +343,17 @@ public class InterviewRenderer implements Renderer, ViewComputeListener {
 
     public void onResume() {
         /* Do stuff to resume the renderer */
+        isFirstDraw = true;
         mLastTime = System.currentTimeMillis();
     }
 
+    public interface OnRendererListener {
+        void onFirstDraw();
+    }
+
+    private OnRendererListener onRendererListener;
+
+    public void setOnGLViewListener(OnRendererListener onRendererListener) {
+        this.onRendererListener = onRendererListener;
+    }
 }

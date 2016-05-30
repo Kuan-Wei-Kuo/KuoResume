@@ -3,14 +3,11 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
-import com.kuo.kuoresume.compute.ImageDefaultSize;
 import com.kuo.kuoresume.data.ChartData;
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLChartRect;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLSquare;
-import com.kuo.kuoresume.object.GLText;
 import com.kuo.kuoresume.object.GLImage;
 
 import java.util.ArrayList;
@@ -50,8 +47,8 @@ public class GLSkill extends ComputeRect{
 
     private GLSquare bg_yellow_square, bg_coffee_square;
 
-    public GLSkill(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
-        super(context, viewComputeListener, objectListener);
+    public GLSkill(Context context, ViewComputeListener viewComputeListener) {
+        super(context, viewComputeListener);
 
         PLANT_RANGE_SIZE = 40;
 

@@ -3,7 +3,6 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImage;
 import com.kuo.kuoresume.object.GLSquare;
@@ -20,8 +19,8 @@ public class GLInterview extends ComputeRect{
 
     private GLSquare ground;
 
-    public GLInterview(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
-        super(context, viewComputeListener, objectListener);
+    public GLInterview(Context context, ViewComputeListener viewComputeListener) {
+        super(context, viewComputeListener);
 
         INTERVIEW_IMAGE_WIDTH = INTERVIEW_IMAGE_WIDTH * viewComputeListener.getScaling();
         INTERVIEW_IMAGE_HEIGHT = INTERVIEW_IMAGE_HEIGHT * viewComputeListener.getScaling();

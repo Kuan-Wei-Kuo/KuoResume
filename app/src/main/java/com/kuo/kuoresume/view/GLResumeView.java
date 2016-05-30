@@ -5,17 +5,14 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.kuo.kuoresume.compute.HolderBitmap;
-import com.kuo.kuoresume.compute.ViewCompute;
 import com.kuo.kuoresume.listener.ActivityListener;
-import com.kuo.kuoresume.listener.ObjectListener;
+import com.kuo.kuoresume.presents.HolderBitmap;
 import com.kuo.kuoresume.renderer.InterviewRenderer;
-import com.kuo.kuoresume.script.Human;
 
 /**
  * Created by Kuo on 2016/5/4.
  */
-public class GLResumeView extends GLSurfaceView implements ObjectListener {
+public class GLResumeView extends GLSurfaceView {
 
     private InterviewRenderer mInterviewRenderer;
 
@@ -40,7 +37,8 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
 
         //setBackgroundResource(R.mipmap.bg_1);
 
-        mInterviewRenderer = new InterviewRenderer(context, this, activityListener);
+        mInterviewRenderer = new InterviewRenderer(context, activityListener);
+        mInterviewRenderer.setOnGLViewListener(onRendererListener);
         setRenderer(mInterviewRenderer);
     }
 
@@ -62,18 +60,21 @@ public class GLResumeView extends GLSurfaceView implements ObjectListener {
         mInterviewRenderer.onResume();
     }
 
-    @Override
-    public HolderBitmap getHolderBitmap() {
-        return holderBitmap;
+    public interface OnGLViewListener {
+        void onFirstDraw();
     }
 
-    @Override
-    public ViewCompute getViewCompute() {
-        return null;
+    private OnGLViewListener onGLViewListener;
+
+    public void setOnGLViewListener(OnGLViewListener onGLViewListener) {
+        this.onGLViewListener = onGLViewListener;
     }
 
-    @Override
-    public Human getHuman() {
-        return null;
-    }
+    private InterviewRenderer.OnRendererListener onRendererListener = new InterviewRenderer.OnRendererListener() {
+        @Override
+        public void onFirstDraw() {
+            if (onGLViewListener != null)
+                onGLViewListener.onFirstDraw();
+        }
+    };
 }

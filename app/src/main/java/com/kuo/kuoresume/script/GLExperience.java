@@ -3,7 +3,6 @@ package com.kuo.kuoresume.script;
 import android.content.Context;
 import android.graphics.RectF;
 
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImageText;
 import com.kuo.kuoresume.object.GLSquare;
@@ -52,8 +51,8 @@ public class GLExperience extends ComputeRect {
 
     private GLImage experienceIcon;
 
-    public GLExperience(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
-        super(context, viewComputeListener, objectListener);
+    public GLExperience(Context context, ViewComputeListener viewComputeListener) {
+        super(context, viewComputeListener);
 
         PLANT_RANGE_SIZE = 70;
 

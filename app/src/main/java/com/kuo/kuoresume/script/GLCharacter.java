@@ -5,7 +5,6 @@ import android.graphics.RectF;
 
 import com.kuo.kuoresume.animation.SampleAnimation;
 import com.kuo.kuoresume.animation.SpriteController;
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImage;
 import com.kuo.kuoresume.object.RectCollider;
@@ -51,8 +50,8 @@ public class GLCharacter extends ComputeRect {
 
     private GLImage characterRun, characterIdle, characterBoat, characterJump;
 
-    public GLCharacter(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener) {
-        super(context, viewComputeListener, objectListener);
+    public GLCharacter(Context context, ViewComputeListener viewComputeListener) {
+        super(context, viewComputeListener);
 
         CHARACTER_RUN_WIDTH = CHARACTER_RUN_WIDTH * viewComputeListener.getScaling();
         CHARACTER_RUN_HEIGHT = CHARACTER_RUN_HEIGHT * viewComputeListener.getScaling();

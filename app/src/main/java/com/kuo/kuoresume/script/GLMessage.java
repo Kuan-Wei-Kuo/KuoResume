@@ -6,12 +6,9 @@ import android.view.MotionEvent;
 
 import com.kuo.kuoresume.animation.SpriteController;
 import com.kuo.kuoresume.listener.ActivityListener;
-import com.kuo.kuoresume.listener.ObjectListener;
 import com.kuo.kuoresume.listener.ViewComputeListener;
 import com.kuo.kuoresume.object.GLImage;
 import com.kuo.kuoresume.object.GLSquare;
-
-import java.util.ArrayList;
 
 /**
  * Created by Kuo on 2016/5/9.
@@ -39,8 +36,8 @@ public class GLMessage extends ComputeRect {
 
     private ActivityListener activityListener;
 
-    public GLMessage(Context context, ViewComputeListener viewComputeListener, ObjectListener objectListener, ActivityListener activityListener) {
-        super(context, viewComputeListener, objectListener);
+    public GLMessage(Context context, ViewComputeListener viewComputeListener, ActivityListener activityListener) {
+        super(context, viewComputeListener);
 
         PLANT_RANGE_SIZE = 20;
 
