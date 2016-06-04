@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.kuo.mychartlib.listener.ChartListener;
 import com.kuo.mychartlib.presenter.ChartCompute;
-import com.kuo.mychartlib.renderer.PieChartRenderer;
 
 /*
  * Created by Kuo on 2016/4/15.
@@ -19,9 +18,8 @@ public class PieComputeScroll extends ComputeScroll {
     }
 
     @Override
-    protected void startScroll(float distanceX, float distanceY, ChartCompute chartCompute) {
-        super.startScroll(distanceX, distanceY, chartCompute);
-
+    protected boolean startScroll(float distanceX, float distanceY, ChartCompute chartCompute) {
+        return super.startScroll(distanceX, distanceY, chartCompute);
     }
 
     @Override

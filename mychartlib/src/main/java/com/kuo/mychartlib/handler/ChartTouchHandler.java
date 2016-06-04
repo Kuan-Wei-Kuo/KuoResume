@@ -1,7 +1,6 @@
 package com.kuo.mychartlib.handler;
 
 import android.content.Context;
-import android.support.v4.view.ViewCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -69,36 +68,35 @@ public class ChartTouchHandler {
 
     public boolean onTouchEvent(MotionEvent event, ViewParent viewParent) {
 
+        this.viewParent = viewParent;
+
+        boolean isInvalidate = false;
+
         if(enable) {
 
-            this.viewParent = viewParent;
+            isInvalidate = gestureDetector.onTouchEvent(event);
+            isInvalidate = scaleGestureDetector.onTouchEvent(event) || isInvalidate;
 
-            disallowParentInterceptTouchEvent();
+            isInvalidate = computeSelect.onTouchEvent(event, chartListener.getSelectData()) || isInvalidate;
 
-            boolean isInvalidate = scaleGestureDetector.onTouchEvent(event) && gestureDetector.onTouchEvent(event);
+            if(scaleGestureDetector.isInProgress())
+                disallowParentInterceptTouchEvent();
 
-            boolean canSelect = computeSelect.onTouchEvent(event, chartListener.getSelectData());
-
-            if(isInvalidate || canSelect)
-                ViewCompat.postInvalidateOnAnimation(chartListener.getView());
-
-            return true;
         }
 
-        return false;
+        return isInvalidate;
     }
 
     private void disallowParentInterceptTouchEvent() {
-        if (null != viewParent)
+
+        if (viewParent != null)
             viewParent.requestDisallowInterceptTouchEvent(true);
     }
 
     private void allowParentInterceptTouchEvent() {
-        if (null != viewParent) {
+
+        if (viewParent != null) {
             if (!computeScroll.isCanScrollX()
-                    && !scaleGestureDetector.isInProgress()) {
-                viewParent.requestDisallowInterceptTouchEvent(false);
-            } else if (!computeScroll.isCanScrollY()
                     && !scaleGestureDetector.isInProgress()) {
                 viewParent.requestDisallowInterceptTouchEvent(false);
             }
@@ -130,11 +128,7 @@ public class ChartTouchHandler {
                 case VERTICAL:
                     computeZoom.computeVerticalZoom(scale, detector.getFocusX(), detector.getFocusY(), chartCompute);
                     break;
-
             }
-
-            allowParentInterceptTouchEvent();
-
             return true;
         }
     }
@@ -145,6 +139,7 @@ public class ChartTouchHandler {
         public boolean onDown(MotionEvent e) {
 
             computeScroll.stopAnimation();
+            disallowParentInterceptTouchEvent();
 
             return true;
         }
@@ -154,6 +149,8 @@ public class ChartTouchHandler {
 
             computeScroll.startScroll(distanceX, distanceY, chartCompute);
             allowParentInterceptTouchEvent();
+
+            //if(computeScroll.startScroll(distanceX, distanceY, chartCompute)) {}
 
             return true;
         }

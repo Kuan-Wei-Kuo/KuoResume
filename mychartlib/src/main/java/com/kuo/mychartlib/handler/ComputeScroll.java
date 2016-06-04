@@ -1,6 +1,7 @@
 package com.kuo.mychartlib.handler;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Scroller;
 
 import com.kuo.mychartlib.model.Viewport;
@@ -22,7 +23,7 @@ public class ComputeScroll {
     /**
      * 這邊並不打算使用Scroller去做滑動的運算，直接算出當前位置可以避免一些問題。
      * */
-    protected void startScroll(float distanceX, float distanceY, ChartCompute chartCompute) {
+    protected boolean startScroll(float distanceX, float distanceY, ChartCompute chartCompute) {
 
         //為了多點觸碰的問題，我們滑動時使用distance來做主要方法。
         Viewport minViewport = chartCompute.getMinViewport();
@@ -33,31 +34,33 @@ public class ComputeScroll {
         float right  = left + curViewport.width();
         float bottom = top + curViewport.height();
 
-        boolean enableX = false;
-        boolean enableY = false;
-
         canScrollX = false;
         canScrollY = false;
 
         if(curViewport.left < minViewport.left && distanceX <= 0) {
+            Log.d("x", "1");
             canScrollX = true;
-            enableX = true;
         } else if(curViewport.right > minViewport.right && distanceX >= 0) {
+            Log.d("x", "2");
             canScrollX = true;
-            enableX = true;
         }
 
         if(curViewport.top < minViewport.top && distanceY <= 0) {
+            Log.d("y", "1");
             canScrollY = true;
-            enableY = true;
         } else if(curViewport.bottom > minViewport.bottom && distanceY >= 0) {
+            Log.d("y", "2");
             canScrollY = true;
-            enableY = true;
         }
 
+        Log.d("distanceX", "" +distanceX);
+        Log.d("distanceY", "" +distanceY);
 
-        if(enableX || enableY)
+
+        if(canScrollY || canScrollX)
             chartCompute.containsCurrentViewport(left, top, right, bottom);
+
+        return canScrollY || canScrollX;
     }
 
     /**

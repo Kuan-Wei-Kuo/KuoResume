@@ -76,8 +76,6 @@ public class ComputeZoom {
 
     private void setCurViewport(float left, float top, float right, float bottom, ChartCompute chartCompute) {
 
-        canZoom = false;
-
         if (right - left < chartCompute.getMinViewport().width()) {
 
             right = left + chartCompute.getMinViewport().width();
@@ -94,7 +92,6 @@ public class ComputeZoom {
 
             }
 
-            canZoom = true;
         }
 
         if (bottom - top < chartCompute.getMinViewport().height()) {
@@ -113,7 +110,6 @@ public class ComputeZoom {
 
             }
 
-            canZoom = true;
         }
 
         chartCompute.getCurViewport().left = Math.min(chartCompute.getMinViewport().left, left);
